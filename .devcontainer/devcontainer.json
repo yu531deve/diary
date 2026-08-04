@@ -1,0 +1,15 @@
+{
+  "name": "diary",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "james-yu.latex-workshop",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+  "remoteUser": "root"
+}
