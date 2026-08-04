@@ -1,0 +1,6 @@
+build/
+*.aux
+*.log
+*.synctex.gz
+node_modules/
+.DS_Store
