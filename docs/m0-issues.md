@@ -68,3 +68,9 @@ M0 の目的: **サンプル 1 問が「lint → PDF → HTML → SVG → サイ
 ---
 
 M0 完了後、M1 で並列解禁。M1 の主な内容: 分冊 PDF（夜間バッチ）、Pagefind 検索、分野索引ページ、kagakudai_inshi からの既存問題移行、誤植報告導線。
+
+## M0-11: ライセンス整備（public 公開に伴う必須対応）
+
+- ルート `LICENSE`: コード部分（site/ lint/ styles/ 等）は MIT。content/ 配下は content/LICENSE.md に従う旨を冒頭に明記
+- `content/LICENSE.md`: 問題コンテンツは個人利用のみ許可。再配布・商用利用・教育機関での配布は不可
+- 受け入れ条件: 2 ファイルが存在し、条文を Yu が最終レビューして承認する
