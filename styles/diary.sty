@@ -17,9 +17,10 @@
 %   ...
 %   \end{document}
 %
-% クラスオプションの代わりに、\documentclass の後で
+% クラスオプションの代わりに、\usepackage{diary} で読み込んだ後
+% （\diaryprintheading などモードを参照するマクロを使う前）に
 %   \diarysetmode{problem}  または  \diarysetmode{solution}
-% を \usepackage{diary} より前に呼んでもよい。
+% を呼んでモードを切り替えてもよい。
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{diary}[2026/08/06 v0.1 Diary common style skeleton]
@@ -30,27 +31,29 @@
 \RequirePackage{amssymb}
 
 % ---- モード管理 ----
-% \diarymode は "problem" または "solution" を保持する内部トークン
-\newcommand{\diary@mode}{problem}
+% \diary@mode / \diary@problemname / \diary@solutionname は \ifx で
+% トークン列を比較するため、すべて \def で定義する（\newcommand は
+% 生成するマクロを \long にしてしまい、\long でない \def との \ifx 比較が
+% 常に不一致になる。定義方法は必ず揃えること）。
+\def\diary@problemname{problem}
+\def\diary@solutionname{solution}
+\def\diary@mode{problem}
 
 \newcommand{\diarysetmode}[1]{%
   \def\diary@modearg{#1}%
   \ifx\diary@modearg\diary@problemname
-    \renewcommand{\diary@mode}{problem}%
+    \def\diary@mode{problem}%
   \else\ifx\diary@modearg\diary@solutionname
-    \renewcommand{\diary@mode}{solution}%
+    \def\diary@mode{solution}%
   \else
     \PackageError{diary}{Unknown mode '#1'. Use 'problem' or 'solution'}{%
       diarysetmode accepts only 'problem' or 'solution'.}%
   \fi\fi
 }
 
-\newcommand{\diary@problemname}{problem}
-\newcommand{\diary@solutionname}{solution}
-
 % ---- クラスオプション（\usepackage[problem]{diary} 形式）----
-\DeclareOption{problem}{\renewcommand{\diary@mode}{problem}}
-\DeclareOption{solution}{\renewcommand{\diary@mode}{solution}}
+\DeclareOption{problem}{\def\diary@mode{problem}}
+\DeclareOption{solution}{\def\diary@mode{solution}}
 \ProcessOptions\relax
 
 % ---- モードに応じた見出し語 ----
