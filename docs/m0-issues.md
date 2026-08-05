@@ -13,8 +13,9 @@ M0 の目的: **サンプル 1 問が「lint → PDF → HTML → SVG → サイ
 
 - `meta.yaml` スキーマ定義（docs/requirements.md §5 準拠）
 - `fields.yaml`（大分野 > 中分野の初版辞書）と `tags.yaml`（空でよい）
-- `docs/difficulty.md` の雛形（基準文は Yu が記入）
+- `docs/difficulty.md` の雛形（初版は Claude が標準的な基準で記入。後から編集する運用）
 - 受け入れ条件: スキーマのバリデーションスクリプトがサンプル meta.yaml を通す
+- 受け入れ条件: 辞書変更時に既存問題の linter エラーが分かりやすく出ること（どのファイルの・どの値が辞書と不一致か、近い候補は何かが一読で分かる）
 
 ## M0-3: diary.sty 初版
 
