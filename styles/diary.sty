@@ -1,0 +1,71 @@
+% diary.sty — Diary プロジェクト共通スタイル（骨格）
+%
+% lualatex + luatexja（jlreq クラス）を前提とする。
+% content/ 配下の .tex は本文のみを書き、ビルド側がこの sty を適用する。
+%
+% 【現段階のスコープ（#15）】
+%   - problem / solution の 2 モード切替（クラスオプション or マクロ）
+%   - A4・和文での最小コンパイル
+% 【次 issue（#16）のスコープ】
+%   - ライセンスフッター
+%   - \diarytitle マクロ
+%
+% 使い方:
+%   \documentclass[paper=a4]{jlreq}
+%   \usepackage[problem]{diary}   % または [solution]
+%   \begin{document}
+%   ...
+%   \end{document}
+%
+% クラスオプションの代わりに、\documentclass の後で
+%   \diarysetmode{problem}  または  \diarysetmode{solution}
+% を \usepackage{diary} より前に呼んでもよい。
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{diary}[2026/08/06 v0.1 Diary common style skeleton]
+
+% ---- 依存パッケージ ----
+\RequirePackage{luatexja}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+
+% ---- モード管理 ----
+% \diarymode は "problem" または "solution" を保持する内部トークン
+\newcommand{\diary@mode}{problem}
+
+\newcommand{\diarysetmode}[1]{%
+  \def\diary@modearg{#1}%
+  \ifx\diary@modearg\diary@problemname
+    \renewcommand{\diary@mode}{problem}%
+  \else\ifx\diary@modearg\diary@solutionname
+    \renewcommand{\diary@mode}{solution}%
+  \else
+    \PackageError{diary}{Unknown mode '#1'. Use 'problem' or 'solution'}{%
+      diarysetmode accepts only 'problem' or 'solution'.}%
+  \fi\fi
+}
+
+\newcommand{\diary@problemname}{problem}
+\newcommand{\diary@solutionname}{solution}
+
+% ---- クラスオプション（\usepackage[problem]{diary} 形式）----
+\DeclareOption{problem}{\renewcommand{\diary@mode}{problem}}
+\DeclareOption{solution}{\renewcommand{\diary@mode}{solution}}
+\ProcessOptions\relax
+
+% ---- モードに応じた見出し語 ----
+% 現段階では見出し文言の切替のみ。タイトル・フッターは #16 で追加する。
+\newcommand{\diaryheading}{%
+  \ifx\diary@mode\diary@problemname
+    問題%
+  \else
+    解答%
+  \fi
+}
+
+% \begin{document} の直後に見出しを出したい場合に呼ぶ補助マクロ
+\newcommand{\diaryprintheading}{%
+  {\bfseries\Large \diaryheading}\par\medskip
+}
+
+\endinput
