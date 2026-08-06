@@ -1,8 +1,13 @@
 .PHONY: lint pdf html build preview
 
 # lint: content/**/*.tex の禁止コマンドチェックなど、linter 一式を実行する。
-lint:
+#       lint/node_modules が無い場合のみ npm ci --prefix lint を自動実行する
+#       （order-only 依存。存在すれば再インストールせず高速に lint のみ走る）。
+lint: | lint/node_modules
 	node lint/check-forbidden-commands.js
+
+lint/node_modules:
+	npm ci --prefix lint
 
 # pdf: content/ を走査し、status: published の問題ごとに
 #      dist/pdf/{id}/problem.pdf・solution.pdf を生成する。
