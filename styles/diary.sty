@@ -39,6 +39,10 @@
 % にしか描画されなかった（jlreq との非互換）。atbegshi 単体は jlreq 配下
 % でも全ページで動作することを確認したため、これを直接使う。
 \RequirePackage{atbegshi}
+% content/ 側の本文で tikzpicture 環境を使えるようにする（#36）。
+% よく使う tikzlibrary のみ読み込む（過剰な追加はしない）。
+\RequirePackage{tikz}
+\usetikzlibrary{calc,intersections}
 
 % ---- モード管理 ----
 % \diary@mode / \diary@problemname / \diary@solutionname は \ifx で
