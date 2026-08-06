@@ -19,9 +19,14 @@
  * HTML 変換向けに再定義している（ライセンスフッターの焼き込みは
  * PDF 専用の仕組みのため HTML 側には移植しない）。
  *
- * TikZ（tikzpicture）の正確な変換は #22 のスコープ外。LaTeXML 本体の
- * tikz サポートで警告付きのまま素通しされることが多いが、失敗しても
- * ビルド全体は exit 0 のまま継続する（SVG 化は #23、フォールバックは #24）。
+ * TikZ（tikzpicture）は LaTeXML にそのまま処理させると壊れやすいため
+ * （#22 で確認済み）、#23 で dvisvgm による事前生成に置き換えた。
+ * 具体的には、LaTeXML に渡す本文コピー（content/ 配下の原本は変更しない）
+ * の中で tikzpicture 環境をプレースホルダーの地の文に差し替え、
+ * 抜き出した tikz ソースは別途 lualatex（DVI 出力）→ dvisvgm で
+ * dist/html/{id}/fig-{n}.svg として生成する。LaTeXML の変換が終わった後、
+ * 出力 HTML 内のプレースホルダーを <img src="fig-n.svg"> に置換する
+ * （詳細は scripts/tikz-svg.js）。フォールバックは #24。
  *
  * 使い方:
  *   node scripts/build-html.js
@@ -30,6 +35,11 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
+const {
+  extractTikzPictures,
+  buildSvgsForId,
+  replacePlaceholdersInHtml,
+} = require("./tikz-svg");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const CONTENT_DIR = path.join(REPO_ROOT, "content");
@@ -65,22 +75,52 @@ function findProblemDirs() {
     .sort();
 }
 
-function buildWrapperTex(mode, bodyPath) {
+function buildWrapperTex(mode, svgStrippedBodyPath) {
   return [
     "\\documentclass[paper=a4]{jlreq}",
     `\\usepackage[${mode}]{diary}`,
     "\\begin{document}",
-    `\\input{${bodyPath}}`,
+    `\\input{${svgStrippedBodyPath}}`,
     "\\end{document}",
     "",
   ].join("\n");
 }
 
-function convertOne(id, mode, bodyPath, failures, generated) {
+// id 単位で problem → solution の順に図番号を通番で振るためのカウンタ。
+// 呼び出し側（main）が id ごとに { next: 1 } を渡す。
+function convertOne(id, mode, bodyPath, failures, generated, figCounter) {
   const workDir = path.join(WORK_DIR, id, mode);
   fs.mkdirSync(workDir, { recursive: true });
+
+  // tikzpicture を抽出し、LaTeXML に渡す本文コピーではプレースホルダーの
+  // 地の文に差し替える（content/ 配下の原本は一切変更しない）。
+  const bodyText = fs.readFileSync(bodyPath, "utf8");
+  const { modifiedText, figures, nextIndex } = extractTikzPictures(
+    bodyText,
+    "fig",
+    figCounter.next
+  );
+  figCounter.next = nextIndex;
+
+  const svgStrippedBodyPath = path.join(workDir, "body.tex");
+  fs.writeFileSync(svgStrippedBodyPath, modifiedText);
+
+  const outDir = path.join(DIST_HTML_DIR, id);
+
+  // 抽出した図を dvisvgm で SVG 化する（ハッシュキャッシュ付き）。
+  if (figures.length > 0) {
+    const svgWorkDir = path.join(WORK_DIR, id, "svg");
+    const { failed } = buildSvgsForId(id, figures, outDir, svgWorkDir);
+    if (failed.length > 0) {
+      failures.push({ id, mode: `${mode}(svg)` });
+      console.error(
+        `[fail] ${id} ${mode}: SVG 生成に失敗した図があります (${failed.map((f) => f.name).join(", ")})`
+      );
+    }
+  }
+
   const wrapperPath = path.join(workDir, "wrapper.tex");
-  fs.writeFileSync(wrapperPath, buildWrapperTex(mode, bodyPath));
+  fs.writeFileSync(wrapperPath, buildWrapperTex(mode, svgStrippedBodyPath));
 
   const outPath = path.join(workDir, "out.html");
 
@@ -102,7 +142,6 @@ function convertOne(id, mode, bodyPath, failures, generated) {
       }
     );
   } catch (err) {
-    // TikZ 未対応等の警告のみで exit 0 になるケースが大半だが、
     // latexmlc が非 0 で終了した（=致命的エラー）場合はここに来る。
     failures.push({ id, mode });
     console.error(`[fail] ${id} ${mode}: latexmlc 変換失敗`);
@@ -119,10 +158,14 @@ function convertOne(id, mode, bodyPath, failures, generated) {
     return false;
   }
 
-  const outDir = path.join(DIST_HTML_DIR, id);
+  let html = fs.readFileSync(outPath, "utf8");
+  if (figures.length > 0) {
+    html = replacePlaceholdersInHtml(html, figures);
+  }
+
   fs.mkdirSync(outDir, { recursive: true });
   const finalPath = path.join(outDir, `${mode}.html`);
-  fs.copyFileSync(outPath, finalPath);
+  fs.writeFileSync(finalPath, html);
   generated.push(finalPath);
   console.log(`[ok] ${id} ${mode} -> ${path.relative(REPO_ROOT, finalPath)}`);
   return true;
@@ -164,6 +207,7 @@ function main() {
       continue;
     }
 
+    const figCounter = { next: 1 };
     for (const mode of MODES) {
       const bodyPath = path.join(dir, `${mode}.tex`);
       if (!fs.existsSync(bodyPath)) {
@@ -171,7 +215,7 @@ function main() {
         console.error(`[fail] ${id} ${mode}: ${mode}.tex が見つかりません`);
         continue;
       }
-      convertOne(id, mode, bodyPath, failures, generated);
+      convertOne(id, mode, bodyPath, failures, generated, figCounter);
     }
   }
 
