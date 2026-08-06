@@ -122,10 +122,21 @@ function main() {
     for (const v of allViolations) {
       process.stderr.write(`${v.file}:${v.line}: forbidden command \\${v.command}\n`);
     }
-    process.exit(1);
   }
 
-  process.exit(0);
+  // Makefile の `lint` ターゲットはこのスクリプトのみを呼ぶ単一コマンドの
+  // ため、引数なしの通常走査時（= `make lint`）に限り、meta.yaml の
+  // スキーマ検証・辞書照合・id 整合チェック（check-meta.js）もあわせて
+  // 実行し、このスクリプトを lint 一式のまとめ役とする。
+  // 引数ありの fixture テスト実行時は禁止コマンドチェックの検証に
+  // 専念させるため実行しない。
+  let metaExitCode = 0;
+  if (args.length === 0) {
+    const checkMeta = require("./check-meta.js");
+    metaExitCode = checkMeta.run([]);
+  }
+
+  process.exit(allViolations.length > 0 || metaExitCode !== 0 ? 1 : 0);
 }
 
 main();
