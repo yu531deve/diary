@@ -1,0 +1,21 @@
+% diary.sty 検証用: solution モード最小コンパイル
+% （\diarysetmode によるモード切替の検証を兼ねる。クラスオプションは使わない）
+\documentclass[paper=a4]{jlreq}
+\usepackage{diary}
+\diarysetmode{solution}
+
+\begin{document}
+\diaryprintheading
+
+$f(x) = x^2 - 3x + 2 = (x-1)(x-2)$ より、$f(x) = 0$ を満たす $x$ は $x = 1, 2$ である。
+
+次に、定積分を計算する。
+\[
+  \int_{1}^{2} f(x)\,dx
+  = \left[ \frac{x^3}{3} - \frac{3x^2}{2} + 2x \right]_{1}^{2}
+  = -\frac{1}{6}
+\]
+
+したがって、求める値は $-\dfrac{1}{6}$ である。
+
+\end{document}
