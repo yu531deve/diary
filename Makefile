@@ -17,9 +17,15 @@ pdf:
 html:
 	node scripts/build-html.js
 
-# preview: site/ の Astro 開発サーバーをローカルで起動する（トップページ仮実装のみ）。
+# preview: site/ の Astro 開発サーバーをローカルで起動する。
 preview:
 	cd site && npm install && npm run dev
 
-# 以下は将来追加予定（未実装）:
-# build:    lint + pdf + html + サイトビルドをまとめて実行する
+# build: lint → pdf → html → サイトビルドを直列実行する（#27）。
+#        make は既定でターゲットごとに新しいシェルを起動し、いずれかの
+#        コマンドが非ゼロで終了すればそこで即座に停止する（-e 相当）ため、
+#        依存関係の列挙だけで「途中失敗で即 exit 非ゼロ」が満たされる。
+#        サイトのビルドは dist/pdf・dist/html の生成物に依存する
+#        （site/src/lib/dist-content.ts）ため、必ずこの順序を保つ。
+build: lint pdf html
+	cd site && npm ci && npm run build
