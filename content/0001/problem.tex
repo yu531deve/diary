@@ -1,0 +1,23 @@
+\diarytitle{0001}{放物線と直線で囲まれた面積}
+
+座標平面上に放物線 $C: y = x^2$ と直線 $\ell: y = x + 2$ がある。
+
+\begin{enumerate}
+  \item $C$ と $\ell$ の共有点の座標をすべて求めよ。
+  \item $C$ と $\ell$ で囲まれた図形の面積 $S$ を求めよ。
+\end{enumerate}
+
+\begin{center}
+\begin{tikzpicture}[domain=-2.5:2.5, scale=0.9]
+  \draw[->] (-2.5,0) -- (2.5,0) node[right] {$x$};
+  \draw[->] (0,-1) -- (0,5) node[above] {$y$};
+  \draw[thick] plot (\x, {\x*\x}) node[right] {$y=x^2$};
+  \draw[thick] plot (\x, {\x+2}) node[above right] {$y=x+2$};
+  \coordinate (P1) at (-1,1);
+  \coordinate (P2) at (2,4);
+  \fill[red] (P1) circle (2pt) node[left] {$(-1,1)$};
+  \fill[red] (P2) circle (2pt) node[above] {$(2,4)$};
+  \draw[dashed] (P1) -- ($(P1)+(0,-1)$);
+  \draw[dashed] (P2) -- ($(P2)+(0,-4)$);
+\end{tikzpicture}
+\end{center}

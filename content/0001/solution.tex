@@ -1,0 +1,44 @@
+\diarytitle{0001}{放物線と直線で囲まれた面積}
+
+\begin{enumerate}
+  \item 共有点は $x^2 = x + 2$ の解に対応する。
+    \[
+      x^2 - x - 2 = 0 \iff (x+1)(x-2) = 0 \iff x = -1,\ 2
+    \]
+    それぞれ $\ell$（または $C$）に代入して
+    \[
+      x=-1 \implies y = 1, \qquad x=2 \implies y = 4
+    \]
+    したがって共有点は $(-1,\ 1)$、$(2,\ 4)$ である。
+
+  \item $-1 \le x \le 2$ の範囲では $x+2 \ge x^2$（区間の内部で
+    $x^2 - x - 2 = (x+1)(x-2) \le 0$ となることから確認できる）ので、
+    $\ell$ が $C$ の上側にある。よって
+    \[
+      S = \int_{-1}^{2} \bigl\{ (x+2) - x^2 \bigr\}\,dx
+        = \int_{-1}^{2} \bigl\{ -(x+1)(x-2) \bigr\}\,dx.
+    \]
+    $\displaystyle \int_{\alpha}^{\beta} -(x-\alpha)(x-\beta)\,dx
+      = \frac{(\beta-\alpha)^3}{6}$ の公式（$\alpha=-1,\ \beta=2$）を用いると
+    \[
+      S = \frac{(2-(-1))^3}{6} = \frac{3^3}{6} = \frac{27}{6} = \frac{9}{2}.
+    \]
+
+    \textbf{検算}（公式を使わず直接計算する）:
+    \[
+      \int_{-1}^{2} (-x^2+x+2)\,dx
+      = \left[ -\frac{x^3}{3} + \frac{x^2}{2} + 2x \right]_{-1}^{2}.
+    \]
+    $x=2$ のとき $-\dfrac{8}{3} + 2 + 4 = -\dfrac{8}{3} + 6 = \dfrac{10}{3}$。
+
+    $x=-1$ のとき $-\left(-\dfrac{1}{3}\right) + \dfrac{1}{2} - 2
+      = \dfrac{1}{3} + \dfrac{1}{2} - 2 = \dfrac{2}{6} + \dfrac{3}{6} - \dfrac{12}{6}
+      = -\dfrac{7}{6}$。
+
+    よって
+    \[
+      S = \frac{10}{3} - \left(-\frac{7}{6}\right)
+        = \frac{20}{6} + \frac{7}{6} = \frac{27}{6} = \frac{9}{2}.
+    \]
+    公式を用いた結果と一致するので、$S = \dfrac{9}{2}$ である。
+\end{enumerate}
