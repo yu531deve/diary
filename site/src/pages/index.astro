@@ -1,0 +1,88 @@
+---
+// トップページ（仮）。content/ 配下の status: published な問題への
+// リンクを一覧表示するだけの最小実装。/problems/{id}/ ・/solutions/{id}/
+// の実ページは #26・#27 で実装する。
+import fs from "node:fs";
+import path from "node:path";
+
+const contentDir = path.resolve("../content");
+
+type ProblemMeta = {
+  id: string;
+  title: string;
+  status: string;
+};
+
+function parseMetaYaml(text: string): ProblemMeta {
+  const get = (key: string) => {
+    const m = text.match(new RegExp(`^${key}:\\s*"?([^"\n]+)"?\\s*$`, "m"));
+    return m ? m[1].trim() : "";
+  };
+  return {
+    id: get("id"),
+    title: get("title"),
+    status: get("status"),
+  };
+}
+
+let problems: ProblemMeta[] = [];
+if (fs.existsSync(contentDir)) {
+  const entries = fs
+    .readdirSync(contentDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort();
+
+  problems = entries
+    .map((id) => {
+      const metaPath = path.join(contentDir, id, "meta.yaml");
+      if (!fs.existsSync(metaPath)) return null;
+      return parseMetaYaml(fs.readFileSync(metaPath, "utf-8"));
+    })
+    .filter((m): m is ProblemMeta => m !== null && m.status === "published");
+}
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Diary — 自作入試数学問題集</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				font-family: system-ui, sans-serif;
+			}
+			body {
+				max-width: 40rem;
+				margin: 0 auto;
+				padding: 1.5rem;
+				line-height: 1.6;
+			}
+			h1 {
+				font-size: 1.5rem;
+			}
+			ul {
+				padding-left: 1.2rem;
+			}
+			a {
+				color: inherit;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Diary — 自作入試数学問題集</h1>
+		<p>自作の大学入試数学問題を公開しています。</p>
+		<ul>
+			{
+				problems.map((p) => (
+					<li>
+						<a href={`/problems/${p.id}/`}>{p.title}</a>
+					</li>
+				))
+			}
+		</ul>
+	</body>
+</html>

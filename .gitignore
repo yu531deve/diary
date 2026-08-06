@@ -6,3 +6,8 @@ dist/
 *.synctex.gz
 node_modules/
 .DS_Store
+
+# site/ (Astro)
+site/dist/
+site/node_modules/
+site/.astro/
