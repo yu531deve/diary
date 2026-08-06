@@ -60,6 +60,11 @@ node lint/check-meta.js lint/fixtures/meta/ok/0001/meta.yaml
 
 ## 依存関係のインストール
 
+`make lint` 実行時に `lint/node_modules` が無ければ自動的に
+`npm ci --prefix lint` が走るため、通常は手動インストール不要。
+
+手動で入れたい場合は次の通り。
+
 ```sh
 cd lint
 npm install
