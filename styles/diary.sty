@@ -3,12 +3,13 @@
 % lualatex + luatexja（jlreq クラス）を前提とする。
 % content/ 配下の .tex は本文のみを書き、ビルド側がこの sty を適用する。
 %
-% 【現段階のスコープ（#15）】
+% 【#15 のスコープ】
 %   - problem / solution の 2 モード切替（クラスオプション or マクロ）
 %   - A4・和文での最小コンパイル
-% 【次 issue（#16）のスコープ】
-%   - ライセンスフッター
-%   - \diarytitle マクロ
+% 【#16 で追加したスコープ】
+%   - \diarytitle{番号}{タイトル} マクロ
+%   - 全ページフッターへのライセンス表記の自動焼き込み
+%     （文言は本ファイル内 1 箇所のみで定義し、無効化コマンドは提供しない）
 %
 % 使い方:
 %   \documentclass[paper=a4]{jlreq}
@@ -29,6 +30,15 @@
 \RequirePackage{luatexja}
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
+% atbegshi の \AtBeginShipout（shipout フック）で各ページに直接焼き込む
+% （\pagestyle とは無関係に動作するため、文書側で \pagestyle{empty} 等を
+% 指定してもフッターは消えない）。
+% 検証時、同種の仕組みである eso-pic の \AddToShipoutPictureBG* と
+% everypage の \AddEverypageHook は、本プロジェクトが使う jlreq クラス
+% （独自の output ルーチンを持つ）と lualatex の組み合わせでは 1 ページ目
+% にしか描画されなかった（jlreq との非互換）。atbegshi 単体は jlreq 配下
+% でも全ページで動作することを確認したため、これを直接使う。
+\RequirePackage{atbegshi}
 
 % ---- モード管理 ----
 % \diary@mode / \diary@problemname / \diary@solutionname は \ifx で
@@ -57,7 +67,6 @@
 \ProcessOptions\relax
 
 % ---- モードに応じた見出し語 ----
-% 現段階では見出し文言の切替のみ。タイトル・フッターは #16 で追加する。
 \newcommand{\diaryheading}{%
   \ifx\diary@mode\diary@problemname
     問題%
@@ -69,6 +78,37 @@
 % \begin{document} の直後に見出しを出したい場合に呼ぶ補助マクロ
 \newcommand{\diaryprintheading}{%
   {\bfseries\Large \diaryheading}\par\medskip
+}
+
+% ---- タイトル表示マクロ ----
+% \diarytitle{問題番号}{タイトル} で「問題 0001　タイトル」のように出力する。
+% 問題番号は content/ 側の meta.yaml の id をそのまま渡す（振り直し・整形はしない）。
+\newcommand{\diarytitle}[2]{%
+  {\bfseries\Large \diaryheading\ #1\quad #2}\par\medskip
+}
+
+% ---- ライセンスフッター ----
+% 文言は content/LICENSE.md の条件（個人利用のみ許可）に合わせる。
+% ここ 1 箇所でのみ定義し、文書側から無効化するコマンドは提供しない
+% （\diary@licensefooter は内部マクロ）。
+%
+% fancyhdr 等の \pagestyle 経由の実装は、本文中で \pagestyle{empty} や
+% \thispagestyle{empty} を書かれると容易にフッターが消えてしまい、
+% 不変条件 3（ライセンス焼き込みを外さない）を満たせない。
+% そのため atbegshi の \AtBeginShipout（shipout フック）でページ座標に
+% 直接焼き込む。\pagestyle の指定内容とは無関係に、出力される全ページに
+% 必ず描画される。
+\def\diary@licensefooter{%
+  Copyright (c) 2026 Yu (yu531deve). All rights reserved. ---
+  本コンテンツは個人利用のみ許可。再配布・商用利用・教育機関等での配布・改変物の公開を禁止する。%
+}
+
+\AtBeginShipout{%
+  \AtBeginShipoutUpperLeft{%
+    \put(0,\dimexpr-\paperheight+1.5cm\relax){%
+      \makebox[\paperwidth][c]{\footnotesize \diary@licensefooter}%
+    }%
+  }%
 }
 
 \endinput
