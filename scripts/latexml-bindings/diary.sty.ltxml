@@ -1,0 +1,72 @@
+# diary.sty.ltxml — LaTeXML 用バインディング（#22）
+#
+# styles/diary.sty 本体は変更しない（保護ファイル）。
+# LaTeXML は \usepackage{diary} を処理する際、対応する .ltxml バインディングが
+# 見つからないと "Can't find binding for package diary" として diary.sty の
+# 中身（\newcommand 等）を一切解釈せず、\diarytitle 等が未定義エラーになる。
+# このファイルは diary.sty が提供するマクロのうち、content/ 側の本文が
+# 実際に使う最小限（\diarysetmode, \diaryheading, \diaryprintheading,
+# \diarytitle, tikz 関連ライブラリの読み込み）を HTML 変換向けに再定義する。
+#
+# ライセンスフッターの焼き込み（atbegshi による shipout フック）は
+# PDF 専用の仕組みであり、HTML 出力には意味を持たないためここでは
+# 移植しない（PDF 側は styles/diary.sty がそのまま担当する）。
+#
+# TikZ 図（tikzpicture）は #22 のスコープでは変換対象外。LaTeXML 本体が
+# 持つ tikz.sty.ltxml で構文としては素通しされるが、\draw の座標計算等を
+# 完全にはサポートしないため警告が出ることがある。#22 では意図的に許容する
+# （SVG 化は #23、フォールバックは #24 で扱う）。
+
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use utf8;
+use LaTeXML::Package;
+
+# ---- 依存パッケージ（diary.sty 本体と同じもの） ----
+RequirePackage('amsmath');
+RequirePackage('amssymb');
+RequirePackage('tikz');
+
+# tikzpicture 自体は変換対象外だが、diary.sty 側で読み込んでいる
+# tikzlibrary を読み込んでおくことで「未定義ライブラリ」エラーによる
+# 変換停止だけは避ける（描画結果の正確さは保証しない）。
+RawTeX('\usetikzlibrary{calc,intersections}');
+
+# ---- モード管理 ----
+# problem / solution のいずれか。既定値は problem。
+AssignValue('diary@mode' => 'problem', 'global');
+
+DeclareOption('problem', sub { AssignValue('diary@mode' => 'problem', 'global'); });
+DeclareOption('solution', sub { AssignValue('diary@mode' => 'solution', 'global'); });
+ProcessOptions();
+
+# \diarysetmode{problem|solution} — \usepackage{diary} の後にモードを
+# 明示的に切り替える補助マクロ（diary.sty と同じ挙動）。
+DefPrimitive('\diarysetmode{}', sub {
+  my ($stomach, $arg) = @_;
+  my $mode = ToString($arg);
+  if ($mode eq 'problem' || $mode eq 'solution') {
+    AssignValue('diary@mode' => $mode, 'global');
+  } else {
+    Warn('unexpected', 'diarysetmode', $stomach,
+      "diarysetmode accepts only 'problem' or 'solution', got '$mode'");
+  }
+  return;
+});
+
+# \diaryheading — モードに応じて「問題」または「解答」に展開する。
+DefMacro('\diaryheading', sub {
+  my $mode = LookupValue('diary@mode') || 'problem';
+  return Tokenize($mode eq 'solution' ? '解答' : '問題');
+});
+
+# \diaryprintheading — 見出しのみを表示する補助マクロ。
+DefMacro('\diaryprintheading',
+  '{\bfseries\Large \diaryheading}\par\medskip{}');
+
+# \diarytitle{番号}{タイトル} — 「問題 0001　タイトル」のように出力する。
+DefMacro('\diarytitle{}{}',
+  '{\bfseries\Large \diaryheading\ #1\quad #2}\par\medskip{}');
+
+1;
