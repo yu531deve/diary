@@ -1,0 +1,12 @@
+% scripts/fixtures/broken-missing-file.tex
+%
+% #24 のフォールバック機構テスト用 fixture。content/ の外に置く
+% （content/ に変換不能ファイルを置いてはいけないため）。
+%
+% \input で存在しないファイルを参照し、LaTeXML を確実に失敗させる。
+% 実測（scripts/test-html-fallback.js 参照）では、この壊れ方の場合
+% latexmlc 自体は exit 0 で終了するが、出力 HTML の <body> には
+% 実質的なコンテンツが入らず「Generated ... by LaTeXML」という
+% フッターのみが残る。これは build-html.js の失敗判定基準3
+% （出力 HTML はあるが本文が空）に該当する。
+\input{scripts/fixtures/this-file-does-not-exist.tex}
