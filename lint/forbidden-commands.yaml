@@ -1,0 +1,17 @@
+# 禁止コマンド定義
+#
+# content/ 配下の .tex で使用を禁止する LaTeX コマンド一覧。
+# ここに列挙したコマンドはビルド不能・変換不能・危険のいずれかの
+# 理由で禁止している。緩和・追加が必要な場合は issue を立てて相談する
+# こと（CLAUDE.md の禁止事項を参照）。
+#
+# 各エントリの `name` は `\` を含まないコマンド名を書く。
+forbidden:
+  - name: write18
+    reason: "シェルコマンド実行が可能で危険なため禁止"
+  - name: input
+    reason: "ファイル取り込みは meta.yaml/ビルド構成の管理外になり変換不能になりやすいため禁止"
+  - name: include
+    reason: "input と同様の理由で禁止"
+  - name: usepackage
+    reason: "diary.sty で提供されないパッケージの混入を防ぎ、変換可能性を保つため禁止"
