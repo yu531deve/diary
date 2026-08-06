@@ -168,3 +168,58 @@ export function hasProblemPdf(id: string): boolean {
   assertDistExists();
   return fs.existsSync(path.join(DIST_PDF_DIR, id, "problem.pdf"));
 }
+
+/**
+ * dist/html/{id}/solution.html を読み、本文の HTML 断片を取り出す。
+ * readProblemHtml と同じ規約（フォールバックマーカー・article 抽出）。
+ */
+export function readSolutionHtml(id: string): ProblemHtml {
+  assertDistExists();
+  const htmlPath = path.join(DIST_HTML_DIR, id, "solution.html");
+  if (!fs.existsSync(htmlPath)) {
+    throw new DistNotFoundError(
+      `dist/html/${id}/solution.html が見つかりません。` +
+        "`make html` を実行して生成してください。"
+    );
+  }
+  const html = fs.readFileSync(htmlPath, "utf-8");
+
+  const dir = path.join(DIST_HTML_DIR, id);
+  const figureFiles = fs.existsSync(dir)
+    ? fs
+        .readdirSync(dir)
+        .filter((f) => /^fig-.*\.svg$/i.test(f))
+        .sort()
+    : [];
+
+  const isFallback = /<meta\s+name="diary-fallback"/i.test(html);
+  if (isFallback) {
+    const reasonMatch = html.match(
+      /<meta\s+name="diary-fallback-reason"\s+content="([^"]*)"/i
+    );
+    return {
+      isFallback: true,
+      bodyHtml: "",
+      fallbackReason: reasonMatch ? reasonMatch[1] : "",
+      figureFiles,
+    };
+  }
+
+  const articleMatch = html.match(
+    /<article[^>]*class="[^"]*ltx_document[^"]*"[^>]*>[\s\S]*?<\/article>/i
+  );
+  const bodyHtml = articleMatch ? articleMatch[0] : "";
+
+  return {
+    isFallback: false,
+    bodyHtml,
+    fallbackReason: "",
+    figureFiles,
+  };
+}
+
+/** dist/pdf/{id}/solution.pdf が存在するかどうか */
+export function hasSolutionPdf(id: string): boolean {
+  assertDistExists();
+  return fs.existsSync(path.join(DIST_PDF_DIR, id, "solution.pdf"));
+}

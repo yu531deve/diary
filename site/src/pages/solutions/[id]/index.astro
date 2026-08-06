@@ -1,0 +1,248 @@
+---
+// 解答ページ /solutions/{id}/（#27）。
+//
+// dist/html/{id}/solution.html（LaTeXML 出力）の本文を取り込んで表示する。
+// 実装方針は /problems/{id}/（#26）とほぼ同じだが、以下の「ワンクリック
+// ガード」が要件（docs/requirements.md §6、site/CLAUDE.md）:
+//   「問題を解く前にうっかり解答が見える」ことを防ぐため、初期状態では
+//   解答本文を隠し、1 クリックの操作を挟んでから表示する。
+//
+// ガード方式として <details>/<summary> を採用する（JS のトグルボタン +
+// display:none ではなく）。理由:
+//   - ブラウザネイティブの開閉機構なので、JS が無効な環境でも
+//     クリックで開閉できる（site/CLAUDE.md の「クライアント JS は
+//     最小限」方針とも合致し、JS 実装・保守コストがゼロ）。
+//   - スクリーンリーダー等の支援技術に対して開閉状態
+//     （aria-expanded 相当）が標準で伝わり、独自 ARIA 実装が不要。
+//   - 「1 クリックで開く」という受け入れ条件をそのまま満たす
+//     （<summary> クリック = 開閉のトグル）。
+// フォールバック（PDF 埋め込み表示）時も同様に <details> の中に埋め込み、
+// 解答 PDF が誤って初期表示されないようにする。
+import {
+  listPublishedProblems,
+  readSolutionHtml,
+  hasSolutionPdf,
+  DistNotFoundError,
+  type ProblemMeta,
+} from "../../../lib/dist-content";
+
+export async function getStaticPaths() {
+  const problems = listPublishedProblems();
+  return problems.map((meta) => ({
+    params: { id: meta.id },
+    props: { meta },
+  }));
+}
+
+type Props = { meta: ProblemMeta };
+const { meta } = Astro.props;
+
+let solutionHtml;
+try {
+  solutionHtml = readSolutionHtml(meta.id);
+} catch (e) {
+  if (e instanceof DistNotFoundError) {
+    throw new Error(
+      `[solutions/${meta.id}] ${e.message}\n` +
+        "（site のビルド前にリポジトリルートで `make pdf && make html` を実行してください）"
+    );
+  }
+  throw e;
+}
+
+const pdfAvailable = hasSolutionPdf(meta.id);
+const pdfHref = `/solutions/${meta.id}/solution.pdf`;
+const problemHref = `/problems/${meta.id}/`;
+const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeURIComponent(
+  `誤植報告: ${meta.id} ${meta.title}（解答）`
+)}`;
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>解答 | {meta.id} {meta.title} | Diary</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				font-family: system-ui, sans-serif;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				max-width: 42rem;
+				margin: 0 auto;
+				padding: 1.5rem;
+				line-height: 1.7;
+				overflow-x: hidden;
+			}
+			header.page-header h1 {
+				font-size: 1.4rem;
+				margin-bottom: 0.25rem;
+			}
+			.meta-line {
+				font-size: 0.85rem;
+				opacity: 0.75;
+				margin: 0 0 1rem;
+			}
+			.meta-line span {
+				margin-right: 0.75rem;
+				display: inline-block;
+			}
+			nav.actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin: 1.25rem 0;
+			}
+			nav.actions a {
+				display: inline-block;
+				padding: 0.5rem 0.9rem;
+				border: 1px solid currentColor;
+				border-radius: 0.4rem;
+				text-decoration: none;
+				color: inherit;
+				font-size: 0.9rem;
+			}
+			nav.actions a.primary {
+				font-weight: bold;
+			}
+			.guard {
+				border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+				padding-top: 1.25rem;
+			}
+			.guard > summary {
+				cursor: pointer;
+				font-weight: bold;
+				font-size: 1.05rem;
+				padding: 0.9rem 1rem;
+				border: 1px solid currentColor;
+				border-radius: 0.4rem;
+				list-style: none;
+			}
+			.guard > summary::-webkit-details-marker {
+				display: none;
+			}
+			.guard > summary::before {
+				content: "▶ ";
+			}
+			.guard[open] > summary::before {
+				content: "▼ ";
+			}
+			.solution-body {
+				margin-top: 1.25rem;
+			}
+			.solution-body :global(p),
+			.solution-body :global(.ltx_p) {
+				margin: 0 0 1rem;
+				overflow-wrap: break-word;
+			}
+			.solution-body :global(ol),
+			.solution-body :global(.ltx_enumerate) {
+				padding-left: 1.4rem;
+			}
+			.solution-body :global(img) {
+				max-width: 100%;
+				height: auto;
+				display: block;
+				margin: 1rem auto;
+			}
+			.solution-body :global(math) {
+				max-width: 100%;
+			}
+			.solution-body :global(.ltx_Math) {
+				display: inline-block;
+				max-width: 100%;
+				overflow-x: auto;
+				vertical-align: middle;
+			}
+			.fallback-notice {
+				padding: 0.75rem 1rem;
+				background: color-mix(in srgb, orange 18%, transparent);
+				border: 1px solid color-mix(in srgb, orange 45%, transparent);
+				border-radius: 0.4rem;
+				margin-bottom: 1rem;
+				font-size: 0.9rem;
+			}
+			.fallback-embed {
+				width: 100%;
+				height: 80vh;
+				border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+			}
+			@media (max-width: 480px) {
+				body {
+					padding: 1rem;
+				}
+				nav.actions a {
+					flex: 1 1 auto;
+					text-align: center;
+				}
+				.fallback-embed {
+					height: 60vh;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<p><a href={problemHref}>← 問題に戻る</a></p>
+		<header class="page-header">
+			<h1>{meta.id} {meta.title}（解答）</h1>
+			<p class="meta-line">
+				<span>分野: {meta.field.major} / {meta.field.minor}</span>
+				{meta.difficulty && <span>難易度: {meta.difficulty}</span>}
+				{meta.tags.length > 0 && <span>タグ: {meta.tags.join("、")}</span>}
+			</p>
+		</header>
+
+		<nav class="actions">
+			{
+				pdfAvailable && (
+					<a class="primary" href={pdfHref} download>
+						解答 PDF をダウンロード
+					</a>
+				)
+			}
+			<a class="primary" href={problemHref}>
+				問題に戻る
+			</a>
+			<a href={issueHref} target="_blank" rel="noopener noreferrer">
+				誤植を報告する
+			</a>
+		</nav>
+
+		<details class="guard">
+			<summary>解答を表示する</summary>
+
+			{
+				solutionHtml.isFallback ? (
+					<div class="fallback-notice">
+						この解答は HTML への自動変換に失敗したため、PDF を埋め込み表示しています。
+						{solutionHtml.fallbackReason && (
+							<>（理由: {solutionHtml.fallbackReason}）</>
+						)}
+					</div>
+				) : null
+			}
+
+			{
+				solutionHtml.isFallback ? (
+					pdfAvailable ? (
+						<embed
+							class="fallback-embed"
+							src={pdfHref}
+							type="application/pdf"
+						/>
+					) : (
+						<p>PDF も見つかりませんでした。ビルドを確認してください。</p>
+					)
+				) : (
+					<div class="solution-body" set:html={solutionHtml.bodyHtml} />
+				)
+			}
+		</details>
+	</body>
+</html>
