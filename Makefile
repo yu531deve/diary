@@ -17,6 +17,9 @@ pdf:
 html:
 	node scripts/build-html.js
 
+# preview: site/ の Astro 開発サーバーをローカルで起動する（トップページ仮実装のみ）。
+preview:
+	cd site && npm install && npm run dev
+
 # 以下は将来追加予定（未実装）:
 # build:    lint + pdf + html + サイトビルドをまとめて実行する
-# preview:  ローカルプレビューサーバーを起動する
