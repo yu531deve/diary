@@ -13,19 +13,29 @@
  * 使い方:
  *   node scripts/build-pdf.js
  *
- * キャッシュ（差分ビルド）は行わない（#21 で対応）。1 問の失敗は残りの
- * ビルドを止めず、最後に失敗一覧を stderr に出して exit 1 する。
+ * 差分ビルド（#21）:
+ *   問題ごとに problem.tex / solution.tex / meta.yaml / styles/diary.sty
+ *   の内容から SHA-256 ハッシュを計算し、.cache/pdf-build-cache.json に
+ *   前回成功時のハッシュを記録する。ハッシュが一致し、かつ前回ビルドが
+ *   成功していた問題はスキップする。前回失敗した問題はハッシュが
+ *   一致していてもスキップしない（失敗を成功として記録しない）。
+ *   diary.sty の内容もハッシュに含めるため、sty の変更は全問の
+ *   再ビルドを引き起こす（意図した挙動）。
  */
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const CONTENT_DIR = path.join(REPO_ROOT, "content");
 const STYLES_DIR = path.join(REPO_ROOT, "styles");
+const DIARY_STY_PATH = path.join(STYLES_DIR, "diary.sty");
 const DIST_PDF_DIR = path.join(REPO_ROOT, "dist", "pdf");
 const WORK_DIR = path.join(DIST_PDF_DIR, ".work");
+const CACHE_DIR = path.join(REPO_ROOT, ".cache");
+const CACHE_PATH = path.join(CACHE_DIR, "pdf-build-cache.json");
 
 const MODES = ["problem", "solution"];
 
@@ -53,6 +63,39 @@ function findProblemDirs() {
     .filter((d) => d.isDirectory() && /^\d{4}$/.test(d.name))
     .map((d) => d.name)
     .sort();
+}
+
+function loadCache() {
+  if (!fs.existsSync(CACHE_PATH)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(CACHE_PATH, "utf8"));
+  } catch (err) {
+    console.error(`[cache] キャッシュファイルの読み込みに失敗したため無視します: ${err.message}`);
+    return {};
+  }
+}
+
+function saveCache(cache) {
+  fs.mkdirSync(CACHE_DIR, { recursive: true });
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2) + "\n");
+}
+
+// 問題 1 件分のハッシュ: problem.tex + solution.tex + meta.yaml + diary.sty
+// の内容を連結して SHA-256 を取る。styles/diary.sty が変われば全問の
+// ハッシュが変化し、全問再ビルドとなる。
+function computeHash(id, dir, styContent) {
+  const hash = crypto.createHash("sha256");
+  hash.update(`id:${id}\n`);
+  for (const name of ["problem.tex", "solution.tex", "meta.yaml"]) {
+    const p = path.join(dir, name);
+    const content = fs.existsSync(p) ? fs.readFileSync(p) : Buffer.from("");
+    hash.update(`${name}:\n`);
+    hash.update(content);
+    hash.update("\n");
+  }
+  hash.update("diary.sty:\n");
+  hash.update(styContent);
+  return hash.digest("hex");
 }
 
 function buildWrapperTex(id, mode, bodyPath) {
@@ -96,14 +139,14 @@ function compileOne(id, mode, bodyPath, failures, generated) {
     if (log) {
       console.error(log.split("\n").slice(-40).join("\n"));
     }
-    return;
+    return false;
   }
 
   const producedPdf = path.join(workDir, "wrapper.pdf");
   if (!fs.existsSync(producedPdf)) {
     failures.push({ id, mode });
     console.error(`[fail] ${id} ${mode}: PDF が生成されませんでした`);
-    return;
+    return false;
   }
 
   const outDir = path.join(DIST_PDF_DIR, id);
@@ -112,12 +155,20 @@ function compileOne(id, mode, bodyPath, failures, generated) {
   fs.copyFileSync(producedPdf, outPath);
   generated.push(outPath);
   console.log(`[ok] ${id} ${mode} -> ${path.relative(REPO_ROOT, outPath)}`);
+  return true;
 }
 
 function main() {
   const ids = findProblemDirs();
   const failures = [];
   const generated = [];
+  const skipped = [];
+
+  const cache = loadCache();
+  const styContent = fs.existsSync(DIARY_STY_PATH)
+    ? fs.readFileSync(DIARY_STY_PATH)
+    : Buffer.from("");
+  const nextCache = {};
 
   for (const id of ids) {
     const dir = path.join(CONTENT_DIR, id);
@@ -133,22 +184,55 @@ function main() {
       continue;
     }
 
+    const hash = computeHash(id, dir, styContent);
+    const prev = cache[id];
+
+    let useCache = false;
+    if (prev && prev.hash === hash && prev.success === true) {
+      const problemPdf = path.join(DIST_PDF_DIR, id, "problem.pdf");
+      const solutionPdf = path.join(DIST_PDF_DIR, id, "solution.pdf");
+      if (fs.existsSync(problemPdf) && fs.existsSync(solutionPdf)) {
+        console.log(`[cache] ${id}: 変更なし・スキップ`);
+        skipped.push(id);
+        nextCache[id] = prev;
+        useCache = true;
+      } else {
+        console.log(`[cache] ${id}: PDF 出力が見つからないため再ビルドします`);
+      }
+    } else if (prev && prev.hash === hash && prev.success === false) {
+      console.log(`[cache] ${id}: ハッシュ一致だが前回ビルド失敗のため再ビルドします`);
+    } else if (prev) {
+      console.log(`[cache] ${id}: 変更を検出・再ビルドします`);
+    } else {
+      console.log(`[cache] ${id}: 初回ビルドします`);
+    }
+
+    if (useCache) continue;
+
+    let idSuccess = true;
     for (const mode of MODES) {
       const bodyPath = path.join(dir, `${mode}.tex`);
       if (!fs.existsSync(bodyPath)) {
         failures.push({ id, mode });
         console.error(`[fail] ${id} ${mode}: ${mode}.tex が見つかりません`);
+        idSuccess = false;
         continue;
       }
-      compileOne(id, mode, bodyPath, failures, generated);
+      const ok = compileOne(id, mode, bodyPath, failures, generated);
+      if (!ok) idSuccess = false;
     }
+
+    nextCache[id] = { hash, success: idSuccess };
   }
+
+  saveCache(nextCache);
 
   console.log("");
   console.log(`生成された PDF: ${generated.length} 件`);
   for (const p of generated) {
     console.log(`  ${path.relative(REPO_ROOT, p)}`);
   }
+  console.log(`スキップされた問題: ${skipped.length} 件`);
 
   if (failures.length > 0) {
     console.error("");
