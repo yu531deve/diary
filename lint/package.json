@@ -1,0 +1,14 @@
+{
+  "name": "diary-lint",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Diary の LaTeX 原稿 linter",
+  "main": "check-forbidden-commands.js",
+  "scripts": {
+    "check-forbidden-commands": "node check-forbidden-commands.js",
+    "test": "node test/run-fixture-tests.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}
