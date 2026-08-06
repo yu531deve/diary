@@ -1,0 +1,106 @@
+name: build
+
+# #28: devcontainer と同一イメージ（同一 Dockerfile）で `make build` を CI で回す。
+# デプロイは #29 で扱うためここには含めない。
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # --- devcontainer イメージのビルド ---
+      # 方式(a): .devcontainer/Dockerfile を docker build して使う。
+      # devcontainers/ci アクション(方式(b))は devcontainer.json の解釈込みで手軽だが、
+      # 内部で毎回 docker build を行い、レイヤキャッシュの制御が buildx cache-from/to ほど
+      # 細かく効かせられない（GHA cache backend の直接指定ができない）。
+      # texlive-full を含むこのイメージはレイヤが大きく、ビルド時間そのものが
+      # CI 時間の大半を占めるため、GHA cache（type=gha）でレイヤキャッシュを
+      # 確実に効かせられる (a) を採用する。
+      - name: Build devcontainer image (with GHA layer cache)
+        uses: docker/build-push-action@v6
+        with:
+          context: .devcontainer
+          file: .devcontainer/Dockerfile
+          tags: diary-devcontainer:ci
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # --- .cache/(PDF・SVG のハッシュキャッシュ)と dist/ の永続化 ---
+      # キー: OS + Dockerfile のハッシュ(イメージ内ツールのバージョンが変われば
+      #       キャッシュを作り直したいため) + content/・styles/diary.sty・scripts/
+      #       の内容ハッシュ(ソースが変われば新キーになり、変更分だけ再ビルドされる)。
+      # restore-keys: 完全一致キーが無くても「同一 Dockerfile 上での直近のキャッシュ」を
+      #       復元できるようにし、build-pdf.js / tikz-svg.js / build-html.js 側の
+      #       ハッシュ差分検出（ソース単位）で再利用できる分は再利用する。
+      - name: Cache .cache/ and dist/
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache
+            dist
+          key: >-
+            build-cache-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile') }}-${{
+            hashFiles('content/**', 'styles/diary.sty', 'scripts/**') }}
+          restore-keys: |
+            build-cache-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile') }}-
+            build-cache-${{ runner.os }}-
+
+      # --- site/ の npm キャッシュ(package-lock.json 単位) ---
+      # make build 内で `cd site && npm ci` が走るため、依存解決を高速化する。
+      - name: Cache site npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: site/node_modules
+          key: site-npm-${{ runner.os }}-${{ hashFiles('site/package-lock.json') }}
+          restore-keys: |
+            site-npm-${{ runner.os }}-
+
+      # --- lint/ の npm キャッシュ(package-lock.json 単位) ---
+      # make lint 内で lint/node_modules が無い場合のみ `npm ci --prefix lint` が走る。
+      - name: Cache lint npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: lint/node_modules
+          key: lint-npm-${{ runner.os }}-${{ hashFiles('lint/package-lock.json') }}
+          restore-keys: |
+            lint-npm-${{ runner.os }}-
+
+      # --- devcontainer と同一イメージ上で make build を実行 ---
+      # コンテナ内で root ユーザー(devcontainer.json の remoteUser: root に合わせる)として
+      # リポジトリ全体を /workspace にマウントし、make build を実行する。
+      - name: make build (in devcontainer image)
+        run: |
+          START=$(date +%s)
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            diary-devcontainer:ci \
+            make build
+          END=$(date +%s)
+          echo "BUILD_SECONDS=$((END - START))" >> "$GITHUB_ENV"
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## build ジョブサマリ"
+            echo ""
+            echo "- \`make build\` 所要時間: ${BUILD_SECONDS:-N/A} 秒"
+            echo "- .cache/dist キャッシュキー: \`build-cache-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile') }}-${{ hashFiles('content/**', 'styles/diary.sty', 'scripts/**') }}\`"
+            echo "- 実行時刻: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          } >> "$GITHUB_STEP_SUMMARY"
