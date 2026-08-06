@@ -6,7 +6,8 @@
   "main": "check-forbidden-commands.js",
   "scripts": {
     "check-forbidden-commands": "node check-forbidden-commands.js",
-    "test": "node test/run-fixture-tests.js"
+    "check-meta": "node check-meta.js",
+    "test": "node test/run-fixture-tests.js && node test/run-meta-fixture-tests.js"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
