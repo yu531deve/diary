@@ -11,7 +11,12 @@ lint:
 pdf:
 	node scripts/build-pdf.js
 
+# html: content/ を走査し、status: published の問題ごとに
+#       LaTeXML（latexmlc）で dist/html/{id}/problem.html・solution.html
+#       を生成する（#22。フォールバックは #24 で追加予定）。
+html:
+	node scripts/build-html.js
+
 # 以下は将来追加予定（未実装）:
-# html:     tex → HTML 変換（失敗時フォールバック確認込み）を行う
 # build:    lint + pdf + html + サイトビルドをまとめて実行する
 # preview:  ローカルプレビューサーバーを起動する
