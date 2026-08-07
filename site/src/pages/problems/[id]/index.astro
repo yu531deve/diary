@@ -1,5 +1,5 @@
 ---
-// 問題ページ /problems/{id}/（#26）。
+// 問題ページ /problems/{id}/（#26、design/02-B デザイン刷新は #66）。
 //
 // dist/html/{id}/problem.html（LaTeXML 出力）の本文を取り込んで表示する。
 // - 数式: LaTeXML の出力は Presentation MathML（<math>...</math>）なので、
@@ -9,29 +9,38 @@
 //   （Chrome 109+ / Firefox / Safari）は Presentation MathML の
 //   ネイティブ描画に対応済みのため、まずこちらを採用し、表示品質が
 //   不足する場合に限り KaTeX 等への切り替えを検討する（詳細は PR 本文）。
-// - 図: dist/html/{id}/fig-*.svg を astro.config.mjs の
-//   astro:build:done フックでビルド出力にコピーし、<img src="fig-n.svg">
-//   をそのまま解決させる。
+// - 図: dist/html/{id}/fig-*.svg を [fig].svg.ts が配信する。design/02-B の
+//   右カラム「図パネル」に埋め込む（<img>。canvas 再実装はしない）。
 // - フォールバック: <meta name="diary-fallback"> があれば PDF 埋め込み
 //   表示に切り替える。
+//
+// design/02-B（design/README.md 「B. 問題ページ」節）準拠。
+// 前後ナビは #61 の listPublishedProblems()（id 昇順）から算出する。
+// 数値のハードコード禁止（design/README.md 実装時の注意 6）: PROBLEMS 数・
+// 難易度ラベル等はすべて実データ（meta.yaml / docs/difficulty.md）に基づく。
 import {
   listPublishedProblems,
   readProblemHtml,
   hasProblemPdf,
+  hasSolutionPdf,
   DistNotFoundError,
   type ProblemMeta,
 } from "../../../lib/dist-content";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
-  return problems.map((meta) => ({
+  return problems.map((meta, i) => ({
     params: { id: meta.id },
-    props: { meta },
+    props: {
+      meta,
+      prev: i > 0 ? problems[i - 1] : null,
+      next: i < problems.length - 1 ? problems[i + 1] : null,
+    },
   }));
 }
 
-type Props = { meta: ProblemMeta };
-const { meta } = Astro.props;
+type Props = { meta: ProblemMeta; prev: ProblemMeta | null; next: ProblemMeta | null };
+const { meta, prev, next } = Astro.props;
 
 let problemHtml;
 try {
@@ -47,11 +56,28 @@ try {
 }
 
 const pdfAvailable = hasProblemPdf(meta.id);
+const solutionPdfAvailable = hasSolutionPdf(meta.id);
 const pdfHref = `/problems/${meta.id}/problem.pdf`;
+const solutionPdfHref = `/solutions/${meta.id}/solution.pdf`;
 const solutionHref = `/solutions/${meta.id}/`;
+const fieldHref = `/fields/${encodeURIComponent(meta.field.major)}/`;
 const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeURIComponent(
   `誤植報告: ${meta.id} ${meta.title}`
 )}`;
+
+// docs/difficulty.md の 5 段階（数値のみが仕様。文言ラベルは定義されて
+// いないため、実データの数値をそのまま出す）。
+const difficultyNum = Number(meta.difficulty) || 0;
+const difficultyDots = Array.from({ length: 5 }, (_, i) => i < difficultyNum);
+
+// LaTeXML 出力（problem.tex 内の figure）は本文に <img> をそのまま含む。
+// design/02-B の図パネルは dist/html/{id}/fig-*.svg を独立表示する仕様の
+// ため、本文側の重複表示を避けたい。ただし figureFiles が空の問題では
+// パネル自体を「図なし」表示にフォールバックする。
+const firstFigure = problemHtml.figureFiles[0] ?? null;
+const figHref = firstFigure ? `/problems/${meta.id}/${firstFigure.replace(/\.svg$/i, "")}.svg` : null;
+
+const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 ---
 
 <html lang="ja">
@@ -60,65 +86,185 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{meta.title} | Diary</title>
+		<title>{meta.id} {meta.title} | Diary</title>
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&display=swap"
+		/>
 		<style>
 			:root {
-				color-scheme: light dark;
-				font-family: system-ui, sans-serif;
+				color-scheme: dark;
 			}
 			* {
 				box-sizing: border-box;
 			}
 			body {
-				max-width: 42rem;
-				margin: 0 auto;
-				padding: 1.5rem;
-				line-height: 1.7;
-				overflow-x: hidden;
+				margin: 0;
+				background: #05060a;
+				color: #dfe6ee;
+				font-family: "Noto Sans JP", system-ui, sans-serif;
+				-webkit-font-smoothing: antialiased;
 			}
-			header.page-header h1 {
-				font-size: 1.4rem;
-				margin-bottom: 0.25rem;
-			}
-			.meta-line {
-				font-size: 0.85rem;
-				opacity: 0.75;
-				margin: 0 0 1rem;
-			}
-			.meta-line span {
-				margin-right: 0.75rem;
-				display: inline-block;
-			}
-			nav.actions {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				margin: 1.25rem 0;
-			}
-			nav.actions a {
-				display: inline-block;
-				padding: 0.5rem 0.9rem;
-				border: 1px solid currentColor;
-				border-radius: 0.4rem;
-				text-decoration: none;
+			a {
 				color: inherit;
-				font-size: 0.9rem;
+				text-decoration: none;
 			}
-			nav.actions a.primary {
-				font-weight: bold;
+			.mono {
+				font-family: "IBM Plex Mono", monospace;
+			}
+			.math-fallback {
+				font-family: "STIX Two Text", serif;
+			}
+
+			/* ヘッダー */
+			.site-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 22px 48px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+			}
+			.logo {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+			.logo strong {
+				font: 700 19px "Space Grotesk", sans-serif;
+			}
+			.logo span {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.header-nav {
+				display: flex;
+				align-items: center;
+				gap: 30px;
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+
+			/* パンくず */
+			.breadcrumb {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 10px;
+				padding: 18px 48px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.1em;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+			}
+			.breadcrumb a:hover {
+				color: #52e0f5;
+			}
+			.breadcrumb .sep {
+				color: #2a3340;
+			}
+			.breadcrumb .current {
+				color: #dfe6ee;
+			}
+
+			/* 本体グリッド */
+			.problem-grid {
+				display: grid;
+				grid-template-columns: 1fr 400px;
+				gap: 64px;
+				padding: 56px 48px 40px;
+			}
+			.col-main {
+				display: flex;
+				flex-direction: column;
+				gap: 30px;
+				min-width: 0;
+			}
+			.id-line {
+				display: flex;
+				align-items: center;
+				gap: 18px;
+				flex-wrap: wrap;
+			}
+			.problem-id {
+				font: 500 34px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.02em;
+			}
+			.difficulty {
+				display: flex;
+				gap: 5px;
+				align-items: center;
+			}
+			.difficulty .dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				background: #2a3340;
+			}
+			.difficulty .dot.on {
+				background: #52e0f5;
+			}
+			.difficulty .label {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				margin-left: 8px;
+				letter-spacing: 0.1em;
+			}
+			.title-heading {
+				margin: 0;
+				font-size: 46px;
+				font-weight: 900;
+				line-height: 1.3;
+				letter-spacing: 0.01em;
+				text-wrap: pretty;
+			}
+			.tag-row {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+			.tag-pill {
+				padding: 6px 14px;
+				border: 1px solid rgba(255, 255, 255, 0.14);
+				border-radius: 999px;
+				font-size: 11px;
+				color: #aeb6c2;
+			}
+			.rule {
+				height: 1px;
+				background: rgba(255, 255, 255, 0.1);
 			}
 			.problem-body {
-				border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-				padding-top: 1.25rem;
+				max-width: 660px;
+				font-size: 18px;
+				line-height: 2.1;
+				color: #dfe6ee;
 			}
 			.problem-body :global(p),
 			.problem-body :global(.ltx_p) {
-				margin: 0 0 1rem;
+				margin: 0 0 22px;
 				overflow-wrap: break-word;
 			}
 			.problem-body :global(ol),
 			.problem-body :global(.ltx_enumerate) {
-				padding-left: 1.4rem;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 18px;
+			}
+			.problem-body :global(.ltx_enumerate .ltx_item) {
+				display: flex;
+				gap: 18px;
+				align-items: flex-start;
+			}
+			.problem-body :global(.ltx_tag) {
+				font: 400 15px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				padding-top: 5px;
+				flex-shrink: 0;
 			}
 			.problem-body :global(img) {
 				max-width: 100%;
@@ -126,8 +272,15 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 				display: block;
 				margin: 1rem auto;
 			}
+			/* 図は右カラムの図パネルに一本化する（design/02-B）。
+			   本文中の <img class="diary-figure"> は重複表示になるため隠す
+			   （scripts/tikz-svg.js が焼き込むクラス名）。 */
+			.problem-body :global(img.diary-figure) {
+				display: none;
+			}
 			.problem-body :global(math) {
 				max-width: 100%;
+				font-family: "STIX Two Text", serif;
 			}
 			/* 長い数式は折り返さず横スクロールに逃がす（モバイル崩れ対策） */
 			.problem-body :global(.ltx_Math) {
@@ -135,26 +288,262 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 				max-width: 100%;
 				overflow-x: auto;
 				vertical-align: middle;
+				font-family: "STIX Two Text", serif;
 			}
+
+			.solution-cta {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 26px 30px;
+				border: 1px solid rgba(82, 224, 245, 0.28);
+				background: rgba(82, 224, 245, 0.05);
+				max-width: 660px;
+				flex-wrap: wrap;
+			}
+			.solution-cta .copy {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				flex: 1;
+				min-width: 200px;
+			}
+			.solution-cta .label {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.2em;
+				color: #52e0f5;
+			}
+			.solution-cta .desc {
+				font-size: 14px;
+				color: #aeb6c2;
+			}
+			.solution-cta .cta-btn {
+				padding: 14px 28px;
+				background: #52e0f5;
+				color: #06232a;
+				font-weight: 700;
+				font-size: 14px;
+				border-radius: 2px;
+				white-space: nowrap;
+			}
+			.solution-cta .cta-btn:hover {
+				background: #7ce8f8;
+			}
+
+			/* 右カラム */
+			.col-side {
+				display: flex;
+				flex-direction: column;
+				gap: 24px;
+				min-width: 0;
+			}
+			.figure-panel {
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				background: #080a10;
+			}
+			.figure-panel .fig-header {
+				display: flex;
+				justify-content: space-between;
+				gap: 12px;
+				padding: 12px 16px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.16em;
+			}
+			.figure-panel .fig-body {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 320px;
+				padding: 16px;
+			}
+			.figure-panel .fig-body img {
+				max-width: 100%;
+				max-height: 100%;
+			}
+			.figure-panel .fig-empty {
+				font-size: 12px;
+				color: #4a5361;
+			}
+
+			.pdf-links {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+				background: rgba(255, 255, 255, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+			}
+			.pdf-links a {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 18px 20px;
+				background: #05060a;
+				transition: background 0.2s;
+			}
+			.pdf-links a:hover {
+				background: #0c0f16;
+			}
+			.pdf-links .pdf-badge {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.14em;
+			}
+			.pdf-links .pdf-name {
+				font-size: 14px;
+				font-weight: 500;
+			}
+			.pdf-links .arrow {
+				margin-left: auto;
+				color: #5c6572;
+			}
+
+			.meta-info {
+				display: flex;
+				flex-direction: column;
+				gap: 14px;
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #5c6572;
+			}
+			.meta-info .row {
+				display: flex;
+				justify-content: space-between;
+			}
+			.meta-info .row .k {
+				letter-spacing: 0.14em;
+			}
+			.meta-info .row .v {
+				color: #aeb6c2;
+			}
+
+			.report-link {
+				font-size: 12px;
+				color: #5c6572;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+				padding-bottom: 6px;
+				align-self: flex-start;
+			}
+			.report-link:hover {
+				color: #aeb6c2;
+			}
+
+			/* フォールバック通知（デザイントーンに合わせる） */
 			.fallback-notice {
-				padding: 0.75rem 1rem;
-				background: color-mix(in srgb, orange 18%, transparent);
-				border: 1px solid color-mix(in srgb, orange 45%, transparent);
-				border-radius: 0.4rem;
-				margin-bottom: 1rem;
-				font-size: 0.9rem;
+				max-width: 660px;
+				padding: 18px 22px;
+				border: 1px solid rgba(82, 224, 245, 0.28);
+				background: rgba(82, 224, 245, 0.05);
+				border-radius: 0;
+				margin-bottom: 8px;
+				font-size: 14px;
+				line-height: 1.8;
+				color: #aeb6c2;
+			}
+			.fallback-notice strong {
+				color: #52e0f5;
+				font-weight: 700;
 			}
 			.fallback-embed {
 				width: 100%;
+				max-width: 660px;
 				height: 80vh;
-				border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				background: #fff;
+			}
+
+			/* 前後ナビ */
+			.pager {
+				display: flex;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+				flex-wrap: wrap;
+			}
+			.pager a,
+			.pager .disabled {
+				flex: 1 1 260px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				padding: 28px 48px;
+				min-width: 0;
+			}
+			.pager a:first-child,
+			.pager .disabled:first-child {
+				border-right: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.pager a:last-child,
+			.pager .disabled:last-child {
+				align-items: flex-end;
+				text-align: right;
+			}
+			.pager a:hover {
+				background: #0c0f16;
+			}
+			.pager .dir-label {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.16em;
+			}
+			.pager a .dir-label {
+				color: #52e0f5;
+			}
+			.pager .pager-title {
+				font-size: 16px;
+				font-weight: 500;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				max-width: 100%;
+			}
+			.pager .disabled .pager-title {
+				color: #4a5361;
+			}
+
+			@media (max-width: 900px) {
+				.site-header,
+				.breadcrumb {
+					padding-left: 24px;
+					padding-right: 24px;
+				}
+				.header-nav span:not(:last-child) {
+					display: none;
+				}
+				.problem-grid {
+					grid-template-columns: 1fr;
+					gap: 40px;
+					padding: 32px 24px;
+				}
+				.title-heading {
+					font-size: 32px;
+				}
+				.problem-body {
+					font-size: 16px;
+					line-height: 1.95;
+				}
+				.pager a:first-child,
+				.pager .disabled:first-child {
+					border-right: none;
+					border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+				}
+				.pager a:last-child,
+				.pager .disabled:last-child {
+					align-items: flex-start;
+					text-align: left;
+				}
 			}
 			@media (max-width: 480px) {
-				body {
-					padding: 1rem;
+				.problem-id {
+					font-size: 26px;
 				}
-				nav.actions a {
-					flex: 1 1 auto;
+				.title-heading {
+					font-size: 26px;
+				}
+				.solution-cta {
+					flex-direction: column;
+					align-items: stretch;
+				}
+				.solution-cta .cta-btn {
 					text-align: center;
 				}
 				.fallback-embed {
@@ -164,57 +553,163 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 		</style>
 	</head>
 	<body>
-		<p><a href="/">← 一覧に戻る</a></p>
-		<header class="page-header">
-			<h1>{meta.id} {meta.title}</h1>
-			<p class="meta-line">
-				<span>分野: {meta.field.major} / {meta.field.minor}</span>
-				{meta.difficulty && <span>難易度: {meta.difficulty}</span>}
-				{meta.tags.length > 0 && <span>タグ: {meta.tags.join("、")}</span>}
-			</p>
+		<header class="site-header">
+			<a class="logo" href="/">
+				<strong>Diary</strong>
+				<span>SELF-MADE MATHEMATICS</span>
+			</a>
+			<nav class="header-nav">
+				<a href="/fields/">分野</a>
+				<a href="/">新着</a>
+			</nav>
 		</header>
 
-		<nav class="actions">
-			{
-				pdfAvailable && (
-					<a class="primary" href={pdfHref} download>
-						問題 PDF をダウンロード
-					</a>
-				)
-			}
-			<a class="primary" href={solutionHref}>
-				解答を見る
-			</a>
-			<a href={issueHref} target="_blank" rel="noopener noreferrer">
-				誤植を報告する
-			</a>
+		<nav class="breadcrumb" aria-label="パンくずリスト">
+			<a href="/">HOME</a>
+			<span class="sep">/</span>
+			<a href={fieldHref}>{meta.field.major}</a>
+			<span class="sep">/</span>
+			<span class="current">{meta.field.minor}</span>
+			<span class="sep">/</span>
+			<span class="current">{meta.id}</span>
 		</nav>
 
-		{
-			problemHtml.isFallback ? (
-				<div class="fallback-notice">
-					この問題は HTML への自動変換に失敗したため、PDF を埋め込み表示しています。
-					{problemHtml.fallbackReason && (
-						<>（理由: {problemHtml.fallbackReason}）</>
-					)}
+		<div class="problem-grid">
+			<div class="col-main">
+				<div>
+					<div class="id-line">
+						<span class="problem-id">{meta.id}</span>
+						<span class="difficulty">
+							{difficultyDots.map((on) => <span class={`dot${on ? " on" : ""}`} />)}
+							<span class="label">難易度 {difficultyNum || "—"} / 5</span>
+						</span>
+					</div>
+					<h1 class="title-heading">{meta.title}</h1>
 				</div>
-			) : null
-		}
 
-		{
-			problemHtml.isFallback ? (
-				pdfAvailable ? (
-					<embed
-						class="fallback-embed"
-						src={pdfHref}
-						type="application/pdf"
-					/>
+				<div class="tag-row">
+					<span class="tag-pill">{meta.field.major}</span>
+					<span class="tag-pill">{meta.field.minor}</span>
+					{meta.tags.map((t) => <span class="tag-pill">{t}</span>)}
+				</div>
+
+				<div class="rule" />
+
+				{
+					problemHtml.isFallback ? (
+						<div class="fallback-notice">
+							<strong>この問題は HTML への自動変換に失敗したため、PDF を埋め込み表示しています。</strong>
+							{problemHtml.fallbackReason && <>（理由: {problemHtml.fallbackReason}）</>}
+						</div>
+					) : null
+				}
+
+				{
+					problemHtml.isFallback ? (
+						pdfAvailable ? (
+							<embed class="fallback-embed" src={pdfHref} type="application/pdf" />
+						) : (
+							<p>PDF も見つかりませんでした。ビルドを確認してください。</p>
+						)
+					) : (
+						<div class="problem-body" set:html={problemHtml.bodyHtml} />
+					)
+				}
+
+				<div class="solution-cta">
+					<div class="copy">
+						<span class="label">SOLUTION</span>
+						<span class="desc">解いたあとに。ヒントから段階的に開けます。</span>
+					</div>
+					<a class="cta-btn" href={solutionHref}>解答ページへ →</a>
+				</div>
+			</div>
+
+			<div class="col-side">
+				<div class="figure-panel">
+					<div class="fig-header">
+						<span>FIGURE</span>
+					</div>
+					<div class="fig-body">
+						{
+							figHref ? (
+								<img src={figHref} alt={`${meta.id} の図`} />
+							) : (
+								<span class="fig-empty">この問題に図はありません</span>
+							)
+						}
+					</div>
+				</div>
+
+				<div class="pdf-links">
+					{
+						pdfAvailable && (
+							<a href={pdfHref} download>
+								<span class="pdf-badge">PDF</span>
+								<span class="pdf-name">問題（印刷用）</span>
+								<span class="arrow">↓</span>
+							</a>
+						)
+					}
+					{
+						solutionPdfAvailable && (
+							<a href={solutionPdfHref} download>
+								<span class="pdf-badge">PDF</span>
+								<span class="pdf-name">解答（印刷用）</span>
+								<span class="arrow">↓</span>
+							</a>
+						)
+					}
+				</div>
+
+				<div class="meta-info">
+					<div class="row">
+						<span class="k">CREATED</span>
+						<span class="v">{formatDate(meta.created)}</span>
+					</div>
+					<div class="row">
+						<span class="k">UPDATED</span>
+						<span class="v">{formatDate(meta.updated)}</span>
+					</div>
+					<div class="row">
+						<span class="k">LICENSE</span>
+						<span class="v">個人利用のみ</span>
+					</div>
+				</div>
+
+				<a class="report-link" href={issueHref} target="_blank" rel="noopener noreferrer">
+					誤植・不備を報告する → GitHub Issue
+				</a>
+			</div>
+		</div>
+
+		<div class="pager">
+			{
+				prev ? (
+					<a href={`/problems/${prev.id}/`}>
+						<span class="dir-label">← PREV / {prev.id}</span>
+						<span class="pager-title">{prev.title}</span>
+					</a>
 				) : (
-					<p>PDF も見つかりませんでした。ビルドを確認してください。</p>
+					<div class="disabled">
+						<span class="dir-label">← PREV</span>
+						<span class="pager-title">最初の問題です</span>
+					</div>
 				)
-			) : (
-				<div class="problem-body" set:html={problemHtml.bodyHtml} />
-			)
-		}
+			}
+			{
+				next ? (
+					<a href={`/problems/${next.id}/`}>
+						<span class="dir-label">NEXT / {next.id} →</span>
+						<span class="pager-title">{next.title}</span>
+					</a>
+				) : (
+					<div class="disabled">
+						<span class="dir-label">NEXT →</span>
+						<span class="pager-title">最新の問題です</span>
+					</div>
+				)
+			}
+		</div>
 	</body>
 </html>
