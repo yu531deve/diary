@@ -11,6 +11,7 @@
 // - モバイル幅（<=860px）ではスクロール演出を出さず、静的ヒーロー（#c1 相当）に
 //   差し替える（#68 で軽量版に差し替え予定。当面はこの静的ヒーローで可）。
 import { computeSiteStats } from "../lib/site-data";
+import LoadingCurtain from "../components/LoadingCurtain.astro";
 
 const stats = computeSiteStats();
 
@@ -639,6 +640,7 @@ const issueHref =
 		</style>
 	</head>
 	<body>
+		<LoadingCurtain />
 		<nav class="site-nav">
 			<div class="brand">
 				<strong>Diary</strong>
