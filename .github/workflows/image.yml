@@ -1,0 +1,73 @@
+name: image
+
+# #50: devcontainer イメージ(texlive-full 込み)を GHCR に事前ビルドして push する。
+# build.yml 側は毎回 docker build する代わりにこのイメージを pull するだけにし、
+# CI 所要時間を texlive-full のビルド時間から解放する。
+#
+# トリガー:
+#   - .devcontainer/** の変更が main に push された時(イメージ内容が変わった時のみ再ビルド)
+#   - workflow_dispatch(手動実行。初回・任意タイミングでの再ビルド用)
+#
+# タグ:
+#   - latest: 常に最新
+#   - Dockerfile の内容ハッシュ(sha256 の先頭 12 文字): 特定バージョンを固定して
+#     参照したい場合や、どの Dockerfile 由来かを追跡したい場合に使う。
+#     build.yml は latest を pull する(固定運用は今後の課題)。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".devcontainer/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compute Dockerfile content hash
+        id: hash
+        run: |
+          HASH=$(sha256sum .devcontainer/Dockerfile | cut -c1-12)
+          echo "hash=${HASH}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push devcontainer image
+        uses: docker/build-push-action@v6
+        with:
+          context: .devcontainer
+          file: .devcontainer/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/diary-devcontainer:latest
+            ghcr.io/${{ github.repository_owner }}/diary-devcontainer:${{ steps.hash.outputs.hash }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## image ジョブサマリ"
+            echo ""
+            echo "- push 先: \`ghcr.io/${{ github.repository_owner }}/diary-devcontainer\`"
+            echo "- タグ: \`latest\`, \`${{ steps.hash.outputs.hash }}\`"
+            echo "- 実行時刻: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          } >> "$GITHUB_STEP_SUMMARY"
