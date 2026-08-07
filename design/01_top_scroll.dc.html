@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#05060a;font-family:"Noto Sans JP",sans-serif;color:#eef2f6}
+a{color:inherit;text-decoration:none}a:hover{opacity:.8}
+::selection{background:#52e0f5;color:#05060a}
+@keyframes scrollpulse{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(8px);opacity:.4}}
+</style></helmet>
+<div style="position:relative">
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:26px 48px;background:linear-gradient(180deg,rgba(5,6,10,.85),rgba(5,6,10,0))">
+    <div style="display:flex;align-items:baseline;gap:12px"><span style="font:700 19px 'Space Grotesk',sans-serif">Diary</span><span style="font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.18em">SELF-MADE MATHEMATICS</span></div>
+    <div style="display:flex;align-items:center;gap:32px;font-size:13px;color:#aeb6c2">
+      <a href="#fields">分野</a><a href="#new">新着</a>
+      <span style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font:400 11px 'IBM Plex Mono',monospace;color:#7d8794">検索<span style="color:#4a5361">⌘K</span></span>
+    </div>
+  </nav>
+  <div id="cur" style="position:fixed;top:0;left:0;width:34px;height:34px;border:1px solid rgba(82,224,245,.8);border-radius:50%;pointer-events:none;z-index:60;mix-blend-mode:screen"></div>
+  <div id="curdot" style="position:fixed;top:0;left:0;width:6px;height:6px;border-radius:50%;background:#52e0f5;pointer-events:none;z-index:60"></div>
+  <div id="track" data-screen-label="スクロール演出" style="position:relative;height:560vh">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden">
+      <canvas id="voidfx" ref="{{ fxRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div id="c1" style="position:absolute;left:0;right:0;top:64vh;display:flex;flex-direction:column;align-items:center;gap:18px;opacity:1">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.34em;color:#52e0f5">ORIGINAL ENTRANCE-EXAM MATHEMATICS</div>
+        <p style="margin:0;font-size:18px;font-weight:500;color:#c3ccd8;letter-spacing:.06em">自作の入試数学、1000問へ。解く価値のある一問を。</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px;font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.3em">
+          <span>SCROLL</span><span style="display:block;width:1px;height:34px;background:linear-gradient(180deg,#52e0f5,transparent);animation:scrollpulse 2s ease-in-out infinite"></span>
+        </div>
+      </div>
+      <div id="c2" style="position:absolute;left:48px;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;gap:20px;max-width:440px;opacity:0">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.24em;color:#52e0f5">PROBLEM 0001</div>
+        <h2 style="margin:0;font-size:40px;font-weight:900;line-height:1.35">放物線と直線で<br>囲まれた面積</h2>
+        <div style="font:italic 400 21px 'STIX Two Text',serif;color:#aab6d4">∫₋₁² {(x+2) − x²} dx = 9/2</div>
+        <p style="margin:0;font-size:14px;line-height:1.9;color:#7d8794">すべての問題は完全自作。<br>ブラウザで読んで、PDF で解く。</p>
+      </div>
+      <div id="c3" style="position:absolute;left:0;right:0;top:66vh;display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0">
+        <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:#52e0f5">GOAL</div>
+        <p style="margin:0;font-size:19px;font-weight:500;color:#c3ccd8">1000問を目指して、毎日つくる。</p>
+      </div>
+      <div id="c4" style="position:absolute;left:0;right:0;top:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;opacity:0;pointer-events:none">
+        <h2 style="margin:0;font-size:56px;font-weight:900;letter-spacing:.02em">解く価値のある、一問を。</h2>
+        <div style="display:flex;gap:14px">
+          <a href="#fields" style="padding:15px 32px;background:#52e0f5;color:#06232a;font-weight:700;font-size:14px;border-radius:2px">分野から探す</a>
+          <a href="#new" style="padding:15px 32px;border:1px solid rgba(255,255,255,.25);color:#dfe6ee;font-size:14px;border-radius:2px">新着問題 →</a>
+        </div>
+      </div>
+      <div style="position:absolute;right:48px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:14px">
+        <span id="scn" style="font:400 11px 'IBM Plex Mono',monospace;color:#7d8794;letter-spacing:.2em">01 / 04</span>
+        <span style="display:block;width:1px;height:120px;background:rgba(255,255,255,.12);position:relative;overflow:hidden"><span id="prog" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#52e0f5;transform:scaleY(0);transform-origin:top"></span></span>
+      </div>
+      <div style="position:absolute;left:48px;bottom:32px;display:flex;gap:36px;font:400 11px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.12em">
+        <span>PROBLEMS <span style="color:#dfe6ee">0042</span></span><span>FIELDS <span style="color:#dfe6ee">18</span></span><span>GOAL <span style="color:#52e0f5">1000+</span></span>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;z-index:1;background:#05060a">
+    <section id="fields" data-screen-label="分野" style="padding:120px 48px 90px;max-width:1400px;margin:0 auto">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:34px">
+        <h2 style="margin:0;font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:#7d8794">FIELDS — 分野から探す</h2>
+        <a href="#fields" style="font:400 11px 'IBM Plex Mono',monospace;color:#52e0f5">ALL 18 →</a>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">01</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">数と式</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">003 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">02</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">二次関数</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">005 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">04</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">場合の数・確率</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">008 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">05</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">整数</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">006 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">13</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">微分積分</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">012 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">14</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">数列</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">007 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">15</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">ベクトル</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">004 問</span></a>
+        <a href="#fields" style="display:flex;align-items:baseline;gap:36px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);transition:all .25s" style-hover="color:#52e0f5;padding-left:26px"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#4a5361;width:32px">16</span><span style="font-size:52px;font-weight:900;letter-spacing:.02em;line-height:1.1">複素数平面</span><span style="margin-left:auto;font:400 12px 'IBM Plex Mono',monospace;color:#5c6572">002 問</span></a>
+      </div>
+    </section>
+    <section id="new" data-screen-label="新着" style="padding:40px 48px 110px;max-width:1400px;margin:0 auto">
+      <h2 style="margin:0 0 24px;font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:#7d8794">LATEST — 新着問題</h2>
+      <div style="display:flex;flex-direction:column">
+        <a href="#new" style="display:flex;align-items:center;gap:28px;padding:22px 0;border-top:1px solid rgba(255,255,255,.09);transition:all .2s" style-hover="background:rgba(82,224,245,.04);padding-left:14px">
+          <span style="font:500 13px 'IBM Plex Mono',monospace;color:#52e0f5">0003</span>
+          <span style="flex:1;font-size:17px;font-weight:500">漸化式で定まる数列の極限</span>
+          <span style="font-size:11px;color:#7d8794;padding:4px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px">数列 / 漸化式</span>
+          <span style="display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span></span>
+          <span style="font:400 11px 'IBM Plex Mono',monospace;color:#4a5361">2026.08.06</span>
+        </a>
+        <a href="#new" style="display:flex;align-items:center;gap:28px;padding:22px 0;border-top:1px solid rgba(255,255,255,.09);transition:all .2s" style-hover="background:rgba(82,224,245,.04);padding-left:14px">
+          <span style="font:500 13px 'IBM Plex Mono',monospace;color:#52e0f5">0002</span>
+          <span style="flex:1;font-size:17px;font-weight:500">条件付き確率と漸化式の融合</span>
+          <span style="font-size:11px;color:#7d8794;padding:4px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px">場合の数・確率</span>
+          <span style="display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span></span>
+          <span style="font:400 11px 'IBM Plex Mono',monospace;color:#4a5361">2026.08.06</span>
+        </a>
+        <a href="#new" style="display:flex;align-items:center;gap:28px;padding:22px 0;border-top:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09);transition:all .2s" style-hover="background:rgba(82,224,245,.04);padding-left:14px">
+          <span style="font:500 13px 'IBM Plex Mono',monospace;color:#52e0f5">0001</span>
+          <span style="flex:1;font-size:17px;font-weight:500">放物線と直線で囲まれた面積</span>
+          <span style="font-size:11px;color:#7d8794;padding:4px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px">微分積分 / 定積分</span>
+          <span style="display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span></span>
+          <span style="font:400 11px 'IBM Plex Mono',monospace;color:#4a5361">2026.08.06</span>
+        </a>
+      </div>
+    </section>
+    <footer style="display:flex;justify-content:space-between;padding:24px 48px;border-top:1px solid rgba(255,255,255,.07);font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;letter-spacing:.1em">
+      <span>© 2026 DIARY — PERSONAL USE ONLY</span><span>誤植報告 → GITHUB ISSUE</span>
+    </footer>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;particleGap&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:6,&quot;min&quot;:4,&quot;max&quot;:10,&quot;step&quot;:1,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;演出&quot;},&quot;mouseRadius&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:120,&quot;min&quot;:0,&quot;max&quot;:280,&quot;step&quot;:10,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;演出&quot;}}">
+class Component extends DCLogic {
+  ensureLoop() {
+    if (this._raf) return;
+    this.P = []; this.mx = -9999; this.my = -9999; this.cx = 0; this.cy = 0;
+    if (!this._ev) {
+      this._ev = true;
+      window.addEventListener('mousemove', (e) => { this.mx = e.clientX; this.my = e.clientY; });
+      if (document.fonts) document.fonts.ready.then(() => { this._builtKey = null; });
+    }
+    const tick = (now) => { try { this.draw(now); } catch (e) {} this._raf = requestAnimationFrame(tick); };
+    this._raf = requestAnimationFrame(tick);
+  }
+  componentDidMount() { this.ensureLoop(); }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); this._raf = null; }
+  sampleText(str, fs, w, h, cy) {
+    const oc = document.createElement('canvas'); oc.width = w; oc.height = h;
+    const og = oc.getContext('2d');
+    og.font = '700 ' + fs + 'px "Space Grotesk", sans-serif';
+    og.textAlign = 'center'; og.textBaseline = 'middle';
+    og.fillStyle = '#fff'; og.fillText(str, w / 2, cy);
+    const d = og.getImageData(0, 0, w, h).data;
+    const gap = this.props.particleGap ?? 6, pts = [];
+    for (let y = 0; y < h; y += gap) for (let x = 0; x < w; x += gap) {
+      if (d[(y * w + x) * 4 + 3] > 128) pts.push({ x, y });
+    }
+    return pts;
+  }
+  build(w, h) {
+    // graph mapping for problem 0001: u in [-2.2,3.2], v in [-1.5,5.5]
+    const pw = Math.min(w * 0.52, 760), pl = w * 0.5 - (w > 900 ? 0 : pw * 0.5) + (w > 900 ? 60 : 0);
+    const L = w > 900 ? w * 0.46 : (w - pw) / 2, R = L + pw, B = h * 0.86, T = h * 0.16;
+    this.gm = { L, R, B, T };
+    this.sx = (u) => L + (u + 2.2) / 5.4 * (R - L);
+    this.sy = (v) => B - (v + 1.5) / 7 * (B - T);
+    const graph = [];
+    for (let u = -2.2; u <= 3.2; u += 0.018) graph.push({ x: this.sx(u), y: this.sy(u * u) });
+    for (let u = -2.2; u <= 3.2; u += 0.026) graph.push({ x: this.sx(u), y: this.sy(u + 2) });
+    for (let v = -1.5; v <= 5.5; v += 0.09) graph.push({ x: this.sx(0), y: this.sy(v) });
+    for (let u = -2.2; u <= 3.2; u += 0.07) graph.push({ x: this.sx(u), y: this.sy(0) });
+    const diary = this.sampleText('Diary', Math.min(w * 0.24, 340), w, h, h * 0.42);
+    const thousand = this.sampleText('1000+', Math.min(w * 0.22, 300), w, h, h * 0.44);
+    const N = Math.max(diary.length, graph.length, thousand.length);
+    const cyc = (a, i) => a[i % a.length];
+    const scatter = [], up = [];
+    for (let i = 0; i < N; i++) {
+      scatter.push({ x: Math.random() * w, y: Math.random() * h });
+      up.push({ x: Math.random() * w, y: Math.random() * h - h * 0.8 });
+    }
+    this.sets = [scatter,
+      Array.from({ length: N }, (_, i) => cyc(diary, i)),
+      Array.from({ length: N }, (_, i) => cyc(graph, i)),
+      Array.from({ length: N }, (_, i) => cyc(thousand, i)),
+      up];
+    const P = [];
+    for (let i = 0; i < N; i++) {
+      const o = this.P[i];
+      P.push(o || { x: Math.random() * w, y: Math.random() * h, c: Math.random() < 0.16, s: Math.random() * 1.4 + 1.1, ph: Math.random() * 6.28 });
+    }
+    this.P = P;
+  }
+  seg(p) {
+    // [start, end, fromSet, toSet]
+    const S = [[0, .14, 0, 1], [.14, .26, 1, 1], [.26, .42, 1, 2], [.42, .56, 2, 2], [.56, .70, 2, 3], [.70, .80, 3, 3], [.80, 1.001, 3, 4]];
+    for (const [a, b, f, to] of S) {
+      if (p >= a && p < b) {
+        let t = (p - a) / (b - a);
+        t = t * t * (3 - 2 * t);
+        return [f, to, t];
+      }
+    }
+    return [4, 4, 1];
+  }
+  fade(p, a, b) {
+    const fi = Math.min(Math.max((p - a) / 0.05, 0), 1);
+    const fo = Math.min(Math.max((b - p) / 0.05, 0), 1);
+    return Math.min(fi, fo);
+  }
+  draw(t) {
+    const cv = this._cv; if (!cv) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); this._builtKey = null; }
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const key = (this.props.particleGap ?? 6) + 'x' + w + 'x' + h;
+    if (this._builtKey !== key) { this.build(w, h); this._builtKey = key; }
+    const track = this._track || (this._track = document.getElementById('track'));
+    let p = 0;
+    if (track) {
+      const r = track.getBoundingClientRect();
+      p = Math.min(Math.max(-r.top / (r.height - h), 0), 1);
+    }
+    const [fi, ti, e] = this.seg(p);
+    const A = this.sets[fi], Bs = this.sets[ti];
+    g.fillStyle = 'rgba(5,6,10,0.34)'; g.fillRect(0, 0, w, h);
+    // graph extras (axes fill) weighted by presence of set 2
+    let w2 = 0;
+    if (fi === 2 && ti === 2) w2 = 1; else if (ti === 2) w2 = e; else if (fi === 2) w2 = 1 - e;
+    if (w2 > 0.02 && this.sx) {
+      g.save(); g.globalAlpha = w2 * 0.9;
+      g.beginPath();
+      g.moveTo(this.sx(-1), this.sy(1));
+      for (let u = -1; u <= 2.001; u += 0.05) g.lineTo(this.sx(u), this.sy(u + 2));
+      for (let u = 2; u >= -1.001; u -= 0.05) g.lineTo(this.sx(u), this.sy(u * u));
+      g.closePath();
+      g.fillStyle = 'rgba(82,224,245,0.13)'; g.fill();
+      g.restore();
+    }
+    const R = this.props.mouseRadius ?? 120;
+    for (let i = 0; i < this.P.length; i++) {
+      const pt = this.P[i], a = A[i], b = Bs[i];
+      const tx = a.x + (b.x - a.x) * e, ty = a.y + (b.y - a.y) * e;
+      pt.x += (tx - pt.x) * 0.09 + Math.sin(t * 0.001 + pt.ph) * 0.3;
+      pt.y += (ty - pt.y) * 0.09 + Math.cos(t * 0.0012 + pt.ph) * 0.3;
+      const dx = pt.x - this.mx, dy = pt.y - this.my, d2 = dx * dx + dy * dy;
+      if (d2 < R * R) { const d = Math.sqrt(d2) || 1, f = (1 - d / R) * 5; pt.x += dx / d * f; pt.y += dy / d * f; }
+      g.fillStyle = pt.c ? 'rgba(82,224,245,0.95)' : 'rgba(226,236,244,0.78)';
+      g.fillRect(pt.x, pt.y, pt.s, pt.s);
+    }
+    // captions
+    const caps = { c1: this.fade(p, -1, 0.13), c2: this.fade(p, 0.30, 0.58), c3: this.fade(p, 0.60, 0.82), c4: p > 0.86 ? Math.min((p - 0.86) / 0.05, 1) : 0 };
+    for (const id in caps) {
+      const el = document.getElementById(id); if (!el) continue;
+      const o = caps[id];
+      el.style.opacity = o;
+      el.style.transform = 'translateY(' + ((1 - o) * 26) + 'px)';
+      if (id === 'c4') el.style.pointerEvents = o > 0.5 ? 'auto' : 'none';
+    }
+    const scn = document.getElementById('scn'), prog = document.getElementById('prog');
+    if (scn) {
+      const n = p < 0.26 ? 1 : p < 0.56 ? 2 : p < 0.80 ? 3 : 4;
+      const txt = '0' + n + ' / 04';
+      if (scn.textContent !== txt) scn.textContent = txt;
+    }
+    if (prog) prog.style.transform = 'scaleY(' + p + ')';
+    const cur = document.getElementById('cur'), dot = document.getElementById('curdot');
+    if (cur) {
+      this.cx += (this.mx - this.cx) * 0.14; this.cy += (this.my - this.cy) * 0.14;
+      cur.style.transform = 'translate(' + (this.cx - 17) + 'px,' + (this.cy - 17) + 'px)';
+      if (dot) dot.style.transform = 'translate(' + (this.mx - 3) + 'px,' + (this.my - 3) + 'px)';
+    }
+  }
+  renderVals() {
+    return { fxRef: (el) => { if (el) { this._cv = el; this.ensureLoop(); } } };
+  }
+}
+</script>
+</body>
+</html>
