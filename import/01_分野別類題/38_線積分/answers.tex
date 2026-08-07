@@ -1,0 +1,171 @@
+% 分野別類題: 線積分（ベクトル解析の初歩） 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 線積分（Line Integrals）}
+
+\daimon{【解法】線積分の解き方と導出}
+
+\noindent
+\textbf{1. パラメータ表示による計算.}
+ベクトル場 $\bm{F}(x,y) = (P(x,y), Q(x,y))$ の、曲線 $C$ に沿う線積分は
+\[
+\int_{C} \bm{F}\cdot d\bm{r} = \int_{C} P\,dx + Q\,dy
+\]
+と定義される。$C$ が $x = x(t)$, $y = y(t)$ $(a \le t \le b)$ とパラメータ表示されるとき、$dx = x'(t)\,dt$, $dy = y'(t)\,dt$ を代入すれば
+\[
+\int_{C} P\,dx + Q\,dy = \int_{a}^{b} \Bigl[ P(x(t), y(t))\,x'(t) + Q(x(t), y(t))\,y'(t) \Bigr] dt
+\]
+という通常の1変数定積分に帰着する。
+
+\medskip
+\noindent
+\textbf{2. グリーンの定理.}
+$D$ を単純閉曲線 $C$（反時計回り）で囲まれた領域とし、$P, Q$ が $D$ 上で $C^{1}$ 級であるとき、グリーンの定理は
+\[
+\oint_{C} P\,dx + Q\,dy = \iint_{D} \left( \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y} \right) dx\,dy
+\]
+を主張する。導出の概略は次の通りである。$D$ を $x$ 方向・$y$ 方向にそれぞれ簡単な形（縦線集合・横線集合）に分割できるとして、まず
+\[
+\iint_{D} \frac{\partial P}{\partial y}\,dA = \int_{a}^{b} \left[ \int_{y_1(x)}^{y_2(x)} \frac{\partial P}{\partial y}\,dy \right] dx
+= \int_{a}^{b} \bigl[ P(x, y_2(x)) - P(x, y_1(x)) \bigr] dx
+\]
+であり、これは $C$ を上側境界（逆向き）と下側境界に分けて $P\,dx$ を線積分したものの符号違いに一致する（$y$ 座標が大きい上側の境界は反時計回りでは左向きに進む）ので、
+\[
+-\iint_{D} \frac{\partial P}{\partial y}\,dA = \oint_{C} P\,dx
+\]
+となる。同様に $Q$ については
+\[
+\iint_{D} \frac{\partial Q}{\partial x}\,dA = \oint_{C} Q\,dy
+\]
+が成り立つ。両者を足し合わせるとグリーンの定理が得られる。この定理により、閉曲線に沿う線積分を面積分（重積分）に変換して計算できる。
+
+\medskip
+\noindent
+\textbf{3. 保存場とポテンシャル（経路無依存性）.}
+単連結領域 $D$ 上で定義されたベクトル場 $\bm{F} = (P, Q)$ が、あるスカラー関数 $\phi(x,y)$（ポテンシャル）を用いて
+\[
+\bm{F} = \nabla \phi = \left( \frac{\partial \phi}{\partial x}, \frac{\partial \phi}{\partial y} \right)
+\]
+と表せるとき、$\bm{F}$ を保存場と呼ぶ。このとき、曲線 $C$: $x=x(t), y=y(t)$ $(a\le t\le b)$ に沿う線積分は、合成関数の微分（連鎖律）
+\[
+\frac{d}{dt}\phi(x(t),y(t)) = \phi_x\,x'(t) + \phi_y\,y'(t) = P\,x'(t) + Q\,y'(t)
+\]
+を用いて
+\[
+\int_{C} \bm{F}\cdot d\bm{r} = \int_{a}^{b} \frac{d}{dt}\phi(x(t),y(t))\,dt = \phi(x(b),y(b)) - \phi(x(a),y(a))
+\]
+と、始点と終点の $\phi$ の値の差だけで決まる（経路によらない）。逆に、$D$ が単連結で $P, Q$ が $C^{1}$ 級のとき、$\bm{F}$ が保存場であるための必要十分条件は
+\[
+\frac{\partial P}{\partial y} = \frac{\partial Q}{\partial x}
+\]
+が $D$ 上で成り立つことである（必要性はポテンシャルが $C^{2}$ 級ならば $\phi_{xy} = \phi_{yx}$ となることから、十分性はグリーンの定理を用いて任意の閉曲線に沿う線積分が $0$ になることを示し、経路無依存性からポテンシャルを構成できることから従う）。ポテンシャル $\phi$ は、$\phi_x = P$ を $x$ について積分してから $y$ の任意関数を加え、それを $\phi_y = Q$ に代入して定めることで具体的に求められる。
+
+\bigskip
+
+\clearpage
+\begin{mondaiboxS}{問1}
+ベクトル場 $\bm{F}(x,y) = (y, x^{2})$ について、曲線 $C$: $x = t$, $y = t^{2}$ $(0 \le t \le 1)$ に沿う線積分
+\[
+\int_{C} \bm{F}\cdot d\bm{r} = \int_{C} y\,dx + x^{2}\,dy
+\]
+を求めよ。
+\end{mondaiboxS}
+\kaitou
+$x = t$, $y = t^{2}$ より $dx = dt$, $dy = 2t\,dt$。よって
+\[
+\int_{C} y\,dx + x^{2}\,dy = \int_{0}^{1} \Bigl[ t^{2} \cdot 1 + t^{2} \cdot 2t \Bigr] dt
+= \int_{0}^{1} \left( t^{2} + 2t^{3} \right) dt
+\]
+\[
+= \left[ \frac{t^{3}}{3} + \frac{t^{4}}{2} \right]_{0}^{1} = \frac{1}{3} + \frac{1}{2} = \frac{2}{6} + \frac{3}{6} = \frac{5}{6}
+\]
+したがって
+\[
+\boxed{\; \int_{C} \bm{F}\cdot d\bm{r} = \frac{5}{6} \;}
+\]
+（検算: 被積分関数 $t^{2}+2t^{3}$ を $[0,1]$ で数値積分しても $\frac{5}{6}\approx 0.8333$ と一致する。原始関数の微分は $\frac{d}{dt}\left(\frac{t^3}{3}+\frac{t^4}{2}\right)=t^2+2t^3$ で被積分関数に戻る。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$C$ を原点を中心とする半径 $2$ の円周（反時計回り）とするとき、グリーンの定理を用いて次の線積分を求めよ。
+\[
+\oint_{C} \left(x^{2}y\right) dx + \left(xy^{2} + 2x\right) dy
+\]
+\end{mondaiboxS}
+\kaitou
+$P = x^{2}y$, $Q = xy^{2} + 2x$ とおくと
+\[
+\frac{\partial Q}{\partial x} = y^{2} + 2, \qquad \frac{\partial P}{\partial y} = x^{2}
+\]
+グリーンの定理より、$D$ を半径 $2$ の円板とすると
+\[
+\oint_{C} P\,dx + Q\,dy = \iint_{D} \left( y^{2} + 2 - x^{2} \right) dx\,dy
+\]
+円板 $D$ は $x \leftrightarrow y$ の入れ替えに関して対称であるから
+\[
+\iint_{D} x^{2}\,dA = \iint_{D} y^{2}\,dA
+\]
+となり、$\iint_{D} (y^{2} - x^{2})\,dA = 0$。したがって
+\[
+\iint_{D} \left( y^{2} + 2 - x^{2} \right) dA = 2\iint_{D} dA = 2 \times (\text{面積}) = 2 \times \pi (2)^{2} = 8\pi
+\]
+ゆえに
+\[
+\boxed{\; \oint_{C} \left(x^{2}y\right) dx + \left(xy^{2} + 2x\right) dy = 8\pi \;}
+\]
+（検算: 極座標 $x = r\cos\theta$, $y = r\sin\theta$ で直接計算すると
+$\iint_D (y^2 - x^2 + 2)\,dA = \int_0^{2\pi}\!\!\int_0^{2} (r^2\sin^2\theta - r^2\cos^2\theta + 2)\, r\,dr\,d\theta$。
+$\theta$ について $\sin^2\theta - \cos^2\theta = -\cos 2\theta$ を $0$ から $2\pi$ まで積分すると $0$ になるので、残るのは
+$\int_0^{2\pi}\!\!\int_0^2 2r\,dr\,d\theta = 2\pi \cdot 2\cdot(2^2/1)$… 具体的には $\int_0^2 2r\,dr = 4$、これを $\theta$ について $0$ から $2\pi$ まで積分すると $8\pi$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+ベクトル場
+\[
+\bm{F}(x,y) = \left(2xy + \cos x,\; x^{2} + 2y\right)
+\]
+について、以下の問に答えよ。
+\begin{enumerate}
+\item $\bm{F}$ が保存場であることを確認せよ。
+\item ポテンシャル関数 $\phi(x,y)$ を求めよ。
+\item 点 $(0,0)$ から点 $(1,\pi)$ までの任意の滑らかな曲線 $C$ に沿う線積分 $\displaystyle\int_{C} \bm{F}\cdot d\bm{r}$ を求めよ。
+\end{enumerate}
+\end{mondaiboxS}
+\kaitou
+\textbf{(1)} $P = 2xy + \cos x$, $Q = x^{2} + 2y$ とおく。
+\[
+\frac{\partial P}{\partial y} = 2x, \qquad \frac{\partial Q}{\partial x} = 2x
+\]
+$xy$ 平面全体（単連結領域）で $\dfrac{\partial P}{\partial y} = \dfrac{\partial Q}{\partial x} = 2x$ が成り立つので、$\bm{F}$ は保存場である。
+
+\textbf{(2)} $\phi_x = P = 2xy + \cos x$ を $x$ について積分すると
+\[
+\phi(x,y) = x^{2}y + \sin x + g(y)
+\]
+（$g$ は $y$ の任意関数）。これを $y$ で偏微分すると $\phi_y = x^{2} + g'(y)$ であり、これが $Q = x^{2} + 2y$ に等しいことから $g'(y) = 2y$、すなわち $g(y) = y^{2} + C_0$（定数 $C_0$ は $0$ としてよい）。したがって
+\[
+\boxed{\; \phi(x,y) = x^{2}y + \sin x + y^{2} \;}
+\]
+（検算: $\phi_x = 2xy + \cos x = P$、$\phi_y = x^{2} + 2y = Q$ となり、確かに $\nabla\phi = \bm{F}$。）
+
+\textbf{(3)} 保存場であり経路によらないから、
+\[
+\int_{C} \bm{F}\cdot d\bm{r} = \phi(1,\pi) - \phi(0,0)
+\]
+\[
+\phi(1,\pi) = 1^{2}\cdot \pi + \sin 1 + \pi^{2} = \pi + \sin 1 + \pi^{2}, \qquad \phi(0,0) = 0
+\]
+したがって
+\[
+\boxed{\; \int_{C} \bm{F}\cdot d\bm{r} = \pi^{2} + \pi + \sin 1 \;}
+\]
+（検算: 例えば直線経路 $x=t$, $y=\pi t$ $(0\le t\le 1)$ に沿って直接計算しても、$dx=dt$, $dy=\pi\,dt$ より
+$\int_0^1 \bigl[(2t\cdot\pi t+\cos t)\cdot 1 + (t^2+2\pi t)\cdot \pi\bigr]dt = \int_0^1 \bigl(2\pi t^2+\cos t+\pi t^2+2\pi^2 t\bigr)dt$
+$=\int_0^1\bigl(3\pi t^2 + 2\pi^2 t+\cos t\bigr)dt = \pi + \pi^2 + \sin 1$ となり一致する。）
+
+\end{document}

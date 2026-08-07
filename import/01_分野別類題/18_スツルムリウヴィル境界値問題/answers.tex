@@ -1,0 +1,225 @@
+% 分野別類題: スツルム・リウヴィル型境界値問題 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- スツルム・リウヴィル型境界値問題}
+
+\daimon{【解法】スツルム・リウヴィル型境界値問題の解き方と導出}
+
+\noindent
+方程式 $y'' + \lambda y = 0$（$\lambda$ は定数）に、区間 $[0, L]$ の両端における線形な境界条件（ディリクレ・ノイマン・混合など）を課した固有値問題を考える。自明でない解 $y \not\equiv 0$ が存在するような $\lambda$ を固有値、対応する解を固有関数という。$\lambda$ の符号によって一般解の形が変わるため、必ず場合分けを行う。
+
+\medskip
+\noindent
+\textbf{(i) $\lambda < 0$ のとき。} $\lambda = -\mu^{2}$（$\mu > 0$）とおくと、特性方程式 $r^{2} - \mu^{2} = 0$ より $r = \pm\mu$。したがって一般解は
+\[
+y = A e^{\mu x} + B e^{-\mu x}
+\]
+または双曲線関数を用いて $y = A'\cosh(\mu x) + B'\sinh(\mu x)$ とも書ける。多くの境界条件（後述の3種を含む）では、この形に境界条件を課すと $A = B = 0$（自明解）しか許されず、固有値は存在しない。
+
+\medskip
+\noindent
+\textbf{(ii) $\lambda = 0$ のとき。} 方程式は $y'' = 0$ となり、一般解は
+\[
+y = A + Bx
+\]
+この1次関数に境界条件を課し、自明でない解が存在するかを確認する。
+
+\medskip
+\noindent
+\textbf{(iii) $\lambda > 0$ のとき。} $\lambda = \mu^{2}$（$\mu > 0$）とおくと、特性方程式 $r^{2} + \mu^{2} = 0$ より $r = \pm i\mu$。したがって一般解は
+\[
+y = A\cos(\mu x) + B\sin(\mu x)
+\]
+この三角関数解に境界条件を課すと、$A, B$ の一方または両方に関する連立条件が得られる。自明でない解 $(A, B) \neq (0,0)$ が存在するための条件（多くの場合、$\sin(\mu L) = 0$ や $\cos(\mu L) = 0$ などの形）から、離散的な $\mu$（したがって $\lambda = \mu^{2}$）の列が固有値として定まる。これがスツルム・リウヴィル型境界値問題の固有値・固有関数の一般的な求め方である。
+
+\medskip
+\noindent
+以上の手順（$\lambda < 0$, $\lambda = 0$, $\lambda > 0$ の場合分け）を各境界条件について実行し、固有値と固有関数を導出する。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+次の境界値問題（ディリクレ境界条件）の固有値と固有関数を求めよ。
+\[
+y'' + \lambda y = 0, \qquad y(0) = 0, \quad y(L) = 0 \qquad (L > 0)
+\]
+\end{mondaiboxS}
+\kaitou
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cosh(\mu x) + B\sinh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y(L) &= B\sinh(\mu L) = 0
+\end{align*}
+$\mu L > 0$ より $\sinh(\mu L) \neq 0$ であるから $B = 0$。
+したがって自明解のみで、固有値は存在しない。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解は
+\[
+y = A + Bx
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y(L) &= BL = 0
+\end{align*}
+$L > 0$ より $B = 0$。自明解のみで、$\lambda = 0$ は固有値ではない。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cos(\mu x) + B\sin(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y(L) &= B\sin(\mu L) = 0
+\end{align*}
+自明でない解（$B \neq 0$）が存在するためには
+\[
+\sin(\mu L) = 0 \quad\Longrightarrow\quad \mu L = n\pi \quad (n = 1, 2, 3, \dots)
+\]
+（$n=0$ は $\mu=0$ となり $\lambda>0$ の仮定に反するので除く。負の $n$ は符号を $B$ に吸収できるので $n \ge 1$ でよい。）よって
+\[
+\mu_{n} = \frac{n\pi}{L}, \qquad \lambda_{n} = \mu_{n}^{2} = \left(\frac{n\pi}{L}\right)^{2}
+\]
+対応する固有関数は $y_{n}(x) = \sin\!\left(\dfrac{n\pi x}{L}\right)$（定数倍を除く）。
+
+（検算: $y_n'' = -\left(\frac{n\pi}{L}\right)^2 \sin\left(\frac{n\pi x}{L}\right) = -\lambda_n y_n$ より $y_n'' + \lambda_n y_n = 0$ を満たす。また $y_n(0) = \sin 0 = 0$、$y_n(L) = \sin(n\pi) = 0$ も満たす。）
+
+\[
+\boxed{\; \lambda_{n} = \left(\frac{n\pi}{L}\right)^{2}, \quad y_{n}(x) = \sin\!\left(\frac{n\pi x}{L}\right) \qquad (n = 1, 2, 3, \dots) \;}
+\]
+
+\clearpage
+\begin{mondaiboxS}{問2}
+次の境界値問題（ノイマン境界条件）の固有値と固有関数を求めよ。
+\[
+y'' + \lambda y = 0, \qquad y'(0) = 0, \quad y'(L) = 0 \qquad (L > 0)
+\]
+\end{mondaiboxS}
+\kaitou
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解とその導関数は
+\[
+y = A\cosh(\mu x) + B\sinh(\mu x), \qquad
+y' = A\mu\sinh(\mu x) + B\mu\cosh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y'(0) &= B\mu = 0 \\
+y'(L) &= A\mu\sinh(\mu L) = 0
+\end{align*}
+$\mu > 0$ より $B = 0$、$\sinh(\mu L)\neq 0$ より $A=0$。
+自明解のみで、固有値は存在しない。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解とその導関数は
+\[
+y = A + Bx, \qquad y' = B
+\]
+境界条件を課すと
+\begin{align*}
+y'(0) &= B = 0 \\
+y'(L) &= B = 0
+\end{align*}
+$B = 0$ とすれば両条件が満たされ、$A$ は任意でよい。$y = A$（定数）は自明でない解を与える。
+したがって $\lambda_{0} = 0$ は固有値であり、対応する固有関数は定数関数 $y_{0}(x) = 1$。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解とその導関数は
+\[
+y = A\cos(\mu x) + B\sin(\mu x), \qquad
+y' = -A\mu\sin(\mu x) + B\mu\cos(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y'(0) &= B\mu = 0 \\
+y'(L) &= -A\mu\sin(\mu L) = 0
+\end{align*}
+$\mu > 0$ より $B = 0$。自明でない解（$A \neq 0$）が存在するためには
+\[
+\sin(\mu L) = 0 \quad\Longrightarrow\quad \mu_{n} = \frac{n\pi}{L} \quad (n = 1, 2, 3, \dots)
+\]
+よって $\lambda_{n} = \left(\dfrac{n\pi}{L}\right)^{2}$、固有関数は $y_{n}(x) = \cos\!\left(\dfrac{n\pi x}{L}\right)$。
+
+（検算: $y_n' = -\frac{n\pi}{L}\sin\left(\frac{n\pi x}{L}\right)$ より $y_n'(0) = 0$、$y_n'(L) = -\frac{n\pi}{L}\sin(n\pi) = 0$ を満たす。$y_n'' + \lambda_n y_n = -\left(\frac{n\pi}{L}\right)^2\cos\left(\frac{n\pi x}{L}\right) + \left(\frac{n\pi}{L}\right)^2\cos\left(\frac{n\pi x}{L}\right) = 0$ も成立。）
+
+$n=0$（$\lambda_0=0$, $y_0=1$）の場合も同じ式 $y_n(x)=\cos\left(\frac{n\pi x}{L}\right)$ に含まれるので、まとめて記す。
+
+\[
+\boxed{\; \lambda_{n} = \left(\frac{n\pi}{L}\right)^{2}, \quad y_{n}(x) = \cos\!\left(\frac{n\pi x}{L}\right) \qquad (n = 0, 1, 2, \dots) \;}
+\]
+
+\clearpage
+\begin{mondaiboxS}{問3}
+次の境界値問題（混合境界条件）の固有値と固有関数を求めよ。
+\[
+y'' + \lambda y = 0, \qquad y(0) = 0, \quad y'(L) = 0 \qquad (L > 0)
+\]
+\end{mondaiboxS}
+\kaitou
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cosh(\mu x) + B\sinh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y'(L) &= B\mu\cosh(\mu L) = 0
+\end{align*}
+$\cosh(\mu L) \ge 1 > 0$ より $B = 0$。
+自明解のみで、固有値は存在しない。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解とその導関数は
+\[
+y = A + Bx, \qquad y' = B
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y'(L) &= B = 0
+\end{align*}
+よって $A=B=0$ で自明解のみ。$\lambda=0$ は固有値ではない。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cos(\mu x) + B\sin(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y'(L) &= B\mu\cos(\mu L) = 0
+\end{align*}
+自明でない解（$B \neq 0$）が存在するためには
+\[
+\cos(\mu L) = 0 \quad\Longrightarrow\quad \mu L = \frac{\pi}{2} + n\pi = \frac{(2n+1)\pi}{2} \quad (n = 0, 1, 2, \dots)
+\]
+よって
+\[
+\mu_{n} = \frac{(2n+1)\pi}{2L}, \qquad \lambda_{n} = \mu_{n}^{2} = \left(\frac{(2n+1)\pi}{2L}\right)^{2}
+\]
+固有関数は $y_{n}(x) = \sin\!\left(\dfrac{(2n+1)\pi x}{2L}\right)$（定数倍を除く）。
+
+（検算: $y_n(0) = \sin 0 = 0$。$y_n'(x) = \frac{(2n+1)\pi}{2L}\cos\left(\frac{(2n+1)\pi x}{2L}\right)$ より $y_n'(L) = \frac{(2n+1)\pi}{2L}\cos\left(\frac{(2n+1)\pi}{2}\right) = 0$（$\cos$ の引数が $\pi/2$ の奇数倍のため）。また $y_n'' + \lambda_n y_n = -\mu_n^2 y_n + \mu_n^2 y_n = 0$ も満たす。）
+
+\[
+\boxed{\; \lambda_{n} = \left(\frac{(2n+1)\pi}{2L}\right)^{2}, \quad y_{n}(x) = \sin\!\left(\frac{(2n+1)\pi x}{2L}\right) \qquad (n = 0, 1, 2, \dots) \;}
+\]
+
+\end{document}

@@ -1,0 +1,38 @@
+% 分野別類題: 複素指数関数の積分・sinc関数（2019 問4 型）
+% オイラーの公式を用いた複素指数積分、有限区間の積分から sinc 関数を導く問題 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- Complex Exponential Integrals and the Sinc Function}
+
+\shijibun{以下の問題では、オイラーの公式 $e^{i\theta} = \cos\theta + i\sin\theta$ を用いて複素指数関数の積分を計算し、実部・虚部を比較することで実積分の値を求めよ。必要であれば $\mathrm{sinc}(x) = \dfrac{\sin x}{x}$（$\mathrm{sinc}(0)=1$）の記法を用いてよい。}
+
+\shomon{問1.}{実数 $k \neq 0$ と正の定数 $a$ に対して、次の積分を計算せよ。}
+\[
+\int_{-a}^{a} e^{-ikx}\,dx
+\]
+さらに、その結果が $2a\,\mathrm{sinc}(ka)$ と表せることを示せ。
+
+\shomon{問2.}{実数 $a, b$（$a \neq 0$）に対して、次の積分を求めよ。}
+\[
+\int e^{ax}\cos(bx)\,dx
+\]
+
+\shomon{問3.}{高さ $1$、幅 $2a$ の矩形パルス関数
+\[
+f(x) =
+\begin{cases}
+1 & (|x| \le a) \\
+0 & (|x| > a)
+\end{cases}
+\]
+のフーリエ変換
+\[
+F(k) = \int_{-\infty}^{\infty} f(x)\,e^{-ikx}\,dx
+\]
+を求め、$F(k)$ が $\mathrm{sinc}$ 関数を用いて表せることを示せ。また $\displaystyle\lim_{k \to 0} F(k)$ を求めよ。}
+
+\end{document}

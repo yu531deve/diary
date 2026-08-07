@@ -1,0 +1,163 @@
+% 分野別類題: ケーリー・ハミルトンの定理と行列多項式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- ケーリー・ハミルトンの定理と行列多項式}
+
+\daimon{【解法】ケーリー・ハミルトンの定理による行列多項式の次数下げの仕方と導出}
+
+\noindent
+$n \times n$ 正方行列 $A$ に対し、固有多項式（特性多項式）を
+\[
+\varphi(\lambda) = \det(\lambda I - A)
+\]
+と定める。ケーリー・ハミルトンの定理は
+\[
+\varphi(A) = O
+\]
+が常に成り立つことを主張する（証明は余因子行列 $\operatorname{adj}(\lambda I - A)$ を用いる標準的な方法によるが、ここでは結果を既知として利用する）。
+
+$2 \times 2$ 行列 $A = \begin{pmatrix} a & b \\ c & d \end{pmatrix}$ の場合、
+\[
+\varphi(\lambda) = \det(\lambda I - A) = \lambda^{2} - (a+d)\lambda + (ad - bc) = \lambda^{2} - (\operatorname{tr} A)\lambda + \det A
+\]
+であるから、
+\[
+A^{2} - (\operatorname{tr} A) A + (\det A) I = O
+\quad\Longleftrightarrow\quad
+A^{2} = (\operatorname{tr} A)A - (\det A) I
+\]
+という関係式が得られる。これにより $A^{2}$ を $A$ と $I$ の1次式で表せる（次数下げ）。
+
+一般に、$A$ の高次べき $A^{n}$ や多項式 $p(A)$ を計算したいとき、多項式 $p(\lambda)$ を固有多項式 $\varphi(\lambda)$ で割った商を $q(\lambda)$、余りを $r(\lambda)$（$\deg r < \deg \varphi = n$）とすると、
+\[
+p(\lambda) = q(\lambda)\varphi(\lambda) + r(\lambda)
+\]
+であり、$\lambda = A$ を代入すると $\varphi(A) = O$ より
+\[
+p(A) = q(A)\varphi(A) + r(A) = r(A)
+\]
+となる。すなわち $p(A)$ は余り $r(\lambda)$ に $A$ を代入するだけで求まり、次数の低い（$n-1$ 次以下の）行列多項式の計算に帰着できる。$2\times 2$ 行列であれば余りは高々1次式 $r(\lambda) = \alpha\lambda + \beta$ となるから、
+\[
+p(A) = \alpha A + \beta I
+\]
+という非常に簡単な形に落とし込める。$3\times 3$ 以上の場合も同様に、余り $r(\lambda)$（次数は $n-1$ 以下）を用いて $p(A) = r(A)$ とし、必要ならば $A^{2}, A^{3}, \dots$（$n-1$ 乗まで）を直接計算して代入すればよい。
+
+余り $r(\lambda)$ を求める実用的な方法として、固有多項式の根（固有値）$\lambda_{1}, \dots, \lambda_{k}$（重複を含む）を用いて
+\[
+p(\lambda_{i}) = r(\lambda_{i}) \quad (i = 1, \dots, k)
+\]
+という連立方程式（重根の場合は微分した式も併用）を立てて $r(\lambda)$ の係数を決定する方法もある。以下の各問では、多項式の割り算により直接 $r(\lambda)$ を求める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+行列 $A = \begin{pmatrix} 1 & 2 \\ 2 & 1 \end{pmatrix}$ について、ケーリー・ハミルトンの定理を用いて $A^{5} - A^{2} - 16A$ を計算せよ。
+\end{mondaiboxS}
+\kaitou
+$A$ の固有多項式は
+\[
+\varphi(\lambda) = \lambda^{2} - (\operatorname{tr} A)\lambda + \det A = \lambda^{2} - 2\lambda - (1 - 4) = \lambda^{2} - 2\lambda - 3
+\]
+（$\operatorname{tr} A = 1+1=2$, $\det A = 1\cdot1 - 2\cdot2 = -3$）であるから、ケーリー・ハミルトンの定理より
+\[
+A^{2} - 2A - 3I = O \quad\Longleftrightarrow\quad A^{2} = 2A + 3I
+\]
+
+求めたい多項式 $p(\lambda) = \lambda^{5} - \lambda^{2} - 16\lambda$ を $\varphi(\lambda) = \lambda^{2} - 2\lambda - 3$ で割ると、
+\[
+\lambda^{5} - \lambda^{2} - 16\lambda = (\lambda^{3} + 2\lambda^{2} + 7\lambda + 19)(\lambda^{2} - 2\lambda - 3) + (43\lambda + 57)
+\]
+（実際、$(\lambda^{3}+2\lambda^{2}+7\lambda+19)(\lambda^{2}-2\lambda-3)$ を展開すると $\lambda^{5} - \lambda^{2} - 59\lambda - 57$ となり、これに余り $43\lambda+57$ を加えると $\lambda^{5} - \lambda^{2} - 16\lambda$ に一致し、割り算が正しいことが確かめられる）。したがって $\varphi(A) = O$ より
+\[
+A^{5} - A^{2} - 16A = 43A + 57I
+\]
+ここで
+\[
+43A = \begin{pmatrix} 43 & 86 \\ 86 & 43 \end{pmatrix}, \qquad 57I = \begin{pmatrix} 57 & 0 \\ 0 & 57 \end{pmatrix}
+\]
+であるから
+\[
+\boxed{\; A^{5} - A^{2} - 16A = \begin{pmatrix} 100 & 86 \\ 86 & 100 \end{pmatrix} \;}
+\]
+（検算: $A$ の固有値は $\varphi(\lambda)=0$ より $\lambda = 3, -1$。固有値 $3$ を代入すると $3^{5} - 3^{2} - 16\cdot 3 = 243 - 9 - 48 = 186 = 43\cdot 3 + 57$、固有値 $-1$ を代入すると $(-1)^{5} - (-1)^{2} - 16(-1) = -1 - 1 + 16 = 14 = 43\cdot(-1)+57$ となり、いずれも $r(\lambda) = 43\lambda+57$ と一致する。さらに直接 $A^{2} = \begin{pmatrix}5&4\\4&5\end{pmatrix}$, $A^{3}=A\cdot A^2=\begin{pmatrix}13&14\\14&13\end{pmatrix}$, $A^{5}=A^{2}\cdot A^{3}=\begin{pmatrix}5\cdot13+4\cdot14 & 5\cdot14+4\cdot13\\ 4\cdot13+5\cdot14 & 4\cdot14+5\cdot13\end{pmatrix}=\begin{pmatrix}121&122\\122&121\end{pmatrix}$ を計算すると、$A^{5}-A^{2}-16A = \begin{pmatrix}121&122\\122&121\end{pmatrix} - \begin{pmatrix}5&4\\4&5\end{pmatrix} - \begin{pmatrix}16&32\\32&16\end{pmatrix} = \begin{pmatrix}100&86\\86&100\end{pmatrix}$ となり、一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+行列 $B = \begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix}$ について、$\lambda^{6}$ を $B$ の固有多項式で割った余りを用いて $B^{6}$ を求めよ。
+\end{mondaiboxS}
+\kaitou
+$B$ は上三角行列なので固有値は対角成分 $2, 3$ であり、固有多項式は
+\[
+\varphi(\lambda) = (\lambda - 2)(\lambda - 3) = \lambda^{2} - 5\lambda + 6
+\]
+ケーリー・ハミルトンの定理より $B^{2} = 5B - 6I$ が成り立つ。
+
+$\lambda^{6}$ を $\varphi(\lambda) = \lambda^{2} - 5\lambda + 6$ で割ると
+\[
+\lambda^{6} = (\lambda^{4} + 5\lambda^{3} + 19\lambda^{2} + 65\lambda + 211)(\lambda^{2} - 5\lambda + 6) + (665\lambda - 1266)
+\]
+であるから
+\[
+B^{6} = 665B - 1266I
+\]
+ここで
+\[
+665B = \begin{pmatrix} 1330 & 665 \\ 0 & 1995 \end{pmatrix}, \qquad 1266I = \begin{pmatrix} 1266 & 0 \\ 0 & 1266 \end{pmatrix}
+\]
+より
+\[
+\boxed{\; B^{6} = \begin{pmatrix} 64 & 665 \\ 0 & 729 \end{pmatrix} \;}
+\]
+（検算: 固有値 $\lambda=2$ を余りの式に代入すると $2^{6} = 64$ に対し $665\cdot2 - 1266 = 1330-1266=64$ で一致。固有値 $\lambda=3$ では $3^{6}=729$ に対し $665\cdot3-1266=1995-1266=729$ で一致。また $B$ は上三角行列なので $B^{6}$ の対角成分は各対角成分の6乗 $2^{6}=64$, $3^{6}=729$ に一致しており、これも検算と整合する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+行列 $C = \begin{pmatrix} 2 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & -2 & 4 \end{pmatrix}$ について、ケーリー・ハミルトンの定理を用いて $C^{4}$ を計算せよ。
+\end{mondaiboxS}
+\kaitou
+$C$ はブロック三角行列であり、固有多項式は $1$ 行目・列のブロック $(2)$ と右下ブロック $\begin{pmatrix}1&1\\-2&4\end{pmatrix}$ の固有多項式の積として求まる。右下ブロックの固有多項式は
+\[
+\lambda^{2} - (1+4)\lambda + (1\cdot4 - 1\cdot(-2)) = \lambda^{2} - 5\lambda + 6 = (\lambda-2)(\lambda-3)
+\]
+であるから、$C$ 全体の固有多項式は
+\[
+\varphi(\lambda) = (\lambda - 2)\cdot(\lambda-2)(\lambda-3) = (\lambda-2)^{2}(\lambda-3) = \lambda^{3} - 7\lambda^{2} + 16\lambda - 12
+\]
+（固有値は $\lambda = 2$（重複度2）, $\lambda = 3$）。ケーリー・ハミルトンの定理より
+\[
+C^{3} - 7C^{2} + 16C - 12I = O
+\]
+
+$\lambda^{4}$ を $\varphi(\lambda) = \lambda^{3} - 7\lambda^{2} + 16\lambda - 12$ で割ると
+\[
+\lambda^{4} = (\lambda + 7)(\lambda^{3} - 7\lambda^{2} + 16\lambda - 12) + (33\lambda^{2} - 100\lambda + 84)
+\]
+であるから
+\[
+C^{4} = 33C^{2} - 100C + 84I
+\]
+
+$C^{2}$ を直接計算すると
+\[
+C^{2} = \begin{pmatrix} 2 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & -2 & 4 \end{pmatrix}^{2} = \begin{pmatrix} 4 & 0 & 0 \\ 0 & -1 & 5 \\ 0 & -10 & 14 \end{pmatrix}
+\]
+（$1$ 行目は $(2\cdot2,\,0,\,0)=(4,0,0)$、$2$ 行目は $(0,\,1\cdot1+1\cdot(-2),\,1\cdot1+1\cdot4)=(0,-1,5)$、$3$ 行目は $(0,\,-2\cdot1+4\cdot(-2),\,-2\cdot1+4\cdot4)=(0,-10,14)$ より）。したがって
+\[
+33C^{2} = \begin{pmatrix} 132 & 0 & 0 \\ 0 & -33 & 165 \\ 0 & -330 & 462 \end{pmatrix}, \quad
+100C = \begin{pmatrix} 200 & 0 & 0 \\ 0 & 100 & 100 \\ 0 & -200 & 400 \end{pmatrix}, \quad
+84I = \begin{pmatrix} 84 & 0 & 0 \\ 0 & 84 & 0 \\ 0 & 0 & 84 \end{pmatrix}
+\]
+より
+\[
+C^{4} = 33C^{2} - 100C + 84I = \begin{pmatrix} 132-200+84 & 0 & 0 \\ 0 & -33-100+84 & 165-100+0 \\ 0 & -330+200+0 & 462-400+84 \end{pmatrix}
+\]
+\[
+\boxed{\; C^{4} = \begin{pmatrix} 16 & 0 & 0 \\ 0 & -49 & 65 \\ 0 & -130 & 146 \end{pmatrix} \;}
+\]
+（検算: 固有値 $\lambda=2$ を余りの式に代入すると $2^{4}=16$ に対し $33\cdot2^{2}-100\cdot2+84 = 132-200+84=16$ で一致。固有値 $\lambda=3$ では $3^{4}=81$ に対し $33\cdot9-100\cdot3+84=297-300+84=81$ で一致。さらに $(1,1)$ 成分は $C$ が上三角ブロックのため $2^{4}=16$ に一致しており整合する。）
+
+\end{document}

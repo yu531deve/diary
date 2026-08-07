@@ -1,0 +1,28 @@
+% 分野別類題: 1階線形非同次偏微分方程式（ラグランジュの補助方程式）
+% P u_x + Q u_y = R の形の準線形偏微分方程式 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 1階線形非同次偏微分方程式}
+
+\shijibun{次の準線形偏微分方程式を解き、導出過程を示せ。（$P\,u_{x} + Q\,u_{y} = R$ の形の方程式は、ラグランジュの補助方程式 $\dfrac{dx}{P} = \dfrac{dy}{Q} = \dfrac{du}{R}$ から独立な2つの第一積分 $\varphi(x,y,u) = c_{1}$, $\psi(x,y,u) = c_{2}$ を求め、一般解を $F(\varphi, \psi) = 0$（または $\varphi = f(\psi)$）の形で表す。）}
+
+\shomon{問1.}{次の偏微分方程式の一般解を求めよ。}
+\[
+x\,u_{x} + y\,u_{y} = u
+\]
+
+\shomon{問2.}{次の偏微分方程式の一般解を求めよ。}
+\[
+u_{x} + u_{y} = u
+\]
+
+\shomon{問3.}{次の偏微分方程式を、与えられた初期条件のもとで解け。}
+\[
+x\,u_{x} - y\,u_{y} = u^{2}, \qquad u(x, 1) = x \quad (x > 0)
+\]
+
+\end{document}

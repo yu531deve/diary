@@ -1,0 +1,130 @@
+% 分野別類題: 定数係数2階線形同次微分方程式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 定数係数2階線形同次微分方程式}
+
+\daimon{【解法】定数係数2階線形同次微分方程式の解き方と導出}
+
+\noindent
+定数係数2階線形同次微分方程式とは、次の形の方程式である。
+\[
+y'' + a y' + b y = 0 \qquad (a,\ b \text{ は定数})
+\]
+$y = e^{\lambda x}$ の形の解を仮定して代入すると、$y' = \lambda e^{\lambda x}$、$y'' = \lambda^{2} e^{\lambda x}$ であるから
+\[
+(\lambda^{2} + a\lambda + b)\,e^{\lambda x} = 0
+\]
+$e^{\lambda x} \neq 0$ より、$\lambda$ は次の\textbf{特性方程式}を満たさなければならない。
+\[
+\lambda^{2} + a\lambda + b = 0
+\]
+これは2次方程式であるから、判別式 $D = a^{2} - 4b$ の符号により根の種類が定まり、一般解の形は次の3通りに分類される。
+
+\medskip
+\noindent
+\textbf{(i) 相異なる実根 $\lambda_{1} \neq \lambda_{2}$（$D > 0$）の場合}
+
+$y = e^{\lambda_{1}x}$ と $y = e^{\lambda_{2}x}$ はともに解であり、互いに一次独立（ロンスキアン $W = (\lambda_{2}-\lambda_{1})e^{(\lambda_{1}+\lambda_{2})x} \neq 0$）なので、一般解は
+\[
+y = C_{1}e^{\lambda_{1}x} + C_{2}e^{\lambda_{2}x}
+\]
+
+\medskip
+\noindent
+\textbf{(ii) 重根 $\lambda_{1} = \lambda_{2} = \lambda$（$D = 0$）の場合}
+
+$y_{1} = e^{\lambda x}$ は解であるが、これだけでは一次独立な解が1つ足りない。そこで $y_{2} = x e^{\lambda x}$ が解になることを確かめる。$y_{2}' = (1+\lambda x)e^{\lambda x}$、$y_{2}'' = (2\lambda + \lambda^{2}x)e^{\lambda x}$ を方程式に代入すると
+\[
+y_{2}'' + a y_{2}' + b y_{2}
+= e^{\lambda x}\Bigl[(\lambda^{2}x + 2\lambda) + a(1+\lambda x) + bx\Bigr]
+= e^{\lambda x}\Bigl[x(\lambda^{2}+a\lambda+b) + (2\lambda + a)\Bigr]
+\]
+重根条件より $\lambda^{2}+a\lambda+b = 0$ かつ $\lambda = -\dfrac{a}{2}$（重根は $-\dfrac{a}{2}$）であるから $2\lambda + a = 0$ となり、上式は $0$ に等しい。よって $y_{2} = xe^{\lambda x}$ も解であり、$y_1, y_2$ は一次独立（$W = e^{2\lambda x} \neq 0$）なので、一般解は
+\[
+y = (C_{1} + C_{2}x)\,e^{\lambda x}
+\]
+
+\medskip
+\noindent
+\textbf{(iii) 共役虚根 $\lambda = p \pm qi$（$D < 0$、$q \neq 0$）の場合}
+
+複素数解 $e^{(p+qi)x} = e^{px}(\cos qx + i\sin qx)$（オイラーの公式）が方程式を満たす。方程式は実係数線形であるから、この複素数解の実部・虚部
+\[
+e^{px}\cos qx, \qquad e^{px}\sin qx
+\]
+もそれぞれ実数値解であり、互いに一次独立である。よって一般解は
+\[
+y = e^{px}\bigl(C_{1}\cos qx + C_{2}\sin qx\bigr)
+\]
+
+\medskip
+\noindent
+初期値問題の場合は、上記の一般解と、それを1回微分した式に初期条件を代入して $C_{1}, C_{2}$ を定める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$y'' - 3y' + 2y = 0$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+特性方程式は
+\[
+\lambda^{2} - 3\lambda + 2 = 0 \quad\Longrightarrow\quad (\lambda-1)(\lambda-2) = 0
+\quad\Longrightarrow\quad \lambda = 1,\ 2
+\]
+相異なる実根であるから、一般解は
+\[
+\boxed{\; y = C_{1}e^{x} + C_{2}e^{2x} \;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $y' = C_{1}e^{x}+2C_{2}e^{2x}$、$y'' = C_{1}e^{x}+4C_{2}e^{2x}$ より
+$y''-3y'+2y = (1-3+2)C_{1}e^{x} + (4-6+2)C_{2}e^{2x} = 0$。成立。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$y'' + 4y' + 4y = 0$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+特性方程式は
+\[
+\lambda^{2} + 4\lambda + 4 = 0 \quad\Longrightarrow\quad (\lambda+2)^{2} = 0
+\quad\Longrightarrow\quad \lambda = -2 \ (\text{重根})
+\]
+重根であるから、一般解は
+\[
+\boxed{\; y = (C_{1} + C_{2}x)\,e^{-2x} \;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $y' = (C_{2} - 2C_{1} - 2C_{2}x)e^{-2x}$、$y'' = (4C_{1} - 4C_{2} + 4C_{2}x)e^{-2x}$ より
+$y''+4y'+4y = \bigl[(4C_{1}-4C_{2}) + 4(C_{2}-2C_{1}) + 4C_{1}\bigr]e^{-2x} + \bigl[4C_{2} - 8C_{2} + 4C_{2}\bigr]xe^{-2x} = 0$。成立。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$y'' + 2y' + 5y = 0, \quad y(0) = 1,\ y'(0) = -1$ を解け。
+\end{mondaiboxS}
+\kaitou
+特性方程式は
+\[
+\lambda^{2} + 2\lambda + 5 = 0 \quad\Longrightarrow\quad \lambda = \frac{-2 \pm \sqrt{4-20}}{2} = -1 \pm 2i
+\]
+共役虚根 $p = -1$、$q = 2$ であるから、一般解は
+\[
+y = e^{-x}\bigl(C_{1}\cos 2x + C_{2}\sin 2x\bigr)
+\]
+$y(0) = C_{1} = 1$。また
+\[
+y' = -e^{-x}\bigl(C_{1}\cos 2x + C_{2}\sin 2x\bigr) + e^{-x}\bigl(-2C_{1}\sin 2x + 2C_{2}\cos 2x\bigr)
+\]
+より $y'(0) = -C_{1} + 2C_{2} = -1$。$C_{1}=1$ を代入して $2C_{2} = 0$、$C_{2} = 0$。したがって
+\[
+\boxed{\; y = e^{-x}\cos 2x \;}
+\]
+（検算: $y' = -e^{-x}\cos 2x - 2e^{-x}\sin 2x$、
+$y'' = e^{-x}\cos 2x + 2e^{-x}\sin 2x + 2e^{-x}\sin 2x - 4e^{-x}\cos 2x = -3e^{-x}\cos 2x + 4e^{-x}\sin 2x$。
+よって $y''+2y'+5y = (-3-2+5)e^{-x}\cos 2x + (4-4+0)e^{-x}\sin 2x = 0$。また $y(0)=1$、$y'(0)=-1$ も満たす。成立。）
+
+\end{document}

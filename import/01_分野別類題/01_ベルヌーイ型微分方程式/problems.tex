@@ -1,0 +1,28 @@
+% 分野別類題: ベルヌーイ型微分方程式（Bernoulli equation）
+% タイトルのみ英語、本文は日本語。u = y^{1-n} の置換で線形化する定番 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- Bernoulli Differential Equations}
+
+\shijibun{次の常微分方程式を解き、導出過程を示せ。（ヒント: $y' + P(x)y = Q(x)y^{n}$ の形の方程式は、$u = y^{1-n}$ の置換により線形方程式に帰着できる。）}
+
+\shomon{問1.}{次の常微分方程式の一般解を求めよ（$y$ を $x$ を用いて表せ）。}
+\[
+\frac{dy}{dx} + \frac{y}{x} = x\,y^{2}
+\]
+
+\shomon{問2.}{次の常微分方程式の一般解を求めよ。}
+\[
+\frac{dy}{dx} - y = e^{x}\,y^{3}
+\]
+
+\shomon{問3.}{次の初期値問題を解け。}
+\[
+\frac{dy}{dx} + 2xy = x\,y^{2}, \qquad y(0) = 1
+\]
+
+\end{document}

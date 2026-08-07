@@ -1,0 +1,38 @@
+% 分野別類題: 微分計算（合成関数・商・積の微分）
+% 三角関数×べき×指数の混合形を中心に、計算スピードを鍛える基本3問＋やや複雑な2問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 微分計算（合成・商・積）}
+
+\shijibun{次の各関数を $x$ について微分せよ。積の微分公式 $(fg)' = f'g + fg'$、商の微分公式 $\left(\dfrac{f}{g}\right)' = \dfrac{f'g - fg'}{g^{2}}$、合成関数の微分公式（連鎖律）$\{f(g(x))\}' = f'(g(x))\,g'(x)$ を適切に組み合わせて計算し、可能な限り簡単な形にまとめよ。}
+
+\shomon{問1.}{次の関数を微分せよ。}
+\[
+y = \frac{\cos x}{\sqrt{x}}
+\]
+
+\shomon{問2.}{次の関数を微分せよ。}
+\[
+y = \frac{1}{\tan^{2} x}
+\]
+
+\shomon{問3.}{次の関数を微分せよ。}
+\[
+y = x^{2} e^{3x} \sin x
+\]
+
+\shomon{問4.}{次の関数を微分せよ。}
+\[
+y = \sin^{3}\!\left(2x^{2} + 1\right)
+\]
+
+\shomon{問5.}{次の関数を微分せよ。（対数微分法を用いよ。）}
+\[
+y = x^{x} \quad (x > 0)
+\]
+
+\end{document}

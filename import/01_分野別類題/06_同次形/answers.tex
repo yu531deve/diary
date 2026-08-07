@@ -1,0 +1,162 @@
+% 分野別類題: 同次形 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 同次形}
+
+\daimon{【解法】同次形の解き方と導出}
+
+\noindent
+同次形とは、次のように右辺が $y/x$ のみの関数として書ける1階常微分方程式である。
+\[
+\frac{dy}{dx} = f\!\left(\frac{y}{x}\right)
+\]
+そこで
+\[
+v = \frac{y}{x} \quad\Longleftrightarrow\quad y = vx
+\]
+と置換する。$v$ も $x$ の関数であるから、積の微分により
+\[
+\frac{dy}{dx} = v + x\frac{dv}{dx}
+\]
+となる。これを元の方程式に代入すると
+\[
+v + x\frac{dv}{dx} = f(v)
+\quad\Longrightarrow\quad
+x\frac{dv}{dx} = f(v) - v
+\]
+が得られ、これは $v$ と $x$ について変数分離形である。$f(v) \neq v$ のとき
+\[
+\frac{dv}{f(v) - v} = \frac{dx}{x}
+\]
+両辺を積分し、$v = y/x$ を代入して元の変数 $x, y$ に戻せば一般解が求まる。初期条件が与えられた場合は、一般解に代入して積分定数を定める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$\dfrac{dy}{dx} = \dfrac{x^{2} + y^{2}}{xy} \quad (x > 0)$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+右辺を $y/x$ のみで表すと
+\[
+\frac{x^{2}+y^{2}}{xy} = \frac{1 + (y/x)^{2}}{y/x}
+\]
+であるから同次形である。$v = y/x$（$y = vx$）と置くと $\dfrac{dy}{dx} = v + x\dfrac{dv}{dx}$ より
+\[
+v + x\frac{dv}{dx} = \frac{1+v^{2}}{v}
+\quad\Longrightarrow\quad
+x\frac{dv}{dx} = \frac{1+v^{2}}{v} - v = \frac{1}{v}
+\]
+変数分離して
+\[
+v\,dv = \frac{dx}{x}
+\quad\Longrightarrow\quad
+\frac{v^{2}}{2} = \ln x + C_{1}
+\quad\Longrightarrow\quad
+v^{2} = 2\ln x + C
+\]
+$v = y/x$ を戻すと $\dfrac{y^{2}}{x^{2}} = 2\ln x + C$ より
+\[
+\boxed{\; y^{2} = x^{2}\left(2\ln x + C\right) \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $y^{2}=x^{2}(2\ln x+C)$ の両辺を $x$ で微分すると $2yy' = 2x(2\ln x+C) + x^{2}\cdot\frac{2}{x} = 2x(2\ln x+C+1)$。よって $y' = \dfrac{x(2\ln x+C+1)}{y}$。一方、右辺は $\dfrac{x^{2}+y^{2}}{xy} = \dfrac{x^{2}+x^{2}(2\ln x+C)}{xy} = \dfrac{x(1+2\ln x+C)}{y}$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$\dfrac{dy}{dx} = \dfrac{y}{x} + \tan\dfrac{y}{x} \quad (x > 0)$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+右辺が $y/x$ のみの関数なので同次形である。$v = y/x$（$y=vx$）と置くと
+\[
+v + x\frac{dv}{dx} = v + \tan v
+\quad\Longrightarrow\quad
+x\frac{dv}{dx} = \tan v
+\]
+変数分離して
+\[
+\frac{\cos v}{\sin v}\,dv = \frac{dx}{x}
+\quad\Longrightarrow\quad
+\ln|\sin v| = \ln x + C_{1}
+\quad\Longrightarrow\quad
+\sin v = Cx
+\]
+$v = y/x$ を戻すと
+\[
+\boxed{\; \sin\frac{y}{x} = Cx \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $\sin(y/x) = Cx$ の両辺を $x$ で微分すると、$u=y/x$ とおいて $\cos u \cdot u' = C$。$u' = \dfrac{y'x - y}{x^{2}}$ であり、また $C = \dfrac{\sin u}{x}$ であるから
+\[
+\cos u\cdot\frac{y'x-y}{x^{2}} = \frac{\sin u}{x}
+\;\Longrightarrow\;
+\cos u\,(y'x - y) = x\sin u
+\;\Longrightarrow\;
+y' = \tan u + \frac{y}{x} = \tan\frac{y}{x} + \frac{y}{x}
+\]
+となり元の方程式と一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$\dfrac{dy}{dx} = \dfrac{x+y}{x-y}, \quad y(1) = 0 \quad (x > 0)$ を解け。
+\end{mondaiboxS}
+\kaitou
+右辺を $y/x$ のみで表すと
+\[
+\frac{x+y}{x-y} = \frac{1 + y/x}{1 - y/x}
+\]
+であるから同次形である。$v = y/x$（$y = vx$）と置くと
+\[
+v + x\frac{dv}{dx} = \frac{1+v}{1-v}
+\quad\Longrightarrow\quad
+x\frac{dv}{dx} = \frac{1+v}{1-v} - v = \frac{1+v - v(1-v)}{1-v} = \frac{1+v^{2}}{1-v}
+\]
+変数分離して
+\[
+\frac{1-v}{1+v^{2}}\,dv = \frac{dx}{x}
+\]
+左辺を分解して積分する。
+\[
+\int\frac{1}{1+v^{2}}\,dv - \int\frac{v}{1+v^{2}}\,dv
+= \arctan v - \frac12\ln\!\left(1+v^{2}\right)
+\]
+よって
+\[
+\arctan v - \frac12\ln\!\left(1+v^{2}\right) = \ln x + C_{1}
+\]
+初期条件 $y(1)=0$ より $x=1$ のとき $v = y/x = 0$。代入すると
+\[
+\arctan 0 - \frac12\ln 1 = \ln 1 + C_{1}
+\quad\Longrightarrow\quad
+C_{1} = 0
+\]
+したがって
+\[
+\arctan v - \frac12\ln\!\left(1+v^{2}\right) = \ln x
+\]
+両辺を $2$ 倍し $v = y/x$ を戻すと
+\[
+2\arctan\frac{y}{x} - \ln\!\left(1 + \frac{y^{2}}{x^{2}}\right) = 2\ln x
+\quad\Longrightarrow\quad
+2\arctan\frac{y}{x} - \ln\!\left(\frac{x^{2}+y^{2}}{x^{2}}\right) = 2\ln x
+\]
+\[
+\quad\Longrightarrow\quad
+2\arctan\frac{y}{x} - \ln\!\left(x^{2}+y^{2}\right) + 2\ln x = 2\ln x
+\]
+すなわち
+\[
+\boxed{\; \ln\!\left(x^{2}+y^{2}\right) = 2\arctan\frac{y}{x} \;}
+\]
+（検算: $x=1,\,y=0$ を代入すると左辺 $=\ln 1 = 0$、右辺 $=2\arctan 0 = 0$ となり初期条件を満たす。また $F(x,y) = \ln(x^{2}+y^{2}) - 2\arctan(y/x) = 0$ とおいて陰関数の微分公式 $y' = -F_{x}/F_{y}$ を用いると、
+\[
+F_{x} = \frac{2x}{x^{2}+y^{2}} + \frac{2y}{x^{2}+y^{2}} = \frac{2(x+y)}{x^{2}+y^{2}},
+\qquad
+F_{y} = \frac{2y}{x^{2}+y^{2}} - \frac{2x}{x^{2}+y^{2}} = \frac{2(y-x)}{x^{2}+y^{2}}
+\]
+より $y' = -\dfrac{2(x+y)/(x^{2}+y^{2})}{2(y-x)/(x^{2}+y^{2})} = \dfrac{x+y}{x-y}$ となり元の方程式と一致する。）
+
+\end{document}

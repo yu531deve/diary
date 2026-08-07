@@ -1,0 +1,196 @@
+% 分野別類題: 微分計算（多変数の連鎖律・偏微分・全微分） 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 微分計算（多変数の連鎖律・偏微分・全微分）}
+
+\daimon{【解法】多変数の連鎖律・偏微分・全微分の解き方と導出}
+
+\noindent
+$z = f(x,y)$ が $x,y$ について全微分可能であるとき、その全微分は
+\[
+dz = \frac{\partial z}{\partial x}\,dx + \frac{\partial z}{\partial y}\,dy
+\]
+で与えられる。ここで $x = x(t)$、$y = y(t)$ とおいて $t$ の関数として $z$ をみると、両辺を $dt$ で割ることにより連鎖律（合成関数の微分公式）
+\[
+\frac{dz}{dt} = \frac{\partial z}{\partial x}\frac{dx}{dt} + \frac{\partial z}{\partial y}\frac{dy}{dt}
+\]
+が得られる。同様に $x = x(u,v)$、$y = y(u,v)$ のように2変数でパラメータ表示される場合は、$u$ を止めて $v$ だけ動かす（またはその逆）と考えれば
+\[
+\frac{\partial z}{\partial u} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial u} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial u}, \qquad
+\frac{\partial z}{\partial v} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial v} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial v}
+\]
+が成り立つ。特に極座標変換 $x = r\cos\theta$、$y = r\sin\theta$ の場合は
+\[
+\frac{\partial x}{\partial r} = \cos\theta,\quad \frac{\partial y}{\partial r} = \sin\theta,\quad
+\frac{\partial x}{\partial \theta} = -r\sin\theta,\quad \frac{\partial y}{\partial \theta} = r\cos\theta
+\]
+であるから、
+\[
+\frac{\partial z}{\partial r} = z_{x}\cos\theta + z_{y}\sin\theta, \qquad
+\frac{\partial z}{\partial \theta} = -r z_{x}\sin\theta + r z_{y}\cos\theta
+\]
+となる。
+
+逆に $r,\theta$ を $x,y$ の関数とみると、$r = \sqrt{x^{2}+y^{2}}$、$\theta = \arctan(y/x)$ より
+\[
+r_{x} = \cos\theta,\ r_{y} = \sin\theta,\qquad
+\theta_{x} = -\frac{\sin\theta}{r},\ \theta_{y} = \frac{\cos\theta}{r}
+\]
+であり、これを連鎖律に代入すると、偏微分の作用素として
+\[
+\frac{\partial}{\partial x} = \cos\theta\,\frac{\partial}{\partial r} - \frac{\sin\theta}{r}\frac{\partial}{\partial \theta}, \qquad
+\frac{\partial}{\partial y} = \sin\theta\,\frac{\partial}{\partial r} + \frac{\cos\theta}{r}\frac{\partial}{\partial \theta}
+\]
+という表示（作用素の合成）が得られる。この作用素を2回適用すれば、2階偏微分（ラプラシアン）の極座標表示を導ける（問5参照）。
+
+また、陰関数 $F(x,y) = 0$ が $y = y(x)$ を定めるとき、両辺を $x$ で微分すると連鎖律より
+\[
+F_{x} + F_{y}\frac{dy}{dx} = 0 \quad\Longrightarrow\quad \frac{dy}{dx} = -\frac{F_{x}}{F_{y}} \quad (F_{y} \ne 0)
+\]
+が得られる（陰関数定理）。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$z = x^{2}y - y^{3}$、$x = e^{t}$、$y = \cos t$ のとき、合成関数の連鎖律を用いて $\dfrac{dz}{dt}$ を求めよ。
+\end{mondaiboxS}
+\kaitou
+$z_{x} = 2xy$、$z_{y} = x^{2} - 3y^{2}$、$\dfrac{dx}{dt} = e^{t}$、$\dfrac{dy}{dt} = -\sin t$ であるから、連鎖律より
+\[
+\frac{dz}{dt} = z_{x}\frac{dx}{dt} + z_{y}\frac{dy}{dt}
+= (2xy)(e^{t}) + (x^{2}-3y^{2})(-\sin t)
+\]
+ここで $x = e^{t}$、$y=\cos t$ を代入すると
+\[
+\frac{dz}{dt} = 2e^{t}\cos t \cdot e^{t} - (e^{2t} - 3\cos^{2}t)\sin t
+\]
+すなわち
+\[
+\boxed{\; \frac{dz}{dt} = 2e^{2t}\cos t - e^{2t}\sin t + 3\sin t\cos^{2}t \;}
+\]
+（検算: $t=0$ のとき $x=1,y=1$、$z_x=2,z_y=-2$、$dx/dt=1,dy/dt=0$ なので $dz/dt=2\cdot1+(-2)\cdot0=2$。上式に $t=0$ を代入すると $2\cdot1\cdot1 - 1\cdot0 + 3\cdot0\cdot1 = 2$ で一致。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$z = x^{2} - y^{2}$ について、極座標変換 $x = r\cos\theta$、$y = r\sin\theta$ を行うとき、$\dfrac{\partial z}{\partial r}$ と $\dfrac{\partial z}{\partial \theta}$ を求めよ。
+\end{mondaiboxS}
+\kaitou
+$z_{x} = 2x$、$z_{y} = -2y$、$x_{r} = \cos\theta$、$y_{r}=\sin\theta$、$x_{\theta} = -r\sin\theta$、$y_{\theta} = r\cos\theta$ であるから
+\[
+\frac{\partial z}{\partial r} = z_{x}x_{r} + z_{y}y_{r} = 2x\cos\theta - 2y\sin\theta = 2r\cos^{2}\theta - 2r\sin^{2}\theta = 2r\cos 2\theta
+\]
+\[
+\frac{\partial z}{\partial \theta} = z_{x}x_{\theta} + z_{y}y_{\theta} = -2xr\sin\theta - 2yr\cos\theta = -2r^{2}\sin\theta\cos\theta - 2r^{2}\sin\theta\cos\theta = -2r^{2}\sin 2\theta
+\]
+したがって
+\[
+\boxed{\; \frac{\partial z}{\partial r} = 2r\cos 2\theta, \qquad \frac{\partial z}{\partial \theta} = -2r^{2}\sin 2\theta \;}
+\]
+（検算: $z = r^{2}\cos^{2}\theta - r^{2}\sin^{2}\theta = r^{2}\cos 2\theta$ と直接 $r,\theta$ の関数として書き直すと、$\partial z/\partial r = 2r\cos2\theta$、$\partial z/\partial \theta = -2r^{2}\sin2\theta$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+陰関数 $x^{3} + y^{3} - 3xy = 0$ について、一般の点における $\dfrac{dy}{dx}$ を $x,y$ の式で表せ。さらに、この曲線上の点 $\left(\dfrac{3}{2}, \dfrac{3}{2}\right)$ における $\dfrac{dy}{dx}$ の値を求めよ。
+\end{mondaiboxS}
+\kaitou
+$F(x,y) = x^{3} + y^{3} - 3xy$ とおくと
+\[
+F_{x} = 3x^{2} - 3y, \qquad F_{y} = 3y^{2} - 3x
+\]
+であるから、陰関数定理より
+\[
+\frac{dy}{dx} = -\frac{F_{x}}{F_{y}} = -\frac{3x^{2}-3y}{3y^{2}-3x} = \frac{y-x^{2}}{y^{2}-x}
+\]
+点 $\left(\dfrac{3}{2},\dfrac{3}{2}\right)$ はこの曲線上にある（実際 $\left(\tfrac{3}{2}\right)^{3}+\left(\tfrac{3}{2}\right)^{3}-3\cdot\tfrac{3}{2}\cdot\tfrac{3}{2} = \tfrac{27}{8}+\tfrac{27}{8}-\tfrac{27}{4} = \tfrac{27}{4}-\tfrac{27}{4}=0$）。この点で
+\[
+\frac{dy}{dx} = \frac{\frac{3}{2} - \left(\frac{3}{2}\right)^{2}}{\left(\frac{3}{2}\right)^{2} - \frac{3}{2}} = \frac{\frac{3}{2}-\frac{9}{4}}{\frac{9}{4}-\frac{3}{2}} = \frac{-\frac{3}{4}}{\frac{3}{4}} = -1
+\]
+したがって
+\[
+\boxed{\; \frac{dy}{dx} = \frac{y-x^{2}}{y^{2}-x}, \quad \left.\frac{dy}{dx}\right|_{(3/2,\,3/2)} = -1 \;}
+\]
+（検算: $F_y = 3\left(\tfrac{9}{4}\right)-3\cdot\tfrac{3}{2} = \tfrac{27}{4}-\tfrac{18}{4}=\tfrac{9}{4}\ne 0$ より陰関数定理が適用できる。）
+
+\clearpage
+\begin{mondaiboxS}{問4}
+$z = f(x,y)$ に対し、$x = u^{2} - v^{2}$、$y = 2uv$ とおくとき、$\dfrac{\partial z}{\partial u}$、$\dfrac{\partial z}{\partial v}$ を $\dfrac{\partial z}{\partial x}$、$\dfrac{\partial z}{\partial y}$、$u$、$v$ を用いて表せ。さらに $f(x,y) = xy$ の場合について、$\dfrac{\partial z}{\partial u}$、$\dfrac{\partial z}{\partial v}$ を $u,v$ の式として具体的に求めよ。
+\end{mondaiboxS}
+\kaitou
+$x_{u} = 2u$、$y_{u} = 2v$、$x_{v} = -2v$、$y_{v} = 2u$ であるから、連鎖律より
+\[
+\frac{\partial z}{\partial u} = z_{x}\cdot 2u + z_{y}\cdot 2v = 2u\,z_{x} + 2v\,z_{y}
+\]
+\[
+\frac{\partial z}{\partial v} = z_{x}\cdot(-2v) + z_{y}\cdot 2u = -2v\,z_{x} + 2u\,z_{y}
+\]
+次に $f(x,y) = xy$ のとき $z_{x} = y$、$z_{y} = x$ であるから、$x = u^{2}-v^{2}$、$y=2uv$ を用いて
+\[
+\frac{\partial z}{\partial u} = 2u\cdot y + 2v\cdot x = 2u(2uv) + 2v(u^{2}-v^{2}) = 4u^{2}v + 2u^{2}v - 2v^{3} = 6u^{2}v - 2v^{3}
+\]
+\[
+\frac{\partial z}{\partial v} = -2v\cdot y + 2u\cdot x = -2v(2uv) + 2u(u^{2}-v^{2}) = -4uv^{2} + 2u^{3} - 2uv^{2} = 2u^{3} - 6uv^{2}
+\]
+したがって
+\[
+\boxed{\; \frac{\partial z}{\partial u} = 2u\,z_{x}+2v\,z_{y},\qquad \frac{\partial z}{\partial v} = -2v\,z_{x}+2u\,z_{y} \;}
+\]
+\[
+f=xy \text{ のとき }\quad
+\boxed{\; \frac{\partial z}{\partial u} = 6u^{2}v-2v^{3},\qquad \frac{\partial z}{\partial v} = 2u^{3}-6uv^{2} \;}
+\]
+（検算: $z = xy = (u^{2}-v^{2})(2uv) = 2u^{3}v - 2uv^{3}$ を直接 $u,v$ で偏微分すると $\partial z/\partial u = 6u^{2}v-2v^{3}$、$\partial z/\partial v = 2u^{3}-6uv^{2}$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問5}
+$z = f(x,y)$ に対し、極座標変換 $x = r\cos\theta$、$y = r\sin\theta$ を行うとき、2階偏微分について次の関係式が成り立つことを示せ。
+\[
+\frac{\partial^{2} z}{\partial x^{2}} + \frac{\partial^{2} z}{\partial y^{2}} = \frac{\partial^{2} z}{\partial r^{2}} + \frac{1}{r}\frac{\partial z}{\partial r} + \frac{1}{r^{2}}\frac{\partial^{2} z}{\partial \theta^{2}}.
+\]
+\end{mondaiboxS}
+\kaitou
+【解法】で示した作用素の関係
+\[
+\frac{\partial}{\partial x} = \cos\theta\,\partial_{r} - \frac{\sin\theta}{r}\partial_{\theta}, \qquad
+\frac{\partial}{\partial y} = \sin\theta\,\partial_{r} + \frac{\cos\theta}{r}\partial_{\theta}
+\]
+を用いる。まず
+\[
+z_{x} = \cos\theta\, z_{r} - \frac{\sin\theta}{r} z_{\theta}
+\]
+に再び $\partial/\partial x$ を作用させる。$\theta$ に依存する $\cos\theta,\sin\theta$ と $r$ に依存する $1/r$ に注意して積の微分を行うと
+\[
+\partial_{r}\left(\cos\theta\,z_{r} - \frac{\sin\theta}{r}z_{\theta}\right)
+= \cos\theta\,z_{rr} + \frac{\sin\theta}{r^{2}}z_{\theta} - \frac{\sin\theta}{r}z_{r\theta}
+\]
+\[
+\partial_{\theta}\left(\cos\theta\,z_{r} - \frac{\sin\theta}{r}z_{\theta}\right)
+= -\sin\theta\,z_{r} + \cos\theta\,z_{r\theta} - \frac{\cos\theta}{r}z_{\theta} - \frac{\sin\theta}{r}z_{\theta\theta}
+\]
+であるから
+\[
+z_{xx} = \cos\theta\left[\cos\theta\,z_{rr} + \frac{\sin\theta}{r^{2}}z_{\theta} - \frac{\sin\theta}{r}z_{r\theta}\right]
+- \frac{\sin\theta}{r}\left[-\sin\theta\,z_{r} + \cos\theta\,z_{r\theta} - \frac{\cos\theta}{r}z_{\theta} - \frac{\sin\theta}{r}z_{\theta\theta}\right]
+\]
+\[
+= \cos^{2}\theta\, z_{rr} + \frac{\sin^{2}\theta}{r}z_{r} + \frac{\sin^{2}\theta}{r^{2}}z_{\theta\theta} - \frac{2\sin\theta\cos\theta}{r}z_{r\theta} + \frac{2\sin\theta\cos\theta}{r^{2}}z_{\theta}
+\]
+同様に $z_{y} = \sin\theta\,z_{r} + \dfrac{\cos\theta}{r}z_{\theta}$ にもう一度 $\partial/\partial y$ を作用させると
+\[
+z_{yy} = \sin^{2}\theta\, z_{rr} + \frac{\cos^{2}\theta}{r}z_{r} + \frac{\cos^{2}\theta}{r^{2}}z_{\theta\theta} + \frac{2\sin\theta\cos\theta}{r}z_{r\theta} - \frac{2\sin\theta\cos\theta}{r^{2}}z_{\theta}
+\]
+両者を加えると、$z_{r\theta}$ の項（符号が逆で係数が同じ）と $z_{\theta}$ の項（同様）はすべて相殺し、$\cos^{2}\theta+\sin^{2}\theta=1$ を用いて
+\[
+z_{xx}+z_{yy} = z_{rr} + \frac{1}{r}z_{r} + \frac{1}{r^{2}}z_{\theta\theta}
+\]
+すなわち
+\[
+\boxed{\; \frac{\partial^{2} z}{\partial x^{2}} + \frac{\partial^{2} z}{\partial y^{2}} = \frac{\partial^{2} z}{\partial r^{2}} + \frac{1}{r}\frac{\partial z}{\partial r} + \frac{1}{r^{2}}\frac{\partial^{2} z}{\partial \theta^{2}} \;}
+\]
+が示された。
+（検算: $z=x^{2}+y^{2}=r^{2}$ とおくと、左辺は $z_{xx}+z_{yy}=2+2=4$。右辺は $z_r=2r,\,z_{rr}=2,\,z_\theta=z_{\theta\theta}=0$ より $2+\tfrac{1}{r}\cdot2r+0=2+2=4$ で一致する。）
+
+\end{document}

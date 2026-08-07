@@ -1,0 +1,28 @@
+% 分野別類題: スツルム・リウヴィル型境界値問題（y'' + λy = 0 の固有値問題）
+% ディリクレ・ノイマン・混合境界条件のもとで固有値と固有関数を求める基本形 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- スツルム・リウヴィル型境界値問題}
+
+\shijibun{次の境界値問題について、方程式 $y'' + \lambda y = 0$ が自明でない解（固有関数）をもつような定数 $\lambda$（固有値）をすべて求め、対応する固有関数を求めよ。$\lambda$ の符号（$\lambda < 0$, $\lambda = 0$, $\lambda > 0$）によって場合分けし、自明解しか存在しない場合はその旨を明記せよ。}
+
+\shomon{問1.}{次の境界値問題（ディリクレ境界条件）の固有値と固有関数を求めよ。}
+\[
+y'' + \lambda y = 0, \qquad y(0) = 0, \quad y(L) = 0 \qquad (L > 0)
+\]
+
+\shomon{問2.}{次の境界値問題（ノイマン境界条件）の固有値と固有関数を求めよ。}
+\[
+y'' + \lambda y = 0, \qquad y'(0) = 0, \quad y'(L) = 0 \qquad (L > 0)
+\]
+
+\shomon{問3.}{次の境界値問題（混合境界条件）の固有値と固有関数を求めよ。}
+\[
+y'' + \lambda y = 0, \qquad y(0) = 0, \quad y'(L) = 0 \qquad (L > 0)
+\]
+
+\end{document}

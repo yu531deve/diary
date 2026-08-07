@@ -1,0 +1,28 @@
+% 分野別類題: 1階線形非同次微分方程式（積分因子法: y' + P(x) y = Q(x)）
+% 積分因子 mu = exp(int P dx) を用いる基本形 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 1階線形非同次微分方程式（積分因子法）}
+
+\shijibun{次の常微分方程式を解き、導出過程を示せ。（1階線形非同次方程式 $y' + P(x)\,y = Q(x)$ は、積分因子 $\mu(x) = \exp\left(\int P(x)\,dx\right)$ を両辺に掛けて $(\mu y)' = \mu Q$ の形に直し、積分することで解ける。）}
+
+\shomon{問1.}{次の常微分方程式の一般解を求めよ（$x > 0$ とする）。}
+\[
+\frac{dy}{dx} + \frac{y}{x} = \frac{\sin x}{x}
+\]
+
+\shomon{問2.}{次の常微分方程式の一般解を求めよ。}
+\[
+\frac{dy}{dx} - 2x\,y = e^{x^{2}}
+\]
+
+\shomon{問3.}{次の初期値問題を解け。}
+\[
+\frac{dy}{dx} + 2y = e^{-x}, \qquad y(0) = 3
+\]
+
+\end{document}

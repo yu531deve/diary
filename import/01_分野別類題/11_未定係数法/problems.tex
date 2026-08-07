@@ -1,0 +1,28 @@
+% 分野別類題: 定数係数2階線形非同次微分方程式（未定係数法）
+% y'' + a y' + b y = f(x) の特殊解を未定係数法で求める基本形 3 問（共鳴を含む）。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 定数係数2階線形非同次微分方程式（未定係数法）}
+
+\shijibun{次の常微分方程式の一般解（または初期値問題の解）を、未定係数法を用いて導出過程とともに求めよ。}
+
+\shomon{問1.}{次の常微分方程式の一般解を求めよ。}
+\[
+y'' - y = x^{2} + 1
+\]
+
+\shomon{問2.}{次の常微分方程式の一般解を求めよ。（同次解との共鳴に注意せよ。）}
+\[
+y'' + 4y = \sin 2x
+\]
+
+\shomon{問3.}{次の初期値問題を解け。（特性方程式が重根をもつ場合の共鳴に注意せよ。）}
+\[
+y'' - 2y' + y = e^{x}, \qquad y(0) = 1, \quad y'(0) = 0
+\]
+
+\end{document}

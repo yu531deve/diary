@@ -1,0 +1,31 @@
+% 分野別類題: べき級数解法（正則点まわりの ODE の級数解）
+% y = Σ a_n x^n を代入して係数の漸化式を導く問題 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- べき級数解法}
+
+\shijibun{次の常微分方程式について、$x=0$ を正則点として $y = \displaystyle\sum_{n=0}^{\infty} a_n x^{n}$ とおき、方程式に代入して係数 $a_n$ の間の漸化式を導け。そのうえで指示された解を求めよ。}
+
+\shomon{問1.}{エアリー方程式
+\[
+y'' - x y = 0
+\]
+の級数解 $y = \displaystyle\sum_{n=0}^{\infty} a_n x^{n}$ について、係数 $a_n$ の漸化式を導け。さらに $a_0, a_1$ を任意定数として、$a_2$ から $a_7$ までを $a_0, a_1$ で表せ。}
+
+\shomon{問2.}{ルジャンドル方程式
+\[
+(1-x^{2})y'' - 2xy' + n(n+1)y = 0
+\]
+において $n=2$ とする。$y = \displaystyle\sum_{k=0}^{\infty} a_k x^{k}$ を代入して係数の漸化式を導き、$a_1 = 0$ の場合に得られる多項式解（偶数次のみからなる有限級数）を、$a_0$ を用いて表せ。またこれを定数倍して $x=1$ で値 $1$ をとるように正規化した多項式（ルジャンドル多項式 $P_2(x)$）を求めよ。}
+
+\shomon{問3.}{エルミート方程式
+\[
+y'' - 2xy' + 2ny = 0
+\]
+において $n=2$ とし、初期条件 $y(0) = -2,\ y'(0) = 0$ を満たす解を求めよ。$y = \displaystyle\sum_{k=0}^{\infty} a_k x^{k}$ とおいて係数の漸化式を導き、この初期条件のもとで級数が有限項で終わる（多項式になる）ことを確かめたうえで、$y$ を $x$ の多項式として具体的に求めよ。}
+
+\end{document}
