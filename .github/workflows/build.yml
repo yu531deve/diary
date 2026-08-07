@@ -104,3 +104,61 @@ jobs:
             echo "- .cache/dist キャッシュキー: \`build-cache-${{ runner.os }}-${{ hashFiles('.devcontainer/Dockerfile') }}-${{ hashFiles('content/**', 'styles/diary.sty', 'scripts/**') }}\`"
             echo "- 実行時刻: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # --- ビルド成果物のアップロード（deploy ジョブへ引き継ぐ） ---
+      # docker run はコンテナ内で /workspace に書き込むため、ホスト側の
+      # site/dist にも同じ内容が反映されている（bind mount のため）。
+      - name: Upload site/dist artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: site/dist
+          retention-days: 7
+
+  # #29: Cloudflare Pages への自動デプロイ。
+  # - build.yml に同居させる理由: デプロイ対象の成果物（site/dist）は
+  #   build ジョブでしか作られず、ジョブを分けても結局 build の完了を
+  #   待つ必要がある。ワークフローファイルを分割しても得られる独立性が薄く、
+  #   「push 時のみ build の後続として deploy が動く」という依存関係を
+  #   `needs:` で素直に表現できるため、deploy.yml には分離せず同一ファイルの
+  #   別ジョブとした。
+  # - main への push 時のみ実行（PR ではビルドのみでデプロイしない）。
+  #   `on:` は build ジョブと共有だが、このジョブの if 条件で
+  #   「push かつ main ブランチ」以外を弾く。
+  # - wrangler-action を採用: cloudflare/pages-action は Cloudflare 公式の
+  #   アナウンスでも Wrangler ベースの `wrangler pages deploy` への移行が
+  #   案内されており、機能追加は wrangler-action 側に寄っている。
+  #   `wrangler pages deploy` は Direct Upload 方式（Pages プロジェクトの
+  #   Git 連携を使わない）で、GitHub Actions 側だけで完結し、
+  #   Cloudflare 側のリポジトリ接続設定が不要な点も docs/deploy.md の
+  #   手順を単純化できるため選んだ。
+  # - シークレット未登録でも PR の CI が壊れない設計:
+  #   deploy ジョブ自体が push(main) 時にしか実行されないため、PR では
+  #   このジョブそのものがスキップされる。main push 時にシークレットが
+  #   未登録の場合はこのジョブが失敗するが、build ジョブ（PR で見えるもの）
+  #   には影響しない。
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download site/dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: site/dist
+
+      # プロジェクト名を変えたい場合はここを編集する（既定: diary）。
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site/dist --project-name=diary --branch=main
