@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#020306;font-family:"Noto Sans JP",sans-serif;color:#eef2f6}
+a{color:inherit;text-decoration:none}
+::selection{background:#52e0f5;color:#05060a}
+@keyframes sp{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(6px);opacity:.35}}
+</style></helmet>
+
+<div style="padding:36px 40px 60px;display:flex;flex-direction:column;gap:26px">
+<div style="display:flex;align-items:baseline;gap:14px">
+  <span style="font:700 15px 'Space Grotesk',sans-serif">Diary</span>
+  <span style="font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.2em">MOBILE 390 × 844 — 演出は軽量版に置き換え、下部にタブナビ</span>
+</div>
+
+<div style="display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap">
+
+<div data-screen-label="M トップ" style="display:flex;flex-direction:column;gap:9px">
+<div style="font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;letter-spacing:.2em">TOP</div>
+<div style="position:relative;width:390px;height:844px;background:#05060a;border:1px solid rgba(255,255,255,.12);border-radius:34px;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;font:600 13px 'IBM Plex Mono',monospace;color:#eef2f6"><span>9:41</span><span style="display:flex;gap:5px;font-size:11px;color:#aeb6c2">▮▮▮ ⌁ ▰</span></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 22px">
+    <span style="font:700 17px 'Space Grotesk',sans-serif">Diary</span>
+    <span style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font:400 11px 'IBM Plex Mono',monospace;color:#7d8794">検索</span>
+  </div>
+  <div style="position:relative;height:376px;overflow:hidden">
+    <canvas id="mhero" ref="{{ heroRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+    <div style="position:absolute;left:0;right:0;bottom:26px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 24px">
+      <div style="font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.24em;color:#52e0f5;text-align:center">ORIGINAL ENTRANCE-EXAM MATH</div>
+      <p style="margin:0;font-size:14px;font-weight:500;color:#c3ccd8;text-align:center;line-height:1.8">自作の入試数学、1000問へ。<br>解く価値のある一問を。</p>
+      <span style="display:block;width:1px;height:22px;background:linear-gradient(180deg,#52e0f5,transparent);animation:sp 2s ease-in-out infinite;margin-top:4px"></span>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.1em">
+    <span>PROBLEMS <span style="color:#dfe6ee">0042</span></span><span>FIELDS <span style="color:#dfe6ee">18</span></span><span>GOAL <span style="color:#52e0f5">1000+</span></span>
+  </div>
+  <div style="padding:22px 24px 0;display:flex;flex-direction:column;gap:2px">
+    <div style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.24em;color:#7d8794;margin-bottom:12px">LATEST</div>
+    <a href="#" style="display:flex;flex-direction:column;gap:8px;padding:15px 0;border-top:1px solid rgba(255,255,255,.09)">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#52e0f5">0003</span><span style="display:flex;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#2a3340"></span><span style="width:5px;height:5px;border-radius:50%;background:#2a3340"></span></span></div>
+      <span style="font-size:15px;font-weight:500;line-height:1.5">漸化式で定まる数列の極限</span>
+      <span style="font-size:11px;color:#5c6572">数列 / 漸化式</span>
+    </a>
+    <a href="#" style="display:flex;flex-direction:column;gap:8px;padding:15px 0;border-top:1px solid rgba(255,255,255,.09)">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font:500 11px 'IBM Plex Mono',monospace;color:#52e0f5">0002</span><span style="display:flex;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#52e0f5"></span><span style="width:5px;height:5px;border-radius:50%;background:#2a3340"></span></span></div>
+      <span style="font-size:15px;font-weight:500;line-height:1.5">条件付き確率と漸化式の融合</span>
+      <span style="font-size:11px;color:#5c6572">場合の数・確率</span>
+    </a>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(5,6,10,.94);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(12px)">
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#52e0f5"><span style="font:400 15px 'IBM Plex Mono',monospace">◆</span><span style="font-size:10px;font-weight:500">ホーム</span></a>
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#5c6572"><span style="font:400 15px 'IBM Plex Mono',monospace">≡</span><span style="font-size:10px">分野</span></a>
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#5c6572"><span style="font:400 15px 'IBM Plex Mono',monospace">⌕</span><span style="font-size:10px">検索</span></a>
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#5c6572"><span style="font:400 15px 'IBM Plex Mono',monospace">☆</span><span style="font-size:10px">保存</span></a>
+  </div>
+</div>
+</div>
+
+<div data-screen-label="M 索引" style="display:flex;flex-direction:column;gap:9px">
+<div style="font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;letter-spacing:.2em">FIELDS</div>
+<div style="position:relative;width:390px;height:844px;background:#05060a;border:1px solid rgba(255,255,255,.12);border-radius:34px;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;font:600 13px 'IBM Plex Mono',monospace;color:#eef2f6"><span>9:41</span><span style="display:flex;gap:5px;font-size:11px;color:#aeb6c2">▮▮▮ ⌁ ▰</span></div>
+  <div style="padding:14px 24px 20px">
+    <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.26em;color:#52e0f5">FIELDS</span>
+    <h1 style="margin:10px 0 0;font-size:34px;font-weight:900;line-height:1.2">分野から探す</h1>
+  </div>
+  <div style="padding:0 24px;display:flex;flex-direction:column;overflow:hidden;height:600px">
+    <sc-for list="{{ mfields }}" as="f" hint-placeholder-count="6">
+      <div style="border-top:1px solid rgba(255,255,255,.1)">
+        <div onClick="{{ f.toggle }}" style="display:flex;align-items:center;gap:14px;padding:17px 0;cursor:pointer">
+          <span style="font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;width:20px">{{ f.no }}</span>
+          <span style="font-size:20px;font-weight:700;color:{{ f.color }}">{{ f.name }}</span>
+          <span style="margin-left:auto;display:flex;align-items:center;gap:14px"><span style="font:400 11px 'IBM Plex Mono',monospace;color:#5c6572">{{ f.count }}</span><span style="font:400 15px 'IBM Plex Mono',monospace;color:#52e0f5;width:10px;text-align:center">{{ f.sign }}</span></span>
+        </div>
+        <div style="overflow:hidden;transition:max-height .4s ease;max-height:{{ f.maxH }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 0 18px 34px">
+            <sc-for list="{{ f.subs }}" as="s" hint-placeholder-count="3">
+              <a href="#" style="display:flex;align-items:baseline;gap:8px;padding:9px 14px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:12px;color:#c3ccd8">{{ s.name }}<span style="font:400 9px 'IBM Plex Mono',monospace;color:#5c6572">{{ s.n }}</span></a>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(5,6,10,.94);border-top:1px solid rgba(255,255,255,.1)">
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#5c6572"><span style="font:400 15px 'IBM Plex Mono',monospace">◆</span><span style="font-size:10px">ホーム</span></a>
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#52e0f5"><span style="font:400 15px 'IBM Plex Mono',monospace">≡</span><span style="font-size:10px;font-weight:500">分野</span></a>
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#5c6572"><span style="font:400 15px 'IBM Plex Mono',monospace">⌕</span><span style="font-size:10px">検索</span></a>
+    <a href="#" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 24px;color:#5c6572"><span style="font:400 15px 'IBM Plex Mono',monospace">☆</span><span style="font-size:10px">保存</span></a>
+  </div>
+</div>
+</div>
+
+<div data-screen-label="M 問題" style="display:flex;flex-direction:column;gap:9px">
+<div style="font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;letter-spacing:.2em">PROBLEM</div>
+<div style="position:relative;width:390px;height:844px;background:#05060a;border:1px solid rgba(255,255,255,.12);border-radius:34px;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;font:600 13px 'IBM Plex Mono',monospace;color:#eef2f6"><span>9:41</span><span style="display:flex;gap:5px;font-size:11px;color:#aeb6c2">▮▮▮ ⌁ ▰</span></div>
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;color:#aeb6c2"><span>←</span><span style="font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.1em">微分積分 / 定積分</span></div>
+  <div style="padding:24px 24px 0;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="font:500 26px 'IBM Plex Mono',monospace;color:#52e0f5">0001</span>
+      <span style="display:flex;gap:4px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#52e0f5"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span><span style="width:6px;height:6px;border-radius:50%;background:#2a3340"></span><span style="font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;margin-left:6px">標準</span></span>
+    </div>
+    <h1 style="margin:0;font-size:26px;font-weight:900;line-height:1.45;text-wrap:pretty">放物線と直線で<br>囲まれた面積</h1>
+    <div style="border:1px solid rgba(255,255,255,.1);background:#080a10">
+      <canvas id="mfig" ref="{{ figRef }}" style="display:block;width:100%;height:190px"></canvas>
+    </div>
+    <p style="margin:0;font-size:15px;line-height:2.05;color:#dfe6ee">放物線 <span style="font:italic 400 16px 'STIX Two Text',serif">C : y = x²</span> と直線 <span style="font:italic 400 16px 'STIX Two Text',serif">ℓ : y = x + 2</span> を考える。</p>
+    <div style="display:flex;gap:12px"><span style="font:400 13px 'IBM Plex Mono',monospace;color:#52e0f5;padding-top:3px">(1)</span><p style="margin:0;font-size:15px;line-height:2.05;color:#dfe6ee">交点の <span style="font:italic 400 16px 'STIX Two Text',serif">x</span> 座標をすべて求めよ。</p></div>
+    <div style="display:flex;gap:12px"><span style="font:400 13px 'IBM Plex Mono',monospace;color:#52e0f5;padding-top:3px">(2)</span><p style="margin:0;font-size:15px;line-height:2.05;color:#dfe6ee">囲まれた図形の面積 <span style="font:italic 400 16px 'STIX Two Text',serif">S</span> を求めよ。</p></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:0;background:rgba(5,6,10,.96);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(12px)">
+    <div style="display:flex;gap:10px;padding:14px 24px">
+      <a href="#" style="flex:1;display:flex;align-items:center;justify-content:center;height:52px;background:#52e0f5;color:#06232a;font-weight:700;font-size:14px;border-radius:3px">解答を見る</a>
+      <a href="#" style="width:52px;display:flex;align-items:center;justify-content:center;height:52px;border:1px solid rgba(255,255,255,.2);font:400 10px 'IBM Plex Mono',monospace;color:#aeb6c2;border-radius:3px">PDF</a>
+      <a href="#" style="width:52px;display:flex;align-items:center;justify-content:center;height:52px;border:1px solid rgba(255,255,255,.2);font-size:16px;color:#aeb6c2;border-radius:3px">☆</a>
+    </div>
+    <div style="height:22px"></div>
+  </div>
+</div>
+</div>
+
+<div data-screen-label="M 解答" style="display:flex;flex-direction:column;gap:9px">
+<div style="font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;letter-spacing:.2em">SOLUTION — タップで開閉します</div>
+<div style="position:relative;width:390px;height:844px;background:#05060a;border:1px solid rgba(255,255,255,.12);border-radius:34px;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;font:600 13px 'IBM Plex Mono',monospace;color:#eef2f6"><span>9:41</span><span style="display:flex;gap:5px;font-size:11px;color:#aeb6c2">▮▮▮ ⌁ ▰</span></div>
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;color:#aeb6c2"><span>←</span><span style="font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.1em">SOLUTION / 0001</span></div>
+  <div style="padding:22px 24px 0;display:flex;flex-direction:column;gap:14px">
+    <h1 style="margin:0;font-size:21px;font-weight:900;line-height:1.5">放物線と直線で囲まれた面積</h1>
+    <div style="border:1px solid rgba(255,255,255,.12);background:#080a10">
+      <div onClick="{{ toggleHint }}" style="display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer">
+        <span style="font:400 9px 'IBM Plex Mono',monospace;color:#52e0f5;letter-spacing:.16em">STEP 1</span>
+        <span style="font-size:14px;font-weight:700">ヒント</span>
+        <span style="margin-left:auto;font:400 15px 'IBM Plex Mono',monospace;color:#52e0f5">{{ hintSign }}</span>
+      </div>
+      <div style="overflow:hidden;transition:max-height .4s ease;max-height:{{ hintH }}">
+        <p style="margin:0;padding:0 18px 18px;font-size:14px;line-height:1.95;color:#c3ccd8">交点は 2 式を連立。面積は「上の関数 − 下の関数」を交点間で積分します。</p>
+      </div>
+    </div>
+    <div style="border:1px solid rgba(255,255,255,.12);background:#080a10">
+      <div onClick="{{ toggleApproach }}" style="display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer">
+        <span style="font:400 9px 'IBM Plex Mono',monospace;color:#52e0f5;letter-spacing:.16em">STEP 2</span>
+        <span style="font-size:14px;font-weight:700">方針</span>
+        <span style="margin-left:auto;font:400 15px 'IBM Plex Mono',monospace;color:#52e0f5">{{ appSign }}</span>
+      </div>
+      <div style="overflow:hidden;transition:max-height .4s ease;max-height:{{ appH }}">
+        <p style="margin:0;padding:0 18px 18px;font-size:14px;line-height:1.95;color:#c3ccd8">1/6 公式 <span style="font:italic 400 15px 'STIX Two Text',serif;color:#eef2f6">(β−α)³/6</span> を使えば計算が短縮できます。</p>
+      </div>
+    </div>
+    <div style="position:relative;border:1px solid rgba(82,224,245,.28);background:#080a10">
+      <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <span style="font:400 9px 'IBM Plex Mono',monospace;color:#52e0f5;letter-spacing:.16em">STEP 3</span>
+        <span style="font-size:14px;font-weight:700">解答</span>
+        <span style="margin-left:auto;font:400 10px 'IBM Plex Mono',monospace;color:#5c6572">{{ ansLabel }}</span>
+      </div>
+      <div style="position:relative">
+        <div style="padding:20px 18px;display:flex;flex-direction:column;gap:16px;filter:blur({{ ansBlur }});transition:filter .6s ease">
+          <p style="margin:0;font-size:14px;line-height:1.95;color:#dfe6ee">連立して <span style="font:italic 400 15px 'STIX Two Text',serif">(x+1)(x−2) = 0</span></p>
+          <div style="padding:12px 16px;background:rgba(82,224,245,.07);border-left:2px solid #52e0f5;font:italic 400 17px 'STIX Two Text',serif">x = −1 , 2</div>
+          <p style="margin:0;font-size:14px;line-height:1.95;color:#dfe6ee">区間 <span style="font:italic 400 15px 'STIX Two Text',serif">−1 ≤ x ≤ 2</span> で <span style="font:italic 400 15px 'STIX Two Text',serif">x + 2 ≥ x²</span> より</p>
+          <div style="padding:14px 16px;background:rgba(255,255,255,.03);font:italic 400 15px/1.9 'STIX Two Text',serif;color:#dfe6ee">S = ∫<sub>−1</sub><sup>2</sup>{(x+2) − x²}dx = 27/6</div>
+          <div style="padding:12px 16px;background:rgba(82,224,245,.07);border-left:2px solid #52e0f5;font:italic 400 19px 'STIX Two Text',serif">S = 9/2</div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(5,6,10,.55);opacity:{{ ansOverlay }};pointer-events:{{ ansPE }};transition:opacity .5s">
+          <p style="margin:0;font-size:13px;color:#aeb6c2">解き終わりましたか？</p>
+          <div onClick="{{ toggleAnswer }}" style="padding:13px 28px;background:#52e0f5;color:#06232a;font-weight:700;font-size:13px;border-radius:3px;cursor:pointer">解答を表示</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1760}}">
+const MF = [
+  { no: '01', name: '数と式', count: '003', subs: [['式の計算', 1], ['実数・絶対値', 1], ['1次不等式', 1]] },
+  { no: '02', name: '二次関数', count: '005', subs: [['最大最小', 2], ['2次方程式', 2], ['2次不等式', 1]] },
+  { no: '04', name: '場合の数・確率', count: '008', subs: [['順列・組合せ', 3], ['確率', 3], ['条件付き確率', 2]] },
+  { no: '05', name: '整数', count: '006', subs: [['約数・倍数', 2], ['合同式', 2], ['不定方程式', 2]] },
+  { no: '13', name: '微分積分', count: '012', subs: [['極限', 2], ['微分法', 3], ['積分法', 3], ['定積分', 2], ['面積', 2]] },
+  { no: '14', name: '数列', count: '007', subs: [['一般項', 2], ['漸化式', 3], ['数学的帰納法', 2]] },
+  { no: '15', name: 'ベクトル', count: '004', subs: [['平面ベクトル', 2], ['空間ベクトル', 2]] }
+];
+
+class Component extends DCLogic {
+  state = { open: '13', hint: false, app: false, ans: false };
+
+  componentDidMount() {
+    this.mx = -9999; this.my = -9999;
+    this.tryFig();
+    const tick = (t) => { try { this.hero(t); } catch (e) {} this._raf = requestAnimationFrame(tick); };
+    this._raf = requestAnimationFrame(tick);
+  }
+  componentDidUpdate() { this.tryFig(); }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); clearTimeout(this._t); }
+
+  ctx(cv) {
+    const r = cv.getBoundingClientRect();
+    const w = r.width, h = r.height;
+    if (w < 10) return null;
+    const d = Math.min(window.devicePixelRatio || 1, 2);
+    if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); this._built = false; }
+    const g = cv.getContext('2d');
+    g.setTransform(d, 0, 0, d, 0, 0);
+    return [g, w, h];
+  }
+
+  hero(t) {
+    const cv = this._hero; if (!cv) return;
+    const c = this.ctx(cv); if (!c) return;
+    const [g, w, h] = c;
+    if (!this._built) {
+      const oc = document.createElement('canvas'); oc.width = w; oc.height = h;
+      const og = oc.getContext('2d');
+      og.font = '700 ' + Math.min(w * 0.34, 130) + 'px "Space Grotesk", sans-serif';
+      og.textAlign = 'center'; og.textBaseline = 'middle';
+      og.fillStyle = '#fff'; og.fillText('Diary', w / 2, h * 0.42);
+      const d = og.getImageData(0, 0, w, h).data, pts = [];
+      for (let y = 0; y < h; y += 4) for (let x = 0; x < w; x += 4) if (d[(y * w + x) * 4 + 3] > 128) pts.push({ x, y });
+      this.P = pts.map((p) => ({ tx: p.x, ty: p.y, x: Math.random() * w, y: Math.random() * h, c: Math.random() < 0.16, s: Math.random() * 1.2 + 1, ph: Math.random() * 6.28 }));
+      this._built = true;
+    }
+    g.fillStyle = 'rgba(5,6,10,0.3)'; g.fillRect(0, 0, w, h);
+    for (const p of this.P) {
+      p.x += (p.tx - p.x) * 0.06 + Math.sin(t * 0.0011 + p.ph) * 0.35;
+      p.y += (p.ty - p.y) * 0.06 + Math.cos(t * 0.0013 + p.ph) * 0.35;
+      g.fillStyle = p.c ? 'rgba(82,224,245,0.95)' : 'rgba(226,236,244,0.72)';
+      g.fillRect(p.x, p.y, p.s, p.s);
+    }
+  }
+
+  tryFig(n) {
+    clearTimeout(this._t);
+    const el = this._fig || document.getElementById('mfig');
+    if (el && el.getBoundingClientRect().width > 10) { this._fig = el; this.drawFig(el); return; }
+    if ((n || 0) < 40) this._t = setTimeout(() => this.tryFig((n || 0) + 1), 120);
+  }
+  drawFig(cv) {
+    const c = this.ctx(cv); if (!c) return;
+    const [g, w, h] = c;
+    g.clearRect(0, 0, w, h);
+    const L = 26, R = w - 18, B = h - 20, T = 16;
+    const sx = (u) => L + (u + 2.4) / 5.6 * (R - L);
+    const sy = (v) => B - (v + 1.2) / 7.2 * (B - T);
+    g.beginPath();
+    g.moveTo(sx(-1), sy(1));
+    for (let u = -1; u <= 2.001; u += 0.05) g.lineTo(sx(u), sy(u + 2));
+    for (let u = 2; u >= -1.001; u -= 0.05) g.lineTo(sx(u), sy(u * u));
+    g.closePath();
+    g.fillStyle = 'rgba(82,224,245,0.16)'; g.fill();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(200,215,250,0.32)';
+    g.beginPath(); g.moveTo(sx(-2.4), sy(0)); g.lineTo(sx(3.2), sy(0)); g.stroke();
+    g.beginPath(); g.moveTo(sx(0), sy(-1.2)); g.lineTo(sx(0), sy(6)); g.stroke();
+    g.lineWidth = 1.8; g.strokeStyle = '#52e0f5';
+    g.beginPath();
+    for (let u = -2.4; u <= 2.7; u += 0.05) { const X = sx(u), Y = sy(u * u); u === -2.4 ? g.moveTo(X, Y) : g.lineTo(X, Y); }
+    g.stroke();
+    g.lineWidth = 1.4; g.strokeStyle = 'rgba(226,236,244,0.85)';
+    g.beginPath(); g.moveTo(sx(-2.4), sy(-0.4)); g.lineTo(sx(3.2), sy(5.2)); g.stroke();
+    for (const u of [-1, 2]) { g.beginPath(); g.arc(sx(u), sy(u * u), 3.4, 0, 6.284); g.fillStyle = '#eef2f6'; g.fill(); }
+    g.font = 'italic 12px "STIX Two Text", serif'; g.fillStyle = '#52e0f5';
+    g.fillText('S = 9/2', sx(0.15), sy(1.5));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const set = (k) => () => this.setState((p) => ({ [k]: !p[k] }));
+    return {
+      heroRef: (el) => { if (el) { this._hero = el; this._built = false; } },
+      figRef: (el) => { if (el && el !== this._fig) { this._fig = el; this.tryFig(); } },
+      mfields: MF.map((f) => {
+        const on = s.open === f.no;
+        return {
+          no: f.no, name: f.name, count: f.count,
+          color: on ? '#52e0f5' : '#eef2f6',
+          sign: on ? '−' : '+',
+          maxH: on ? '160px' : '0px',
+          subs: f.subs.map(([name, n]) => ({ name, n })),
+          toggle: () => this.setState({ open: on ? '' : f.no })
+        };
+      }),
+      toggleHint: set('hint'), toggleApproach: set('app'), toggleAnswer: set('ans'),
+      hintSign: s.hint ? '−' : '+', appSign: s.app ? '−' : '+',
+      hintH: s.hint ? '150px' : '0px', appH: s.app ? '150px' : '0px',
+      ansLabel: s.ans ? '表示中' : '非表示',
+      ansBlur: s.ans ? '0px' : '8px',
+      ansOverlay: s.ans ? 0 : 1,
+      ansPE: s.ans ? 'none' : 'auto'
+    };
+  }
+}
+</script>
+</body>
+</html>

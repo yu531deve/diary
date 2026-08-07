@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#05060a;font-family:"Noto Sans JP",sans-serif;color:#eef2f6;overflow:hidden}
+a{color:inherit;text-decoration:none}a:hover{opacity:.8}
+::selection{background:#52e0f5;color:#05060a}
+@keyframes sp{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(8px);opacity:.35}}
+</style></helmet>
+
+<div style="position:relative;width:100%;height:100vh;overflow:hidden;background:#05060a">
+
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;opacity:{{ siteOp }};transition:opacity .8s ease .3s">
+    <nav style="display:flex;align-items:center;justify-content:space-between;padding:26px 48px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font:700 19px 'Space Grotesk',sans-serif">Diary</span><span style="font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.18em">SELF-MADE MATHEMATICS</span></div>
+      <div style="display:flex;align-items:center;gap:32px;font-size:13px;color:#aeb6c2"><span>分野</span><span>新着</span><span style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font:400 11px 'IBM Plex Mono',monospace;color:#7d8794">検索<span style="color:#4a5361">⌘K</span></span></div>
+    </nav>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding-bottom:80px">
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.34em;color:#52e0f5">ORIGINAL ENTRANCE-EXAM MATHEMATICS</div>
+      <p style="margin:0;font-size:18px;font-weight:500;color:#c3ccd8;letter-spacing:.06em">自作の入試数学、1000問へ。解く価値のある一問を。</p>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px;font:400 10px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.3em"><span>SCROLL</span><span style="display:block;width:1px;height:34px;background:linear-gradient(180deg,#52e0f5,transparent);animation:sp 2s ease-in-out infinite"></span></div>
+    </div>
+    <div style="display:flex;gap:36px;padding:0 48px 32px;font:400 11px 'IBM Plex Mono',monospace;color:#5c6572;letter-spacing:.12em">
+      <span>PROBLEMS <span style="color:#dfe6ee">0042</span></span><span>FIELDS <span style="color:#dfe6ee">18</span></span><span>GOAL <span style="color:#52e0f5">1000+</span></span>
+    </div>
+  </div>
+
+  <div style="position:absolute;inset:0;background:#05060a;opacity:{{ curtain }};transition:opacity .9s ease;pointer-events:{{ curtainPE }}">
+    <canvas id="loadfx" ref="{{ fxRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+    <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 48px 40px">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.32em;color:#52e0f5">{{ phase }}</span>
+        <span style="display:block;width:320px;height:1px;background:rgba(255,255,255,.14);position:relative;overflow:hidden"><span style="position:absolute;inset:0;background:#52e0f5;transform:scaleX({{ prog }});transform-origin:left;transition:transform .2s linear"></span></span>
+      </div>
+      <span style="font:500 76px 'IBM Plex Mono',monospace;line-height:.85;letter-spacing:-.02em;color:#eef2f6">{{ pct }}</span>
+    </div>
+    <div style="position:absolute;left:48px;top:40px;font:400 10px 'IBM Plex Mono',monospace;color:#4a5361;letter-spacing:.2em">DIARY — SELF-MADE MATHEMATICS</div>
+  </div>
+
+  <div onClick="{{ replay }}" style="position:absolute;right:24px;top:24px;z-index:5;padding:10px 18px;border:1px solid rgba(255,255,255,.18);border-radius:999px;font:400 10px 'IBM Plex Mono',monospace;color:#aeb6c2;letter-spacing:.16em;cursor:pointer;background:rgba(5,6,10,.6)" style-hover="border-color:#52e0f5;color:#52e0f5">↻ REPLAY</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;duration&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:3.2,&quot;min&quot;:1.5,&quot;max&quot;:6,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;演出&quot;}}">
+class Component extends DCLogic {
+  state = { p: 0 };
+
+  componentDidMount() { this.start(); }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); }
+
+  start() {
+    this.t0 = performance.now();
+    this._built = false;
+    this.setState({ p: 0 });
+    if (this._raf) return;
+    const tick = (t) => { try { this.draw(t); } catch (e) {} this._raf = requestAnimationFrame(tick); };
+    this._raf = requestAnimationFrame(tick);
+  }
+
+  build(w, h) {
+    const oc = document.createElement('canvas'); oc.width = w; oc.height = h;
+    const og = oc.getContext('2d');
+    og.font = '700 ' + Math.min(w * 0.2, 300) + 'px "Space Grotesk", sans-serif';
+    og.textAlign = 'center'; og.textBaseline = 'middle';
+    og.fillStyle = '#fff'; og.fillText('Diary', w / 2, h * 0.46);
+    const d = og.getImageData(0, 0, w, h).data, pts = [];
+    const gap = 5;
+    for (let y = 0; y < h; y += gap) for (let x = 0; x < w; x += gap) if (d[(y * w + x) * 4 + 3] > 128) pts.push({ x, y });
+    const R = Math.max(w, h) * 0.75;
+    this.P = pts.map((p) => {
+      const a = Math.random() * 6.284, r = R * (0.5 + Math.random() * 0.9);
+      return {
+        tx: p.x, ty: p.y,
+        sx: w / 2 + Math.cos(a) * r, sy: h / 2 + Math.sin(a) * r,
+        x: 0, y: 0, c: Math.random() < 0.18, s: Math.random() * 1.3 + 1,
+        d: Math.random() * 0.42, ph: Math.random() * 6.28
+      };
+    });
+    this._built = true;
+  }
+
+  draw(now) {
+    const cv = this._cv; if (!cv) return;
+    const r = cv.getBoundingClientRect();
+    const w = r.width, h = r.height;
+    if (w < 10) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); this._built = false; }
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!this._built) this.build(w, h);
+
+    const dur = (this.props.duration ?? 3.2) * 1000;
+    const raw = Math.min((now - this.t0) / dur, 1);
+    if (Math.abs(raw - this.state.p) > 0.008 || (raw === 1 && this.state.p !== 1)) this.setState({ p: raw });
+
+    g.fillStyle = 'rgba(5,6,10,0.32)';
+    g.fillRect(0, 0, w, h);
+
+    const out = Math.max((raw - 0.86) / 0.14, 0);
+    for (const p of this.P) {
+      const local = Math.min(Math.max((raw - p.d) / (0.62 - p.d * 0.4), 0), 1);
+      const e = local * local * (3 - 2 * local);
+      let x = p.sx + (p.tx - p.sx) * e;
+      let y = p.sy + (p.ty - p.sy) * e;
+      const drift = (1 - e) * 3 + 0.4;
+      x += Math.sin(now * 0.0012 + p.ph) * drift;
+      y += Math.cos(now * 0.0014 + p.ph) * drift;
+      if (out > 0) {
+        const k = out * out;
+        x += (x - w / 2) * k * 1.4;
+        y += (y - h / 2) * k * 1.4 - k * 60;
+      }
+      const a = (p.c ? 0.95 : 0.75) * (1 - out * 0.9);
+      g.fillStyle = p.c ? 'rgba(82,224,245,' + a + ')' : 'rgba(226,236,244,' + a + ')';
+      g.fillRect(x, y, p.s, p.s);
+    }
+
+    if (raw > 0.15 && raw < 0.92) {
+      g.strokeStyle = 'rgba(82,224,245,' + (0.05 * (1 - out)) + ')';
+      g.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        g.beginPath();
+        for (let x = 0; x <= w; x += 18) {
+          const y = h * 0.5 + (i - 2) * 46 + Math.sin(x * 0.005 + now * 0.0004 + i) * 40;
+          x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+        }
+        g.stroke();
+      }
+    }
+  }
+
+  renderVals() {
+    const p = this.state.p;
+    const done = p >= 1;
+    return {
+      fxRef: (el) => { if (el) { this._cv = el; this._built = false; } },
+      prog: p.toFixed(3),
+      pct: String(Math.round(p * 100)).padStart(3, '0'),
+      phase: p < 0.35 ? 'LOADING PROBLEMS' : p < 0.7 ? 'BUILDING INDEX' : p < 0.95 ? 'READY' : 'WELCOME',
+      curtain: done ? 0 : 1,
+      curtainPE: done ? 'none' : 'auto',
+      siteOp: done ? 1 : 0,
+      replay: () => this.start()
+    };
+  }
+}
+</script>
+</body>
+</html>
