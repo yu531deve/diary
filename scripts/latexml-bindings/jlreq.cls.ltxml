@@ -1,0 +1,59 @@
+# jlreq.cls.ltxml — LaTeXML 用バインディング（#55）
+#
+# 背景（本番 CI で発生した問題）:
+#   本番 CI（Debian bookworm 版 LaTeXML）には jlreq クラス用の .cls.ltxml
+#   バインディングが存在しない。バインディングが見つからないと LaTeXML は
+#   OmniBus という汎用フォールバッククラスへ切り替えるが、その過程で
+#   jlreq.cls 自体（expl3 依存）を「生の TeX」として解釈しようとし、
+#   expl3-code.tex の展開に長時間かかって最終的に
+#   "Fatal:timeout:timedout Conversion timed out" となる。
+#   ローカル（brew 版 0.8.8）は expl3 対応が進んでいたため再現しなかった
+#   環境差であり、jlreq 固有のレイアウト機能（縦組み・行送り制御など）を
+#   このプロジェクトの HTML 変換では一切使っていない。
+#
+# 方針:
+#   jlreq の複雑な組版機能を LaTeXML 上で再現するのではなく、
+#   本プロジェクトが実際に使うのは「documentclass の宣言が通ること」
+#   「diary.sty（本バインディングでは diary.sty.ltxml）が読み込めること」
+#   の 2 点のみなので、標準の article クラスへ委譲する
+#   （elsarticle.cls.ltxml 等、LaTeXML 本体が持つ他クラスの委譲バインディング
+#   と同じ流儀）。expl3 の生ロードは一切発生させない。
+#
+# jlreq 固有オプション（paper=a4, fontsize=10pt, book, report 等）は
+# article 側では意味を持たないため、無害に読み捨てる。
+# 未知のオプションも同様に無視することで、将来 build-html.js 側の
+# ラッパーが新しいオプションを渡しても変換停止を起こさないようにする。
+
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# ---- jlreq 固有オプションを無害に読み捨てる ----
+# 例: \documentclass[paper=a4]{jlreq}
+# key=value 形式・フラグ形式のどちらも LaTeXML の DeclareOption は
+# オプション文字列そのままで受け取るため、代表的なものを列挙しておく。
+foreach my $option (qw(
+  paper=a4 paper=a5 paper=b4 paper=b5 paper=a3 paper=letter
+  fontsize=10pt fontsize=10.5pt fontsize=11pt fontsize=12pt
+  book report jis jisb jisb5 tate yoko
+  10pt 10.5pt 11pt 12pt
+  oneside twoside onecolumn twocolumn
+  openany openright
+  landscape
+)) {
+  DeclareOption($option, undef);
+}
+
+# 上記に列挙していない jlreq 固有オプション（未知のもの）も含め、
+# それ以外はすべて article へパススルーする。article 側で未知の
+# オプションとして扱われても article.cls.ltxml がエラーにはしないため、
+# 変換停止を起こさない。
+DeclareOption(undef, sub {
+  PassOptions('article', 'cls', ToString(Expand(T_CS('\CurrentOption'))));
+});
+
+ProcessOptions();
+LoadClass('article');
+
+1;
