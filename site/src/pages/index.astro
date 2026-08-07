@@ -1,46 +1,13 @@
 ---
-// トップページ（仮）。content/ 配下の status: published な問題への
-// リンクを一覧表示するだけの最小実装。/problems/{id}/ ・/solutions/{id}/
-// の実ページは #26・#27 で実装する。
-import fs from "node:fs";
-import path from "node:path";
+// トップページ（仮）。#61 でビルド時データ生成ユーティリティ（site-data.ts）
+// 経由に置き換え。content/ 配下の status: published な問題一覧に加え、
+// 公開問題数・分野数・分野別問題数・新着一覧を実データから算出して表示する。
+// パーティクル演出等の High-fidelity 実装は別 issue（design/01_top_scroll 系）で行う。
+import { listPublishedProblems } from "../lib/dist-content";
+import { computeSiteStats } from "../lib/site-data";
 
-const contentDir = path.resolve("../content");
-
-type ProblemMeta = {
-  id: string;
-  title: string;
-  status: string;
-};
-
-function parseMetaYaml(text: string): ProblemMeta {
-  const get = (key: string) => {
-    const m = text.match(new RegExp(`^${key}:\\s*"?([^"\n]+)"?\\s*$`, "m"));
-    return m ? m[1].trim() : "";
-  };
-  return {
-    id: get("id"),
-    title: get("title"),
-    status: get("status"),
-  };
-}
-
-let problems: ProblemMeta[] = [];
-if (fs.existsSync(contentDir)) {
-  const entries = fs
-    .readdirSync(contentDir, { withFileTypes: true })
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort();
-
-  problems = entries
-    .map((id) => {
-      const metaPath = path.join(contentDir, id, "meta.yaml");
-      if (!fs.existsSync(metaPath)) return null;
-      return parseMetaYaml(fs.readFileSync(metaPath, "utf-8"));
-    })
-    .filter((m): m is ProblemMeta => m !== null && m.status === "published");
-}
+const problems = listPublishedProblems();
+const stats = computeSiteStats();
 ---
 
 <html lang="ja">
@@ -70,11 +37,41 @@ if (fs.existsSync(contentDir)) {
 			a {
 				color: inherit;
 			}
+			.stats {
+				display: flex;
+				gap: 1.5rem;
+				font-variant-numeric: tabular-nums;
+			}
 		</style>
 	</head>
 	<body>
 		<h1>Diary — 自作入試数学問題集</h1>
 		<p>自作の大学入試数学問題を公開しています。</p>
+		<p class="stats">
+			<span>PROBLEMS {stats.problemCount}</span>
+			<span>FIELDS {stats.fieldCount}</span>
+		</p>
+		<h2>分野別</h2>
+		<ul>
+			{
+				stats.byField.map((f) => (
+					<li>
+						{f.major}（{f.count}）
+					</li>
+				))
+			}
+		</ul>
+		<h2>新着</h2>
+		<ul>
+			{
+				stats.recent.map((p) => (
+					<li>
+						<a href={`/problems/${p.id}/`}>{p.title}</a>
+					</li>
+				))
+			}
+		</ul>
+		<h2>全問題</h2>
 		<ul>
 			{
 				problems.map((p) => (
