@@ -1,0 +1,251 @@
+% 分野別類題: ラプラス方程式（変数分離法） 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- ラプラス方程式（変数分離法）}
+
+\daimon{【解法】ラプラス方程式の変数分離法による解き方と導出}
+
+\noindent
+\textbf{(1) 矩形領域の場合。}
+矩形 $0 < x < a$, $0 < y < b$ 上でラプラス方程式
+\[
+u_{xx} + u_{yy} = 0,
+\quad\text{すなわち}\quad
+\frac{\partial^{2} u}{\partial x^{2}} + \frac{\partial^{2} u}{\partial y^{2}} = 0
+\]
+（$u_{xx}$, $u_{yy}$ は偏微分の略記で、それぞれ $\dfrac{\partial^{2} u}{\partial x^{2}}$, $\dfrac{\partial^{2} u}{\partial y^{2}}$ を表す）
+を、$x = 0,\ a$ で斉次境界条件 $u = 0$ が課されている場合に解く。
+
+\medskip\noindent
+\textbf{手順1: 変数分離。}\ $u(x,y) = X(x)Y(y)$ とおいて代入すると
+\[
+X''(x)Y(y) + X(x)Y''(y) = 0
+\]
+両辺を $X(x)Y(y)$ で割って移項すると
+\[
+\frac{X''(x)}{X(x)} = -\frac{Y''(y)}{Y(y)} = -\lambda
+\]
+左辺は $x$ のみ、右辺は $y$ のみの関数なのに両者が等しいので、その値は $x$ にも $y$ にも依存しない定数である。これを $-\lambda$ とおくと
+\[
+X'' + \lambda X = 0, \qquad Y'' - \lambda Y = 0
+\]
+に分離される。\textbf{熱伝導方程式との違いに注意}: $X$ の方程式は同じ形だが、$Y$ の方程式は符号が反対（$-\lambda$）になる。同じ定数を両辺で共有するため、片方が振動解なら他方は指数解になる。
+
+\medskip\noindent
+\textbf{手順2: 境界条件を $X$ に移し、固有値問題を解く。}\ $u(0,y) = X(0)Y(y) = 0$ がすべての $y$ で成り立つには、$Y \equiv 0$ でない限り $X(0) = 0$。同様に $X(a) = 0$。固有値問題
+\[
+X'' + \lambda X = 0, \qquad X(0) = X(a) = 0
+\]
+はディリクレ型のスツルム・リウヴィル境界値問題であり、$\lambda < 0$（双曲線関数解）と $\lambda = 0$（1次関数解）では両端条件から自明解しか得られず、$\lambda = \mu^2 > 0$ のとき $X = A\cos\mu x + B\sin\mu x$ に $X(0)=A=0$、$X(a) = B\sin\mu a = 0$（$B \neq 0$）を課して
+\[
+\sin\mu a = 0 \quad\Longrightarrow\quad
+\lambda_n = \left(\frac{n\pi}{a}\right)^2, \qquad
+X_n(x) = \sin\frac{n\pi x}{a} \qquad (n = 1, 2, 3, \dots)
+\]
+を得る。
+
+\medskip\noindent
+\textbf{手順3: $Y$ の方程式を解く。}\ 固有値 $\lambda_n$ を代入した $Y_n'' - \left(\dfrac{n\pi}{a}\right)^2 Y_n = 0$ は定数係数2階線形同次方程式で、特性方程式 $m^2 - (n\pi/a)^2 = 0$ より $m = \pm\dfrac{n\pi}{a}$。したがって一般解は
+\[
+Y_n(y) = C_n e^{n\pi y/a} + D_n e^{-n\pi y/a}
+\]
+と書けるが、境界条件の処理には指数関数の組より双曲線関数の組
+\[
+Y_n(y) = A_n \sinh\frac{n\pi y}{a} + B_n \cosh\frac{n\pi y}{a}
+\]
+の方が便利である（$\sinh 0 = 0$, $\cosh 0 = 1$ なので、$y=0$ での条件が1つの係数に直結する）。両者は $\sinh z = \frac{e^z - e^{-z}}{2}$, $\cosh z = \frac{e^z + e^{-z}}{2}$ で結ばれた同じ解空間の基底の取り替えにすぎない。$y = 0$ での境界条件（多くの場合 $u(x,0) = 0$、すなわち $Y_n(0) = 0$）を課すと
+\[
+Y_n(0) = A_n \sinh 0 + B_n \cosh 0 = B_n = 0
+\]
+から $B_n = 0$ が定まる。
+
+\medskip\noindent
+\textbf{手順4: 重ね合わせと残った境界条件。}\ 各 $X_n(x)Y_n(y)$ は方程式と3辺の斉次境界条件を満たすので、線形性より
+\[
+u(x,y) = \sum_{n=1}^{\infty} A_n \sinh\frac{n\pi y}{a} \sin\frac{n\pi x}{a}
+\]
+残る境界 $y = b$ での条件 $u(x,b) = f(x)$ に代入すると
+\[
+f(x) = \sum_{n=1}^{\infty} \left(A_n \sinh\frac{n\pi b}{a}\right) \sin\frac{n\pi x}{a}
+\]
+となるから、これは $f(x)$ の $[0,a]$ 上でのフーリエ正弦級数展開にほかならない。よって
+\[
+A_n \sinh\frac{n\pi b}{a} = \frac{2}{a}\int_0^{a} f(x)\sin\frac{n\pi x}{a}\,dx
+\]
+から $A_n$ が定まる。
+
+\medskip
+\noindent
+\textbf{(2) 円板領域の場合。}
+半径 $R$ の円板 $0 \le r < R$ では、極座標形式
+\[
+u_{rr} + \frac{1}{r}u_r + \frac{1}{r^2}u_{\theta\theta} = 0
+\]
+を用いる。
+
+\medskip\noindent
+\textbf{手順1: 変数分離。}\ $u(r,\theta) = R(r)\Theta(\theta)$ とおいて代入し、全体に $r^2$ を掛けると
+\[
+r^2 R'' \Theta + r R' \Theta + R \Theta'' = 0
+\]
+両辺を $R\Theta$ で割って移項すると
+\[
+\frac{r^2 R'' + r R'}{R} = -\frac{\Theta''}{\Theta}
+\]
+左辺は $r$ のみ、右辺は $\theta$ のみの関数だから両者は定数に等しい。これを $\nu$ とおくと
+\[
+\Theta'' + \nu\,\Theta = 0, \qquad r^2 R'' + rR' - \nu R = 0
+\]
+
+\medskip\noindent
+\textbf{手順2: 周期条件で分離定数が決まる。}\ $\theta$ と $\theta + 2\pi$ は円板上の同じ点を表すから、$\Theta$ には境界条件の代わりに周期条件
+\[
+\Theta(\theta + 2\pi) = \Theta(\theta)
+\]
+が課される。$\nu < 0$ なら $\Theta$ は指数関数（$e^{\pm\sqrt{-\nu}\,\theta}$）となり周期的になれない。$\nu \ge 0$ で $\nu = \omega^2$ とおくと $\Theta = a\cos\omega\theta + b\sin\omega\theta$ であり、これが周期 $2\pi$ をもつのは $\omega$ が整数のときに限る。よって
+\[
+\nu = n^2, \qquad
+\Theta_n(\theta) = a_n \cos n\theta + b_n \sin n\theta \qquad (n = 0, 1, 2, \dots)
+\]
+（$n=0$ のときは定数 $\Theta_0 = a_0$。）
+
+\medskip\noindent
+\textbf{手順3: $r$ 方向はオイラー方程式。}\ $\nu = n^2$ を代入した
+\[
+r^2 R'' + rR' - n^2 R = 0
+\]
+は係数が $r$ のべきになっているオイラー方程式なので、$R = r^m$ を試すと
+\[
+m(m-1) + m - n^2 = 0
+\quad\Longrightarrow\quad
+m^2 = n^2
+\quad\Longrightarrow\quad
+m = \pm n
+\]
+$n \ge 1$ では2つの独立解 $r^n$, $r^{-n}$ が得られ、$R = C r^{n} + D r^{-n}$。$n = 0$ のときは重根 $m = 0$ となり、2つ目の独立解として $\ln r$ が現れて $R = C + D\ln r$ である。
+
+\medskip\noindent
+\textbf{手順4: 有界性で解を絞る。}\ 円板の内部（原点を含む）で解を求めるので、$r \to 0$ で $u$ が有界でなければならない。$r^{-n} \to \infty$、$\ln r \to -\infty$ だからいずれも捨てて $D = 0$、すなわち $R_n(r) = r^n$。したがって重ね合わせにより
+\[
+u(r,\theta) = \frac{a_0}{2} + \sum_{n=1}^{\infty} r^{n}\left(a_n \cos n\theta + b_n \sin n\theta\right)
+\]
+境界 $r = R$ での条件 $u(R,\theta) = g(\theta)$ に代入し、$g(\theta)$ のフーリエ級数展開と係数比較することで $a_n, b_n$ が定まる。
+
+\bigskip
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$u_{xx} + u_{yy} = 0\ (0 < x < \pi,\ 0 < y < 1)$，$u(0,y) = u(\pi,y) = u(x,0) = 0$，$u(x,1) = x(\pi - x)$ を解け。
+\end{mondaiboxS}
+\kaitou
+\textbf{手順1: 変数分離と固有値問題。}\ $u = X(x)Y(y)$ とおいて代入し $XY$ で割ると
+\[
+\frac{X''}{X} = -\frac{Y''}{Y} = -\lambda
+\quad\Longrightarrow\quad
+X'' + \lambda X = 0, \qquad Y'' - \lambda Y = 0
+\]
+$u(0,y) = u(\pi,y) = 0$ より $X(0) = X(\pi) = 0$。この固有値問題（【解法】(1) 手順2で $a = \pi$）の解は
+\[
+\lambda_n = n^2, \qquad X_n(x) = \sin(nx) \qquad (n = 1, 2, 3, \dots)
+\]
+
+\textbf{手順2: $Y$ 方向。}\ $Y_n'' - n^2 Y_n = 0$ の一般解を $Y_n = A_n\sinh(ny) + B_n\cosh(ny)$ ととる。$u(x,0) = 0$ より $Y_n(0) = B_n = 0$。よって $Y_n = A_n\sinh(ny)$ であり、重ね合わせて
+\[
+u(x,y) = \sum_{n=1}^{\infty} A_n \sinh(ny)\sin(nx)
+\]
+
+\textbf{手順3: 残った境界条件をフーリエ正弦級数で処理。}\ $y=1$ を代入すると
+\[
+u(x,1) = \sum_{n=1}^{\infty} \bigl(A_n \sinh n\bigr)\sin(nx) = x(\pi - x)
+\]
+これは $x(\pi-x)$ を $[0,\pi]$ でフーリエ正弦級数に展開した形なので、係数公式より
+\[
+A_n \sinh n = \frac{2}{\pi}\int_0^{\pi} x(\pi - x)\sin(nx)\,dx
+\]
+
+\textbf{手順4: 積分の計算（部分積分）。}\ まず
+\[
+\int_0^\pi x\sin(nx)\,dx
+= \left[-\frac{x\cos(nx)}{n}\right]_0^\pi + \frac{1}{n}\int_0^\pi \cos(nx)\,dx
+= -\frac{\pi(-1)^n}{n} + \left[\frac{\sin(nx)}{n^2}\right]_0^\pi
+= -\frac{\pi(-1)^n}{n}
+\]
+（$\cos(n\pi) = (-1)^n$, $\sin(n\pi) = 0$ を用いた）。次に部分積分を2回行って
+\begin{align*}
+\int_0^\pi x^2\sin(nx)\,dx
+&= \left[-\frac{x^2\cos(nx)}{n}\right]_0^\pi + \frac{2}{n}\int_0^\pi x\cos(nx)\,dx \\
+&= -\frac{\pi^2(-1)^n}{n} + \frac{2}{n}\left(\left[\frac{x\sin(nx)}{n}\right]_0^\pi - \frac{1}{n}\int_0^\pi \sin(nx)\,dx\right) \\
+&= -\frac{\pi^2(-1)^n}{n} + \frac{2}{n}\left(0 + \left[\frac{\cos(nx)}{n^2}\right]_0^\pi\right)
+= -\frac{\pi^2(-1)^n}{n} + \frac{2(-1)^n - 2}{n^3}
+\end{align*}
+これらより
+\[
+\int_0^\pi x(\pi-x)\sin(nx)\,dx
+= \pi\left(-\frac{\pi(-1)^n}{n}\right) - \left(-\frac{\pi^2(-1)^n}{n} + \frac{2(-1)^n-2}{n^3}\right)
+= \frac{2\bigl(1-(-1)^n\bigr)}{n^3}
+\]
+$n$ が偶数のときは $(-1)^n = 1$ なので $1 - (-1)^n = 0$、$n = 2k+1$（奇数）のときは $(-1)^n = -1$ なので $1 - (-1)^n = 2$ となり、積分値は奇数 $n$ に対してのみ $\dfrac{4}{n^3}$ が残る。したがって
+\[
+A_n \sinh n = \frac{2}{\pi}\cdot\frac{4}{n^3} = \frac{8}{\pi n^3} \quad (n\text{: 奇数}), \qquad A_n = 0\ (n\text{: 偶数})
+\]
+よって
+\[
+\boxed{\;
+u(x,y) = \frac{8}{\pi}\sum_{k=0}^{\infty} \frac{\sinh\bigl((2k+1)y\bigr)}{(2k+1)^{3}\sinh(2k+1)}\,\sin\bigl((2k+1)x\bigr)
+\;}
+\]
+（検算: 各項 $\sin(nx)\sinh(ny)$ は $u_{xx}+u_{yy} = (-n^2+n^2)\sin(nx)\sinh(ny) = 0$ を満たし調和。$y=0$ で $\sinh 0 = 0$ より $u(x,0)=0$。$x=0,\pi$ で $\sin(nx)=0$ より境界条件を満たす。$y=1$ では $\sinh n/\sinh n = 1$ となり $u(x,1) = \frac{8}{\pi}\sum \frac{\sin((2k+1)x)}{(2k+1)^3}$ は $x(\pi-x)$ の標準的なフーリエ正弦級数と一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$u_{xx} + u_{yy} = 0\ (0 < x < \pi,\ 0 < y < 2)$，$u(0,y) = u(\pi,y) = u(x,0) = 0$，$u(x,2) = 5\sin 3x$ を解け。
+\end{mondaiboxS}
+\kaitou
+問1と同じ設定（$a = \pi$、3辺で斉次条件）なので、変数分離から手順2までは問1と共通で、一般解は
+\[
+u(x,y) = \sum_{n=1}^{\infty} A_n \sinh(ny)\sin(nx)
+\]
+である。$y = 2$ を代入して境界条件と比べると
+\[
+\sum_{n=1}^{\infty} \bigl(A_n \sinh 2n\bigr)\sin(nx) = 5\sin 3x
+\]
+右辺はすでに固有関数 $\sin 3x$（$n=3$）の1項なので、フーリエ積分を計算するまでもなく係数比較（固有関数系の直交性により一意）で
+\[
+A_3 \sinh 6 = 5, \qquad A_n = 0\ (n \neq 3)
+\]
+すなわち $A_3 = \dfrac{5}{\sinh 6}$。したがって
+\[
+\boxed{\; u(x,y) = \frac{5\sinh(3y)}{\sinh 6}\sin(3x) \;}
+\]
+（検算: $u_x = \dfrac{15\sinh(3y)}{\sinh 6}\cos(3x)$, $u_{xx} = -\dfrac{45\sinh(3y)}{\sinh 6}\sin(3x)$。$u_y = \dfrac{15\cosh(3y)}{\sinh 6}\sin(3x)$, $u_{yy} = \dfrac{45\sinh(3y)}{\sinh 6}\sin(3x)$。ゆえに $u_{xx}+u_{yy}=0$。また $y=0$ で $\sinh 0=0$ より $u=0$，$x=0,\pi$ で $\sin(3x)=0$ より $u=0$，$y=2$ で $u = \frac{5\sinh 6}{\sinh 6}\sin 3x = 5\sin 3x$ と境界条件を満たす。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+半径 $3$ の円板における $u_{rr} + \dfrac{1}{r}u_r + \dfrac{1}{r^2}u_{\theta\theta} = 0$，$u(3,\theta) = 4 + 6\cos\theta - 3\sin 2\theta$（$u$ は円板内で有界）を解け。
+\end{mondaiboxS}
+\kaitou
+\textbf{手順1: 一般解の構成。}\ $u = R(r)\Theta(\theta)$ とおくと（【解法】(2) の手順1〜4）、周期条件から $\Theta_n = a_n\cos n\theta + b_n\sin n\theta$（$n = 0,1,2,\dots$）、$r$ 方向はオイラー方程式 $r^2R'' + rR' - n^2R = 0$ より $R = Cr^n + Dr^{-n}$（$n=0$ では $C + D\ln r$）。円板内（原点を含む）で有界という条件から $r^{-n}$ と $\ln r$ を捨てて $R_n = r^n$。重ね合わせて有界解は
+\[
+u(r,\theta) = \frac{a_0}{2} + \sum_{n=1}^{\infty} r^{n}\bigl(a_n\cos n\theta + b_n\sin n\theta\bigr)
+\]
+
+\textbf{手順2: 境界条件と係数比較。}\ $r = 3$ を代入すると
+\[
+\frac{a_0}{2} + \sum_{n=1}^{\infty} 3^{n}\bigl(a_n\cos n\theta + b_n\sin n\theta\bigr) = 4 + 6\cos\theta - 3\sin 2\theta
+\]
+右辺はすでに三角多項式（定数＋$\cos\theta$＋$\sin 2\theta$）の形なので、フーリエ級数の一意性から同じ関数の係数どうしを比較して
+\[
+\frac{a_0}{2} = 4, \qquad 3\,a_1 = 6, \qquad 3^{2}\,b_2 = -3
+\]
+（他の $a_n, b_n$ はすべて $0$）よって $a_0 = 8$, $a_1 = 2$, $b_2 = -\dfrac{1}{3}$ より
+\[
+\boxed{\; u(r,\theta) = 4 + 2r\cos\theta - \frac{1}{3}r^{2}\sin 2\theta \;}
+\]
+（検算: $r\cos\theta$，$r^2\sin2\theta$ はいずれも調和関数（$r^n\cos n\theta$, $r^n\sin n\theta$ 型）であり定数関数も調和だから、$u$ は円板内で調和。$r=3$ を代入すると $u(3,\theta) = 4 + 6\cos\theta - \dfrac{9}{3}\sin2\theta = 4 + 6\cos\theta - 3\sin2\theta$ となり境界条件と一致する。また $r \to 0$ で有界。）
+
+\end{document}

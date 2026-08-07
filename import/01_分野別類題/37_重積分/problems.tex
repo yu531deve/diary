@@ -1,0 +1,25 @@
+% 分野別類題: 重積分（累次積分・極座標・体積計算）
+% 基本2問（累次積分の順序交換、極座標変換）＋応用1問（曲面下の体積）。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 重積分}
+
+\shijibun{以下の各問について、累次積分の設定・積分順序の交換、極座標を用いた変数変換、体積計算のいずれかを用いて重積分を計算せよ。導出過程を示せ。}
+
+\shomon{問1.}{次の累次積分の積分順序を交換し、その値を求めよ。}
+\[
+\int_{0}^{1}\int_{y}^{1} e^{x^{2}}\,dx\,dy
+\]
+
+\shomon{問2.}{領域 $D = \{(x,y) \mid x^{2} + y^{2} \le 4,\ x \ge 0,\ y \ge 0\}$ において、次の重積分を極座標変換により求めよ。}
+\[
+\iint_{D} \sqrt{x^{2} + y^{2}}\,dx\,dy
+\]
+
+\shomon{問3.}{曲面 $z = 4 - x^{2} - y^{2}$ と平面 $z = 0$ とで囲まれる立体のうち、$z \ge 0$ の部分の体積 $V$ を求めよ。}
+
+\end{document}

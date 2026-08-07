@@ -1,0 +1,167 @@
+% 分野別類題: 微分計算（合成関数・商・積の微分） 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 微分計算（合成・商・積）}
+
+\daimon{【解法】積・商・合成関数の微分公式とその導出}
+
+\noindent
+\textbf{(1) 積の微分公式}\\
+$f, g$ が微分可能なとき、積 $y = f(x)g(x)$ の導関数は定義
+\[
+y'(x) = \lim_{h\to 0}\frac{f(x+h)g(x+h) - f(x)g(x)}{h}
+\]
+において分子に $-f(x+h)g(x) + f(x+h)g(x)$ を加えて引くと
+\[
+\frac{f(x+h)g(x+h) - f(x+h)g(x) + f(x+h)g(x) - f(x)g(x)}{h}
+\]
+\[
+= f(x+h)\cdot\frac{g(x+h)-g(x)}{h} + \frac{f(x+h)-f(x)}{h}\cdot g(x)
+\]
+$h\to 0$ とすれば $f(x+h)\to f(x)$ なので
+\[
+(fg)' = f'g + fg'
+\]
+を得る。3 つ以上の積 $fgh$ の場合はこれを 2 回適用して
+\[
+(fgh)' = f'gh + fg'h + fgh'
+\]
+となる（各因子を 1 つずつ微分し、残りをそのまま掛けた項の和）。
+
+\noindent
+\textbf{(2) 商の微分公式}\\
+$y = \dfrac{f(x)}{g(x)}$（$g\neq 0$）は $y = f\cdot g^{-1}$ と見て積の微分公式と、後述の合成関数の微分公式（$g^{-1}$ の微分は $-g^{-2}g'$）を用いると
+\[
+y' = f'g^{-1} + f\cdot(-g^{-2}g') = \frac{f'g - fg'}{g^{2}}
+\]
+を得る。
+
+\noindent
+\textbf{(3) 合成関数の微分公式（連鎖律）}\\
+$y = f(u)$, $u = g(x)$ とし、$y = f(g(x))$ とする。$g$ が $x_0$ で微分可能、$f$ が $u_0 = g(x_0)$ で微分可能とすると
+\[
+\frac{f(g(x_0+h)) - f(g(x_0))}{h}
+= \frac{f(u_0+k) - f(u_0)}{k}\cdot\frac{k}{h}, \qquad k = g(x_0+h) - g(x_0)
+\]
+$h\to 0$ のとき $k\to 0$ であり（$g$ の連続性）、$k/h \to g'(x_0)$、$\dfrac{f(u_0+k)-f(u_0)}{k}\to f'(u_0)$ となるから（$k=0$ となる点の扱いは極限の議論で補える）
+\[
+\{f(g(x))\}' = f'(g(x))\,g'(x)
+\]
+を得る。多重合成 $f(g(h(x)))$ の場合はこれを繰り返し適用し、外側から順に微分して内側の導関数を掛けていく。
+
+\noindent
+\textbf{(4) 対数微分法}\\
+$y = u(x)^{v(x)}$（$u>0$）のように底・指数がともに $x$ の関数である場合、両辺の自然対数をとると
+\[
+\ln y = v(x)\ln u(x)
+\]
+両辺を $x$ で微分すると（左辺は合成関数の微分、右辺は積の微分）
+\[
+\frac{y'}{y} = v'(x)\ln u(x) + v(x)\cdot\frac{u'(x)}{u(x)}
+\]
+よって
+\[
+y' = y\left[v'(x)\ln u(x) + \frac{v(x)u'(x)}{u(x)}\right]
+= u(x)^{v(x)}\left[v'(x)\ln u(x) + \frac{v(x)u'(x)}{u(x)}\right]
+\]
+となる。特に $u(x)=x$, $v(x)=x$（$y=x^{x}$）の場合は $y' = x^{x}(\ln x + 1)$ である。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$y = \dfrac{\cos x}{\sqrt{x}}$ を微分せよ。
+\end{mondaiboxS}
+\kaitou
+$f(x) = \cos x$, $g(x) = \sqrt{x} = x^{1/2}$ とすると $f' = -\sin x$, $g' = \dfrac{1}{2}x^{-1/2}$。商の微分公式より
+\[
+y' = \frac{f'g - fg'}{g^{2}}
+= \frac{-\sin x\cdot x^{1/2} - \cos x\cdot \dfrac{1}{2}x^{-1/2}}{x}
+\]
+分子・分母に $2x^{1/2}$ を掛けて整理すると
+\[
+\boxed{\; y' = -\dfrac{2x\sin x + \cos x}{2x\sqrt{x}} \;}
+\]
+（検算: $x=\pi$ で数値的に確認する。$y=\cos x\,x^{-1/2}$ を直接微分すると
+$y' = -\sin x\,x^{-1/2} + \cos x\cdot\left(-\dfrac{1}{2}\right)x^{-3/2}
+= -\dfrac{\sin x}{\sqrt{x}} - \dfrac{\cos x}{2x\sqrt{x}}
+= -\dfrac{2x\sin x + \cos x}{2x\sqrt{x}}$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$y = \dfrac{1}{\tan^{2} x}$ を微分せよ。
+\end{mondaiboxS}
+\kaitou
+$y = (\tan x)^{-2}$ と見て合成関数の微分公式を用いると
+\[
+y' = -2(\tan x)^{-3}\cdot \sec^{2}x
+= -\frac{2\sec^{2}x}{\tan^{3}x}
+\]
+$\sec^{2}x = \dfrac{1}{\cos^{2}x}$, $\tan^{3}x = \dfrac{\sin^{3}x}{\cos^{3}x}$ を代入して整理すると
+\[
+\boxed{\; y' = -\dfrac{2\cos x}{\sin^{3} x} \;}
+\]
+（検算: $y=\cot^{2}x$ とも書けるから $y' = 2\cot x\cdot(-\csc^{2}x) = -2\dfrac{\cos x}{\sin x}\cdot\dfrac{1}{\sin^{2}x} = -\dfrac{2\cos x}{\sin^{3}x}$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$y = x^{2}e^{3x}\sin x$ を微分せよ。
+\end{mondaiboxS}
+\kaitou
+3 つの積の微分公式 $(fgh)' = f'gh + fg'h + fgh'$ を用いる。$f=x^{2}$, $g=e^{3x}$, $h=\sin x$ とすると $f'=2x$, $g'=3e^{3x}$, $h'=\cos x$ より
+\[
+y' = 2x\,e^{3x}\sin x + 3x^{2}e^{3x}\sin x + x^{2}e^{3x}\cos x
+\]
+$e^{3x}$ でくくると
+\[
+y' = e^{3x}\left[(3x^{2}+2x)\sin x + x^{2}\cos x\right]
+\]
+さらに $x$ でくくって
+\[
+\boxed{\; y' = x\,e^{3x}\bigl[(3x+2)\sin x + x\cos x\bigr] \;}
+\]
+（検算: $x=0$ を代入すると $y'(0) = 0$ となる。一方 $y = x^{2}e^{3x}\sin x$ は $x=0$ の近傍で $x^{2}$ のオーダーであるから $y'(0)=0$ は妥当である。）
+
+\clearpage
+\begin{mondaiboxS}{問4}
+$y = \sin^{3}\!\left(2x^{2}+1\right)$ を微分せよ。
+\end{mondaiboxS}
+\kaitou
+$u = 2x^{2}+1$ とおくと $y = \sin^{3}u = (\sin u)^{3}$ であり、$u' = 4x$。まず外側の $(\ \cdot\ )^{3}$ を微分し、次に $\sin u$ を微分し、最後に $u$ を微分するという多重連鎖律を適用する。
+\[
+\frac{dy}{du} = 3\sin^{2}u, \qquad \frac{d}{du}(\sin u) \text{ は既に上式に含まれるので、} \frac{d(\sin u)}{dx} = \cos u\cdot u'
+\]
+より
+\[
+y' = 3\sin^{2}u\cdot\cos u\cdot u' = 3\sin^{2}(2x^{2}+1)\cos(2x^{2}+1)\cdot 4x
+\]
+整理すると
+\[
+\boxed{\; y' = 12x\sin^{2}\!\left(2x^{2}+1\right)\cos\!\left(2x^{2}+1\right) \;}
+\]
+（検算: $x=0$ のとき $u=1$ で $y'(0) = 12\cdot 0\cdot(\cdots) = 0$。実際 $y(x) = \sin^{3}(2x^{2}+1)$ は偶関数（$x\to -x$ で不変）なので、微分可能ならば $y'(0)=0$ でなければならず、整合している。）
+
+\clearpage
+\begin{mondaiboxS}{問5}
+$y = x^{x}$（$x>0$）を微分せよ。（対数微分法を用いよ。）
+\end{mondaiboxS}
+\kaitou
+両辺の自然対数をとると
+\[
+\ln y = x\ln x
+\]
+両辺を $x$ で微分すると、左辺は合成関数の微分により $\dfrac{y'}{y}$、右辺は積の微分公式により $\ln x + x\cdot\dfrac{1}{x} = \ln x + 1$ となるから
+\[
+\frac{y'}{y} = \ln x + 1
+\]
+よって
+\[
+\boxed{\; y' = x^{x}(\ln x + 1) \;}
+\]
+（検算: $x=1$ のとき $y=1^{1}=1$, $y'(1) = 1\cdot(\ln 1 + 1) = 1$。実際 $x^{x} = e^{x\ln x}$ を直接微分すると
+$y' = e^{x\ln x}\cdot(\ln x + 1) = x^{x}(\ln x+1)$ となり一致する。）
+
+\end{document}

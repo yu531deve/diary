@@ -1,0 +1,28 @@
+% 分野別類題: 一次同次線形偏微分方程式（P u_x + Q u_y = 0）
+% 特性曲線法で解く基本形 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 一次同次線形偏微分方程式}
+
+\shijibun{次の偏微分方程式の一般解を求めよ。導出過程を示せ。（ヒント: $P(x,y)\,\dfrac{\partial u}{\partial x} + Q(x,y)\,\dfrac{\partial u}{\partial y} = 0$ の一般解は、特性方程式 $\dfrac{dx}{P} = \dfrac{dy}{Q}$ の解 $\varphi(x,y) = C$ を用いて $u = F(\varphi(x,y))$（$F$ は任意関数）と表せる。）}
+
+\shomon{問1.}{次の偏微分方程式の一般解を求めよ。}
+\[
+x\frac{\partial u}{\partial x} - y\frac{\partial u}{\partial y} = 0
+\]
+
+\shomon{問2.}{次の偏微分方程式の一般解を求めよ。}
+\[
+y\frac{\partial u}{\partial x} + x\frac{\partial u}{\partial y} = 0
+\]
+
+\shomon{問3.}{次の偏微分方程式の一般解を求め、さらに条件 $u(0, y) = \sin y$ を満たす解を求めよ。}
+\[
+\frac{\partial u}{\partial x} + 2x\frac{\partial u}{\partial y} = 0
+\]
+
+\end{document}

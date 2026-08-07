@@ -1,0 +1,28 @@
+% 分野別類題: 同次形（1階常微分方程式 dy/dx = f(y/x)）
+% y = vx の置換により変数分離形に帰着する定番パターン 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 同次形}
+
+\shijibun{次の常微分方程式を解き、導出過程を示せ。（$\dfrac{dy}{dx} = f\!\left(\dfrac{y}{x}\right)$ の形（同次形）は $y = vx$ の置換により変数分離形に帰着して解ける。）}
+
+\shomon{問1.}{次の常微分方程式の一般解を求めよ（$x > 0$ とする）。}
+\[
+\frac{dy}{dx} = \frac{x^{2} + y^{2}}{xy}
+\]
+
+\shomon{問2.}{次の常微分方程式の一般解を求めよ（$x > 0$ とする）。}
+\[
+\frac{dy}{dx} = \frac{y}{x} + \tan\frac{y}{x}
+\]
+
+\shomon{問3.}{次の初期値問題を解け（$x > 0$ とする）。}
+\[
+\frac{dy}{dx} = \frac{x + y}{x - y}, \qquad y(1) = 0
+\]
+
+\end{document}

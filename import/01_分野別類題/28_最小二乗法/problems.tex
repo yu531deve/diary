@@ -1,0 +1,33 @@
+% 分野別類題: 最小二乗法（多項式フィット）
+% 誤差二乗和の偏微分＝0 から正規方程式を導出して解く 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 最小二乗法（多項式フィット）}
+
+\shijibun{データ点 $(x_i, y_i)$ ($i=1,\dots,n$) に対し、モデル $y = f(x)$ の誤差二乗和 $S = \displaystyle\sum_{i=1}^{n}\bigl(y_i - f(x_i)\bigr)^{2}$ を最小にするように未知係数を定めよ。誤差二乗和を各係数で偏微分して $0$ とおいた正規方程式を導出し、それを解くこと。}
+
+\shomon{問1.}{4個のデータ点
+\[
+(x_1,y_1)=(0,1),\quad (x_2,y_2)=(1,2),\quad (x_3,y_3)=(2,2),\quad (x_4,y_4)=(3,4)
+\]
+に対し、直線 $y = ax + b$ を最小二乗法でフィットせよ。誤差二乗和 $S(a,b) = \displaystyle\sum_{i=1}^{4}(y_i - ax_i - b)^2$ を $a, b$ で偏微分して $0$ とおくことにより正規方程式を導出し、$a, b$ を求めよ。}
+
+\shomon{問2.}{5個のデータ点
+\[
+(-2,4),\quad (-1,1),\quad (0,0),\quad (1,1),\quad (2,6)
+\]
+に対し、2次関数 $y = ax^2 + bx + c$ を最小二乗法でフィットせよ。誤差二乗和 $S(a,b,c) = \displaystyle\sum_{i=1}^{5}(y_i - ax_i^2 - bx_i - c)^2$ を $a, b, c$ でそれぞれ偏微分して $0$ とおくことにより正規方程式を導出し、$a, b, c$ を求めよ。}
+
+\shomon{問3.}{データ点 $(x_i, y_i)$ ($i=1,\dots,n$) に直線 $y = ax + b$ をフィットする最小二乗問題を、計画行列
+\[
+A = \begin{pmatrix} x_1 & 1 \\ x_2 & 1 \\ \vdots & \vdots \\ x_n & 1 \end{pmatrix}, \qquad
+\bm{x} = \begin{pmatrix} a \\ b \end{pmatrix}, \qquad
+\bm{b} = \begin{pmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{pmatrix}
+\]
+を用いて $\|\bm{b} - A\bm{x}\|^2$ の最小化として定式化し、正規方程式 $A^{\top}A\,\bm{x} = A^{\top}\bm{b}$ を導け。さらに、この行列形式が問1の偏微分による正規方程式と一致することを確認せよ。}
+
+\end{document}

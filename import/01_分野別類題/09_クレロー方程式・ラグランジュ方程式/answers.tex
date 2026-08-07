@@ -1,0 +1,183 @@
+% 分野別類題: クレロー方程式・ラグランジュ方程式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- クレロー方程式・ラグランジュ方程式}
+
+\daimon{【解法】クレロー方程式・ラグランジュ方程式の解き方と導出}
+
+\noindent
+\textbf{(1) クレロー方程式}\quad
+次の形の1階微分方程式をクレロー方程式という。
+\[
+y = xy' + f(y')
+\]
+$p = y'$ とおくと $y = xp + f(p)$。両辺を $x$ で微分すると（$p = \dfrac{dy}{dx}$ に注意し、右辺は $x$ と $p(x)$ の積の微分として扱う）
+\[
+p = p + x\frac{dp}{dx} + f'(p)\frac{dp}{dx}
+\quad\Longrightarrow\quad
+\bigl(x + f'(p)\bigr)\frac{dp}{dx} = 0
+\]
+微分によって得たこの式は\textbf{必要条件}にすぎない（微分は情報を落とす操作である）ことに注意し、2通りの各ケースについて、得られる曲線が\textbf{実際に元の方程式を満たすこと}まで確かめて初めて導出が完結する。
+
+\medskip
+\noindent
+\textbf{ケース1（一般解）.}\quad
+$\dfrac{dp}{dx} = 0$、すなわち $p = C$（定数）のとき、$y = xp+f(p)$ に代入して
+\[
+y = Cx + f(C)
+\]
+\textbf{代入確認}: この直線に対し $y' = C$ であるから
+\[
+xy' + f(y') = Cx + f(C) = y
+\]
+となり、確かに元の方程式を満たす。よってこれが\textbf{一般解}（傾き $C$ の直線族）である。
+
+\medskip
+\noindent
+\textbf{ケース2（特異解）.}\quad
+$x + f'(p) = 0$ のとき、$y = xp + f(p)$ と連立して
+\[
+x = -f'(p), \qquad y = -p\,f'(p) + f(p)
+\]
+という $p$ を媒介変数とする曲線が得られる。\textbf{この曲線が解であることの確認}: 媒介変数 $p$ で微分すると
+\[
+\frac{dx}{dp} = -f''(p), \qquad
+\frac{dy}{dp} = -f'(p) - p\,f''(p) + f'(p) = -p\,f''(p) = p\,\frac{dx}{dp}
+\]
+であるから（$f''(p)\neq0$ のとき）
+\[
+\frac{dy}{dx} = \frac{dy/dp}{dx/dp} = p
+\]
+すなわち\textbf{媒介変数 $p$ はこの曲線上で本当に傾き $y'$ に一致する}。したがって曲線の定義式 $y = xp + f(p)$ はそのまま $y = xy' + f(y')$ の成立を意味し、この曲線は元の方程式の解である。任意定数を含まず、$C$ の値をどう選んでも一般解からは得られないので\textbf{特異解}と呼ぶ。
+
+\medskip
+\noindent
+\textbf{特異解＝包絡線であることの確認}: 一般解の直線族を $F(x,y,C) := Cx + f(C) - y = 0$ とみると、包絡線は連立
+\[
+F = 0, \qquad \frac{\partial F}{\partial C} = x + f'(C) = 0
+\]
+から $C$ を消去して得られる。第2式はケース2の条件 $x = -f'(p)$（$C \leftrightarrow p$）そのものであり、第1式は $y = Cx + f(C)$ すなわち曲線の定義式に一致する。よって\textbf{ケース2の曲線は一般解の直線族の包絡線に他ならない}（各点で直線族のいずれか1本と接している）。
+
+\noindent
+\textbf{(2) ラグランジュ方程式}\quad
+次の形（$g(p) \not\equiv p$）をラグランジュ方程式という。
+\[
+y = xg(y') + f(y')
+\]
+$p = y'$ とおき、$y = xg(p) + f(p)$ の両辺を $x$ で微分すると、$\dfrac{dy}{dx} = p$ であるから
+\[
+p = g(p) + \left[x g'(p) + f'(p)\right]\frac{dp}{dx}
+\]
+\[
+\bigl(p - g(p)\bigr)\,dx = \bigl[x g'(p) + f'(p)\bigr]\,dp
+\]
+$p - g(p) \neq 0$ のとき、$x$ を $p$ の関数とみなして整理すると
+\[
+\frac{dx}{dp} - \frac{g'(p)}{p - g(p)}\,x = \frac{f'(p)}{p - g(p)}
+\]
+という $x$ に関する1階線形微分方程式が得られる。これを解いて $x = x(p)$ を求め、$y = x(p)\,g(p) + f(p)$ から $y = y(p)$ を得れば、$(x(p), y(p))$ が $p$ をパラメータとする一般解である（クレロー方程式は $g(p) \equiv p$ の特別な場合にあたり、このときは $p - g(p) \equiv 0$ となるため上の除法ができず、(1) の特別な扱いが必要になる）。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$y = xy' + (y')^{2}$ の一般解と特異解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$p = y'$ とおくと $y = xp + p^{2}$。$f(p) = p^{2}$ なので $f'(p) = 2p$。両辺を $x$ で微分すると
+\[
+p = p + (x + 2p)\frac{dp}{dx}
+\quad\Longrightarrow\quad
+(x + 2p)\frac{dp}{dx} = 0
+\]
+\textbf{一般解}: $\dfrac{dp}{dx} = 0$ より $p = C$。よって
+\[
+\boxed{\; y = Cx + C^{2} \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $y' = C$ なので $xy' + (y')^{2} = xC + C^{2} = y$。成立。）
+
+\textbf{特異解}: $x + 2p = 0$ より $x = -2p$、すなわち $p = -\dfrac{x}{2}$。これを $y = xp+p^{2}$ に代入すると
+\[
+y = x\left(-\frac{x}{2}\right) + \left(-\frac{x}{2}\right)^{2}
+= -\frac{x^{2}}{2} + \frac{x^{2}}{4}
+\]
+\[
+\boxed{\; y = -\frac{x^{2}}{4} \;}
+\]
+（検算: $y' = -\dfrac{x}{2}$ であり、$xy' + (y')^{2} = x\left(-\dfrac{x}{2}\right) + \dfrac{x^{2}}{4} = -\dfrac{x^{2}}{2}+\dfrac{x^{2}}{4} = -\dfrac{x^{2}}{4} = y$。成立。この放物線は一般解の直線族 $y=Cx+C^2$ すべてに接する包絡線になっている。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$y = xy' - \ln y'$（$y' > 0$）の一般解と特異解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$p = y'\ (>0)$ とおくと $y = xp - \ln p$。$f(p) = -\ln p$ なので $f'(p) = -\dfrac{1}{p}$。両辺を $x$ で微分すると
+\[
+p = p + \left(x - \frac{1}{p}\right)\frac{dp}{dx}
+\quad\Longrightarrow\quad
+\left(x - \frac{1}{p}\right)\frac{dp}{dx} = 0
+\]
+\textbf{一般解}: $\dfrac{dp}{dx} = 0$ より $p = C\ (>0)$。よって
+\[
+\boxed{\; y = Cx - \ln C \;}
+\qquad (C > 0 \text{ は任意定数})
+\]
+（検算: $y' = C$ なので $xy' - \ln y' = xC - \ln C = y$。成立。）
+
+\textbf{特異解}: $x - \dfrac{1}{p} = 0$ より $x = \dfrac{1}{p}$、すなわち $p = \dfrac{1}{x}\ (x > 0)$。これを $y = xp - \ln p$ に代入すると
+\[
+y = x \cdot \frac{1}{x} - \ln\frac{1}{x} = 1 + \ln x
+\]
+\[
+\boxed{\; y = 1 + \ln x \;}
+\qquad (x > 0)
+\]
+（検算: $y' = \dfrac{1}{x}$ であり、$xy' - \ln y' = x \cdot \dfrac{1}{x} - \ln\dfrac{1}{x} = 1 - (-\ln x) = 1 + \ln x = y$。成立。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$y = 2xy' + (y')^{2}$ について、$p = y'$ をパラメータとして一般解 $x = x(p)$, $y = y(p)$ を求めよ。さらに、傾き $p = 1$ のとき曲線が点 $(x, y) = \left(-\dfrac{1}{3}, \dfrac{1}{3}\right)$ を通るように、任意定数 $C$ の値を定めよ。
+\end{mondaiboxS}
+\kaitou
+$p = y'$ とおくと $y = xg(p) + f(p)$ の形（ラグランジュ方程式）で、$g(p) = 2p$, $f(p) = p^{2}$、$g'(p) = 2$, $f'(p) = 2p$ である。$p - g(p) = p - 2p = -p$ に注意して
+\[
+(p - g(p))\,dx = \bigl[x g'(p) + f'(p)\bigr]\,dp
+\quad\Longrightarrow\quad
+-p\,dx = (2x + 2p)\,dp
+\]
+\[
+\frac{dx}{dp} = -\frac{2x + 2p}{p} = -\frac{2}{p}x - 2
+\quad\Longrightarrow\quad
+\frac{dx}{dp} + \frac{2}{p}\,x = -2
+\]
+これは $x$ に関する1階線形微分方程式である。積分因子は $\mu(p) = \exp\left(\displaystyle\int \frac{2}{p}\,dp\right) = p^{2}$ なので
+\[
+\frac{d}{dp}\bigl(x\,p^{2}\bigr) = -2p^{2}
+\quad\Longrightarrow\quad
+x\,p^{2} = -\frac{2}{3}p^{3} + C
+\]
+\[
+\boxed{\; x(p) = -\frac{2}{3}p + \frac{C}{p^{2}} \;}
+\qquad (p \neq 0)
+\]
+これを $y = 2xp + p^{2}$ に代入すると
+\[
+y = 2p\left(-\frac{2}{3}p + \frac{C}{p^{2}}\right) + p^{2}
+= -\frac{4}{3}p^{2} + \frac{2C}{p} + p^{2}
+\]
+\[
+\boxed{\; y(p) = -\frac{1}{3}p^{2} + \frac{2C}{p} \;}
+\]
+（検算: $\dfrac{dx}{dp} = -\dfrac{2}{3} - \dfrac{2C}{p^{3}}$, $\dfrac{dy}{dp} = -\dfrac{2}{3}p - \dfrac{2C}{p^{2}} = p\left(-\dfrac{2}{3} - \dfrac{2C}{p^{3}}\right) = p\,\dfrac{dx}{dp}$ より $\dfrac{dy}{dx} = p$ を満たす。また $2xp + p^{2} = 2p\left(-\dfrac23 p + \dfrac{C}{p^2}\right)+p^2 = -\dfrac43p^2+\dfrac{2C}{p}+p^2 = -\dfrac13 p^2+\dfrac{2C}{p} = y$ となり、原方程式を満たす。）
+
+条件: $p = 1$ のとき $x = -\dfrac{1}{3}$, $y = \dfrac{1}{3}$ を通る。$x(1) = -\dfrac{2}{3} + C = -\dfrac{1}{3}$ より
+\[
+\boxed{\; C = \frac{1}{3} \;}
+\]
+（検算: $y(1) = -\dfrac{1}{3} + 2 \cdot \dfrac{1}{3} = -\dfrac{1}{3} + \dfrac{2}{3} = \dfrac{1}{3}$ となり、条件を満たす。）
+
+\end{document}

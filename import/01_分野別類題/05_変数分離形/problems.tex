@@ -1,0 +1,28 @@
+% 分野別類題: 変数分離形（1階常微分方程式）
+% f(y)dy = g(x)dx の形に分離して積分する基本形2問＋置換で分離形に帰着する初期値問題1問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 変数分離形}
+
+\shijibun{次の常微分方程式を解き、導出過程を示せ。（変数分離形 $\dfrac{dy}{dx} = f(x)g(y)$ は $\dfrac{dy}{g(y)} = f(x)\,dx$ として両辺を積分することで解ける。）}
+
+\shomon{問1.}{次の常微分方程式の一般解を求めよ（$y$ を $x$ を用いて表せ）。}
+\[
+\frac{dy}{dx} = x y^{2}
+\]
+
+\shomon{問2.}{次の常微分方程式の一般解を求めよ。}
+\[
+\frac{dy}{dx} = \frac{1+y^{2}}{1+x^{2}}
+\]
+
+\shomon{問3.}{次の初期値問題を解け。$u = x + y$ とおいて変数分離形に帰着させよ。}
+\[
+\frac{dy}{dx} = (x+y)^{2}, \qquad y(0) = 0
+\]
+
+\end{document}

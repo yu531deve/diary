@@ -1,0 +1,37 @@
+% 分野別類題: ヤコビアンと変数変換（重積分の変数変換）
+% 極座標・1次変換・変数変換を用いた重積分の計算 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- ヤコビアンと変数変換}
+
+\shijibun{次の各問に答えよ。座標変換 $(x,y) \to (u,v)$（あるいは3変数の場合はこれに準ずる）に対するヤコビ行列式
+\[
+\frac{\partial(x,y)}{\partial(u,v)} = \det \begin{pmatrix} \dfrac{\partial x}{\partial u} & \dfrac{\partial x}{\partial v} \\[2mm] \dfrac{\partial y}{\partial u} & \dfrac{\partial y}{\partial v} \end{pmatrix}
+\]
+を用いて、重積分の変数変換公式
+\[
+\iint_{D} f(x,y)\, dx\, dy = \iint_{D'} f(x(u,v), y(u,v)) \left| \frac{\partial(x,y)}{\partial(u,v)} \right| du\, dv
+\]
+に基づいて計算せよ。導出過程を示すこと。}
+
+\shomon{問1.}{極座標変換 $x = r\cos\theta,\ y = r\sin\theta$ および球座標変換 $x = r\sin\theta\cos\varphi,\ y = r\sin\theta\sin\varphi,\ z = r\cos\theta$ について、それぞれのヤコビ行列式
+$\dfrac{\partial(x,y)}{\partial(r,\theta)}$ および $\dfrac{\partial(x,y,z)}{\partial(r,\theta,\varphi)}$
+を求めよ。}
+
+\shomon{問2.}{1次変換 $u = x + y,\ v = x - y$ を用いて、次の積分を計算せよ。
+\[
+I = \iint_{D} (x^{2} - y^{2})\, e^{x+y}\, dx\, dy, \qquad D = \{(x,y) \mid 0 \le x+y \le 1,\ 0 \le x-y \le 1\}
+\]
+}
+
+\shomon{問3.}{領域 $D = \{(x,y) \mid x^{2} + y^{2} \le 4,\ x \ge 0,\ y \ge 0\}$ 上で、極座標変換を用いて次の積分を計算せよ。
+\[
+I = \iint_{D} \frac{1}{\sqrt{4 - x^{2} - y^{2}}}\, dx\, dy
+\]
+}
+
+\end{document}

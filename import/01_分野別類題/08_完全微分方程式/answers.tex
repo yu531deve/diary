@@ -1,0 +1,174 @@
+% 分野別類題: 完全微分方程式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 完全微分方程式}
+
+\daimon{【解法】完全微分方程式の解き方と導出}
+
+\noindent
+1階微分方程式
+\[
+M(x,y)\,dx + N(x,y)\,dy = 0
+\]
+が「完全微分方程式」であるとは、ある関数 $F(x,y)$ が存在して
+\[
+dF = \frac{\partial F}{\partial x}\,dx + \frac{\partial F}{\partial y}\,dy = M\,dx + N\,dy
+\]
+すなわち $F_x = M,\ F_y = N$ となることをいう。このとき方程式は $dF = 0$ と同値であるから、一般解は
+\[
+F(x,y) = C \qquad (C \text{ は任意定数})
+\]
+で与えられる。
+
+\medskip
+\noindent
+\textbf{完全性の判定条件。}
+$M, N$ が $C^1$ 級であれば、$F_x = M,\ F_y = N$ から
+\[
+\frac{\partial M}{\partial y} = \frac{\partial^2 F}{\partial y\,\partial x} = \frac{\partial^2 F}{\partial x\,\partial y} = \frac{\partial N}{\partial x}
+\]
+が必要であり、（単連結領域では）これは十分条件でもある。すなわち
+\[
+\frac{\partial M}{\partial y} = \frac{\partial N}{\partial x}
+\]
+が完全微分方程式であるための判定条件である。
+
+\medskip
+\noindent
+\textbf{ポテンシャル関数 $F$ の構成。}
+$F_x = M$ を $x$ について積分すると
+\[
+F(x,y) = \int M\,dx + g(y)
+\]
+（積分定数の代わりに $y$ の任意関数 $g(y)$ を付ける）。これを $y$ で微分して $N$ と比較し、
+\[
+\frac{\partial}{\partial y}\left(\int M\,dx\right) + g'(y) = N
+\]
+から $g'(y)$ を求めて積分すれば $g(y)$、したがって $F(x,y)$ が定まる。完全性条件より右辺は $x$ を含まない式になることが保証される。
+
+\medskip
+\noindent
+\textbf{積分因子による完全化。}
+$M_y \neq N_x$ で完全でない場合でも、適当な関数 $\mu$（積分因子）を掛けた
+\[
+\mu M\,dx + \mu N\,dy = 0
+\]
+が完全微分方程式になることがある。完全性条件 $(\mu M)_y = (\mu N)_x$ を展開すると
+\[
+\mu_y M + \mu M_y = \mu_x N + \mu N_x
+\]
+\begin{itemize}
+\item もし $\dfrac{M_y - N_x}{N}$ が $x$ のみの関数ならば、$\mu = \mu(x)$ ととれて
+\[
+\frac{d\mu}{dx} = \mu \cdot \frac{M_y - N_x}{N}
+\quad\Longrightarrow\quad
+\mu(x) = \exp\left(\int \frac{M_y - N_x}{N}\,dx\right)
+\]
+\item もし $\dfrac{N_x - M_y}{M}$ が $y$ のみの関数ならば、$\mu = \mu(y)$ ととれて
+\[
+\mu(y) = \exp\left(\int \frac{N_x - M_y}{M}\,dy\right)
+\]
+\end{itemize}
+積分因子を掛けた後は、上記の手順で $F(x,y) = C$ を求めればよい。初期条件が与えられた場合は、一般解 $F(x,y) = C$ に代入して $C$ を定める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$(2xy + 3x^{2})\,dx + (x^{2} + 2y)\,dy = 0$ が完全微分方程式であることを確かめ、一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$M = 2xy + 3x^{2}$、$N = x^{2} + 2y$ とおくと
+\[
+\frac{\partial M}{\partial y} = 2x, \qquad \frac{\partial N}{\partial x} = 2x
+\]
+一致するので完全微分方程式である。$F_x = M$ より
+\[
+F = \int (2xy + 3x^{2})\,dx = x^{2}y + x^{3} + g(y)
+\]
+$F_y = x^{2} + g'(y) = N = x^{2} + 2y$ より $g'(y) = 2y$、よって $g(y) = y^{2}$。したがって
+\[
+F(x,y) = x^{2}y + x^{3} + y^{2}
+\]
+一般解は
+\[
+\boxed{\; x^{2}y + x^{3} + y^{2} = C \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $F_x = 2xy + 3x^{2} = M$、$F_y = x^{2} + 2y = N$ で一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$(3xy + y^{2})\,dx + (x^{2} + xy)\,dy = 0$ は完全ではないが、$x$ のみに依存する積分因子 $\mu(x)$ を掛けると完全微分方程式になる。$\mu(x)$ を求め、一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$M = 3xy + y^{2}$、$N = x^{2} + xy$ とおくと
+\[
+\frac{\partial M}{\partial y} = 3x + 2y, \qquad \frac{\partial N}{\partial x} = 2x + y
+\]
+一致しないので完全ではない。
+\[
+\frac{M_y - N_x}{N} = \frac{(3x+2y)-(2x+y)}{x^{2}+xy} = \frac{x+y}{x(x+y)} = \frac{1}{x}
+\]
+は $x$ のみの関数だから、$x$ のみに依存する積分因子が存在し
+\[
+\mu(x) = \exp\left(\int \frac{1}{x}\,dx\right) = e^{\ln x} = x
+\]
+両辺に $\mu(x) = x$ を掛けると
+\[
+(3x^{2}y + xy^{2})\,dx + (x^{3} + x^{2}y)\,dy = 0
+\]
+新しい $M^{*} = 3x^{2}y + xy^{2}$、$N^{*} = x^{3} + x^{2}y$ について
+\[
+\frac{\partial M^{*}}{\partial y} = 3x^{2} + 2xy, \qquad \frac{\partial N^{*}}{\partial x} = 3x^{2} + 2xy
+\]
+一致し完全である。$F_x = M^{*}$ より
+\[
+F = \int (3x^{2}y + xy^{2})\,dx = x^{3}y + \frac{x^{2}y^{2}}{2} + g(y)
+\]
+$F_y = x^{3} + x^{2}y + g'(y) = N^{*} = x^{3} + x^{2}y$ より $g'(y) = 0$。よって一般解は
+\[
+\boxed{\; x^{3}y + \frac{x^{2}y^{2}}{2} = C \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $F_x = 3x^{2}y + xy^{2} = M^{*}$、$F_y = x^{3} + x^{2}y = N^{*}$ で一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$(2x + y\cos x)\,dx + (\sin x - 2y)\,dy = 0, \quad y(0) = 3$ を解け。
+\end{mondaiboxS}
+\kaitou
+$M = 2x + y\cos x$、$N = \sin x - 2y$ とおくと
+\[
+\frac{\partial M}{\partial y} = \cos x, \qquad \frac{\partial N}{\partial x} = \cos x
+\]
+一致するので完全微分方程式である。$F_x = M$ より
+\[
+F = \int (2x + y\cos x)\,dx = x^{2} + y\sin x + g(y)
+\]
+$F_y = \sin x + g'(y) = N = \sin x - 2y$ より $g'(y) = -2y$、よって $g(y) = -y^{2}$。したがって
+\[
+F(x,y) = x^{2} + y\sin x - y^{2}
+\]
+一般解は $x^{2} + y\sin x - y^{2} = C$。初期条件 $y(0) = 3$（$x=0$ のとき $\sin 0 = 0$）を代入すると
+\[
+0 + 0 - 9 = C \quad\Longrightarrow\quad C = -9
+\]
+よって
+\[
+x^{2} + y\sin x - y^{2} = -9
+\]
+これを $y$ について解くと（$y$ に関する2次方程式 $y^{2} - (\sin x)\,y - (x^{2}+9) = 0$ として解の公式を用いる）
+\[
+y = \frac{\sin x \pm \sqrt{\sin^{2}x + 4x^{2} + 36}}{2}
+\]
+初期条件 $y(0) = 3$ を満たすのは根号の前が $+$ の場合（$x=0$ で $y = \dfrac{0 + \sqrt{36}}{2} = 3$）であるから
+\[
+\boxed{\; y = \frac{\sin x + \sqrt{\sin^{2}x + 4x^{2} + 36}}{2} \;}
+\]
+（検算: $x=0$ のとき $y = \dfrac{0+6}{2} = 3$ で初期条件を満たす。また $x^{2} + y\sin x - y^{2} = -9$ に代入すると恒等的に成り立つことが $y$ の定義から確認できる。）
+
+\end{document}

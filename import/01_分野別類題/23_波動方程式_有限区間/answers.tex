@@ -1,0 +1,201 @@
+% 分野別類題: 波動方程式の有限区間問題（両端固定・変数分離法）解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 波動方程式の有限区間問題（変数分離法）}
+
+\daimon{【解法】有限区間における波動方程式の解き方と導出}
+
+\noindent
+長さ $L$ の弦の両端を固定した場合の初期値・境界値問題
+\[
+\frac{\partial^{2} u}{\partial t^{2}} = c^{2}\frac{\partial^{2} u}{\partial x^{2}} \qquad (0 < x < L,\ t > 0)
+\]
+\[
+u(0,t) = 0,\quad u(L,t) = 0 \qquad (t > 0)
+\]
+\[
+u(x,0) = f(x), \qquad \frac{\partial u}{\partial t}(x,0) = g(x) \qquad (0 \le x \le L)
+\]
+を、変数分離法とフーリエ級数展開によって解く。
+
+\medskip
+\noindent
+\textbf{(1) 変数分離}\quad $u(x,t) = X(x)T(t)$ とおいて方程式に代入すると
+\[
+X(x)T''(t) = c^{2}X''(x)T(t)
+\quad\Longrightarrow\quad
+\frac{T''(t)}{c^{2}T(t)} = \frac{X''(x)}{X(x)} = -\lambda
+\]
+（両辺は $x$ と $t$ の独立変数の関数なので定数 $-\lambda$ に等しい。定数を $-\lambda$ とおくのは、後述のように境界条件を満たす非自明解が $\lambda > 0$ のときにしか存在しないためである。）これより連立の常微分方程式
+\[
+X''(x) + \lambda X(x) = 0, \qquad T''(t) + \lambda c^{2} T(t) = 0
+\]
+を得る。
+
+\medskip
+\noindent
+\textbf{(2) 境界条件から固有値・固有関数を決定}\quad $u(0,t) = X(0)T(t) = 0$ かつ $u(L,t) = X(L)T(t) = 0$ が任意の $t$ で成り立つ（$T \equiv 0$ である自明解を除く）ためには
+\[
+X(0) = 0, \qquad X(L) = 0
+\]
+が必要である。$\lambda \le 0$ では $X \equiv 0$ となる自明解しか得られない（$\lambda<0$なら $X$ は指数関数の和、$\lambda=0$ なら1次関数となり、いずれも両端で $0$ になるのは $X\equiv0$ のみ）。$\lambda = k^{2} > 0$ とおくと
+\[
+X(x) = A\cos kx + B\sin kx
+\]
+$X(0)=0$ より $A=0$。$X(L)=B\sin kL = 0$ で $B \neq 0$ より $\sin kL = 0$、すなわち
+\[
+k = k_{n} = \frac{n\pi}{L} \qquad (n = 1,2,3,\dots)
+\]
+よって固有値は $\lambda_{n} = \left(\dfrac{n\pi}{L}\right)^{2}$、固有関数は
+\[
+X_{n}(x) = \sin\frac{n\pi x}{L}
+\]
+
+\medskip
+\noindent
+\textbf{(3) 時間成分}\quad $T''(t) + \lambda_{n}c^{2}T(t) = 0$ より、角振動数 $\omega_{n} = \dfrac{n\pi c}{L}$ として
+\[
+T_{n}(t) = A_{n}\cos\omega_{n}t + B_{n}\sin\omega_{n}t
+\]
+
+\medskip
+\noindent
+\textbf{(4) 重ね合わせと初期条件によるフーリエ係数の決定}\quad 各モード $u_{n}(x,t) = X_{n}(x)T_{n}(t)$ は線形方程式・線形境界条件を満たすので、一般解は重ね合わせ
+\[
+u(x,t) = \sum_{n=1}^{\infty}\left(A_{n}\cos\frac{n\pi c t}{L} + B_{n}\sin\frac{n\pi c t}{L}\right)\sin\frac{n\pi x}{L}
+\]
+で与えられる。初期条件に代入すると
+\[
+u(x,0) = \sum_{n=1}^{\infty} A_{n}\sin\frac{n\pi x}{L} = f(x)
+\]
+\[
+\frac{\partial u}{\partial t}(x,0) = \sum_{n=1}^{\infty} \frac{n\pi c}{L}B_{n}\sin\frac{n\pi x}{L} = g(x)
+\]
+これらは $f,g$ のフーリエ正弦級数展開であるから、$\{\sin(n\pi x/L)\}$ の直交性
+\[
+\int_{0}^{L}\sin\frac{n\pi x}{L}\sin\frac{m\pi x}{L}\,dx = \frac{L}{2}\delta_{nm}
+\]
+を用いて
+\[
+A_{n} = \frac{2}{L}\int_{0}^{L} f(x)\sin\frac{n\pi x}{L}\,dx,
+\qquad
+B_{n} = \frac{2}{n\pi c}\int_{0}^{L} g(x)\sin\frac{n\pi x}{L}\,dx
+\]
+と定まる。これでダランベールの解（無限区間・初期値のみで一意に決まる進行波の重ね合わせ）とは異なり、有限区間では境界条件によって離散的な固有振動（定常波）モードの重ね合わせとして解が表される。両端固定（ディリクレ条件）の代わりに両端自由（ノイマン条件 $u_x(0,t)=u_x(L,t)=0$）が課される場合は、固有関数が $\cos(n\pi x/L)$（$n=0,1,2,\dots$）に置き換わる点が異なる。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+\[
+\frac{\partial^{2} u}{\partial t^{2}} = c^{2}\frac{\partial^{2} u}{\partial x^{2}} \qquad (0 < x < L,\ t > 0), \qquad u(0,t)=u(L,t)=0
+\]
+\[
+u(x,0) = \sin\frac{\pi x}{L}, \qquad u_{t}(x,0) = 0
+\]
+を解け。
+\end{mondaiboxS}
+\kaitou
+上の一般解
+\[
+u(x,t) = \sum_{n=1}^{\infty}\left(A_{n}\cos\frac{n\pi c t}{L} + B_{n}\sin\frac{n\pi c t}{L}\right)\sin\frac{n\pi x}{L}
+\]
+に初期条件を適用する。$u_{t}(x,0) = 0$ より、すべての $n$ について $B_{n} = 0$。また
+\[
+u(x,0) = \sum_{n=1}^{\infty} A_{n}\sin\frac{n\pi x}{L} = \sin\frac{\pi x}{L}
+\]
+は右辺がすでに $n=1$ の固有関数そのものであるから、直交性より $A_{1} = 1$、$A_{n} = 0\ (n \ge 2)$ と一意に定まる（フーリエ係数の積分計算をするまでもない）。よって
+\[
+\boxed{\; u(x,t) = \cos\frac{\pi c t}{L}\,\sin\frac{\pi x}{L} \;}
+\]
+（検算: $u_{tt} = -\left(\dfrac{\pi c}{L}\right)^{2}\cos\dfrac{\pi ct}{L}\sin\dfrac{\pi x}{L}$、$c^{2}u_{xx} = c^{2}\left(-\left(\dfrac{\pi}{L}\right)^{2}\right)\cos\dfrac{\pi ct}{L}\sin\dfrac{\pi x}{L}$ で両者は一致し波動方程式を満たす。$u(0,t)=u(L,t)=0$、$u(x,0)=\sin(\pi x/L)$、$u_t(x,0) = -\frac{\pi c}{L}\sin(0)\sin(\pi x/L)=0$ もすべて満たす。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+\[
+\frac{\partial^{2} u}{\partial t^{2}} = c^{2}\frac{\partial^{2} u}{\partial x^{2}} \qquad (0 < x < L,\ t > 0), \qquad u(0,t)=u(L,t)=0
+\]
+\[
+u(x,0) = f(x) =
+\begin{cases}
+\dfrac{2h}{L}x & (0 \le x \le L/2) \\[1mm]
+\dfrac{2h}{L}(L-x) & (L/2 \le x \le L)
+\end{cases}, \qquad u_{t}(x,0) = 0
+\]
+を解け。
+\end{mondaiboxS}
+\kaitou
+$u_{t}(x,0)=0$ より $B_{n}=0$（すべての $n$）。$A_{n}$ は
+\[
+A_{n} = \frac{2}{L}\int_{0}^{L} f(x)\sin\frac{n\pi x}{L}\,dx
+= \frac{2}{L}\left[\int_{0}^{L/2}\frac{2h}{L}x\sin\frac{n\pi x}{L}\,dx + \int_{L/2}^{L}\frac{2h}{L}(L-x)\sin\frac{n\pi x}{L}\,dx\right]
+\]
+第2項は $x' = L-x$ と置換すると
+\[
+\int_{0}^{L/2}\frac{2h}{L}x'\sin\frac{n\pi(L-x')}{L}\,dx'
+= \int_{0}^{L/2}\frac{2h}{L}x'\left(\sin n\pi\cos\frac{n\pi x'}{L} - \cos n\pi\sin\frac{n\pi x'}{L}\right)dx'
+\]
+となる。$\sin n\pi = 0$、$\cos n\pi = (-1)^{n}$ であるから
+\[
+= -(-1)^{n}\int_{0}^{L/2}\frac{2h}{L}x'\sin\frac{n\pi x'}{L}\,dx'
+\]
+よって
+\[
+A_{n} = \frac{2}{L}\cdot\frac{2h}{L}\left(1-(-1)^{n}\right)\int_{0}^{L/2} x\sin\frac{n\pi x}{L}\,dx
+\]
+偶数 $n$ では $1-(-1)^n=0$ より $A_{n}=0$。奇数 $n$ では $1-(-1)^{n}=2$ であり、部分積分
+\[
+\int_{0}^{L/2} x\sin\frac{n\pi x}{L}\,dx
+= \left[-\frac{L}{n\pi}x\cos\frac{n\pi x}{L}\right]_{0}^{L/2} + \frac{L}{n\pi}\int_{0}^{L/2}\cos\frac{n\pi x}{L}\,dx
+= -\frac{L^{2}}{2n\pi}\cos\frac{n\pi}{2} + \left(\frac{L}{n\pi}\right)^{2}\sin\frac{n\pi}{2}
+\]
+奇数 $n$ では $\cos(n\pi/2)=0$ なので
+\[
+\int_{0}^{L/2} x\sin\frac{n\pi x}{L}\,dx = \left(\frac{L}{n\pi}\right)^{2}\sin\frac{n\pi}{2}
+\]
+これらをまとめると
+\[
+A_{n} = \frac{2}{L}\cdot\frac{2h}{L}\cdot 2 \cdot \left(\frac{L}{n\pi}\right)^{2}\sin\frac{n\pi}{2} = \frac{8h}{n^{2}\pi^{2}}\sin\frac{n\pi}{2}
+\qquad (n:\text{奇数}),\qquad A_{n}=0\ (n:\text{偶数})
+\]
+$\sin(n\pi/2)$ は $n=1,3,5,7,\dots$ に対して $1,-1,1,-1,\dots$ となるので、$n=2m-1$（$m=1,2,3,\dots$）と書けば $\sin\frac{n\pi}{2} = (-1)^{m-1}$。よって
+\[
+\boxed{\;
+u(x,t) = \frac{8h}{\pi^{2}}\sum_{m=1}^{\infty}\frac{(-1)^{m-1}}{(2m-1)^{2}}\cos\frac{(2m-1)\pi c t}{L}\,\sin\frac{(2m-1)\pi x}{L}
+\;}
+\]
+（検算: $t=0$ とすると $u(x,0) = \dfrac{8h}{\pi^{2}}\sum_{m=1}^{\infty}\dfrac{(-1)^{m-1}}{(2m-1)^{2}}\sin\dfrac{(2m-1)\pi x}{L}$ となり、これは三角波 $f(x)$ の標準的なフーリエ正弦級数展開に一致する。特に $x=L/2$ で $\sin\frac{(2m-1)\pi}{2}=(-1)^{m-1}$ なので $u(L/2,0) = \dfrac{8h}{\pi^2}\sum_{m=1}^\infty \dfrac{1}{(2m-1)^2} = \dfrac{8h}{\pi^2}\cdot\dfrac{\pi^2}{8} = h$ となり $f(L/2)=h$ と一致する。また各項は波動方程式・境界条件・$u_t(x,0)=0$ を満たす。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+\[
+\frac{\partial^{2} u}{\partial t^{2}} = c^{2}\frac{\partial^{2} u}{\partial x^{2}} \qquad (0 < x < L,\ t > 0), \qquad u(0,t)=u(L,t)=0
+\]
+\[
+u(x,0) = 0, \qquad u_{t}(x,0) = v_{0}\sin\frac{3\pi x}{L}
+\]
+を解け。
+\end{mondaiboxS}
+\kaitou
+$u(x,0)=0$ より、すべての $n$ について $A_{n}=0$。$B_{n}$ は
+\[
+B_{n} = \frac{2}{n\pi c}\int_{0}^{L} v_{0}\sin\frac{3\pi x}{L}\sin\frac{n\pi x}{L}\,dx
+\]
+右辺の被積分関数はすでに固有関数 $\sin(3\pi x/L)$ そのものなので、直交性より $n=3$ のときのみ
+\[
+\int_{0}^{L} v_{0}\sin^{2}\frac{3\pi x}{L}\,dx = v_{0}\cdot\frac{L}{2}
+\]
+であり、それ以外の $n$ では積分は $0$ となる。よって
+\[
+B_{3} = \frac{2}{3\pi c}\cdot v_{0}\cdot\frac{L}{2} = \frac{v_{0}L}{3\pi c}, \qquad B_{n} = 0\ (n \neq 3)
+\]
+したがって
+\[
+\boxed{\; u(x,t) = \frac{v_{0}L}{3\pi c}\,\sin\frac{3\pi c t}{L}\,\sin\frac{3\pi x}{L} \;}
+\]
+（検算: $u_{t}(x,t) = \dfrac{v_{0}L}{3\pi c}\cdot\dfrac{3\pi c}{L}\cos\dfrac{3\pi ct}{L}\sin\dfrac{3\pi x}{L} = v_{0}\cos\dfrac{3\pi ct}{L}\sin\dfrac{3\pi x}{L}$ で、$t=0$ とすると $u_{t}(x,0) = v_{0}\sin\dfrac{3\pi x}{L}$ となり初期速度条件に一致する。また $u(x,0)=0$、$u(0,t)=u(L,t)=0$ を満たし、$u_{tt} = -\left(\frac{3\pi c}{L}\right)^2 u$、$c^2 u_{xx} = c^2\left(-\left(\frac{3\pi}{L}\right)^2\right)u = -\left(\frac{3\pi c}{L}\right)^2 u$ で波動方程式も満たす。）
+
+\end{document}

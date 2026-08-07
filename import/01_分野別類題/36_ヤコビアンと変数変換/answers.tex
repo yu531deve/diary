@@ -1,0 +1,168 @@
+% 分野別類題: ヤコビアンと変数変換 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- ヤコビアンと変数変換}
+
+\daimon{【解法】ヤコビアンと変数変換の解き方と導出}
+
+\noindent
+2変数の座標変換 $x = x(u,v),\ y = y(u,v)$（$C^{1}$ 級で、局所的に逆変換 $u = u(x,y),\ v = v(x,y)$ が存在するもの）を考える。微小な長方形領域 $[u, u+du] \times [v, v+dv]$ が $(x,y)$ 平面上でどのような面積の図形に写るかを見るために、全微分
+\[
+dx = \frac{\partial x}{\partial u}\, du + \frac{\partial x}{\partial v}\, dv, \qquad
+dy = \frac{\partial y}{\partial u}\, du + \frac{\partial y}{\partial v}\, dv
+\]
+を用いる。$(u,v)$ 平面の基本ベクトル $du\,\hat{e}_u$, $dv\,\hat{e}_v$ に対応する $(x,y)$ 平面上の像ベクトルは
+\[
+\left(\frac{\partial x}{\partial u}, \frac{\partial y}{\partial u}\right) du, \qquad
+\left(\frac{\partial x}{\partial v}, \frac{\partial y}{\partial v}\right) dv
+\]
+であり、この2つのベクトルが張る平行四辺形の面積が、微小面積要素 $du\, dv$ の像の面積である。2次元における2ベクトルの張る平行四辺形の面積は行列式の絶対値で与えられるから、
+\[
+dx\, dy = \left| \det \begin{pmatrix} \dfrac{\partial x}{\partial u} & \dfrac{\partial x}{\partial v} \\[2mm] \dfrac{\partial y}{\partial u} & \dfrac{\partial y}{\partial v} \end{pmatrix} \right| du\, dv
+= \left| \frac{\partial(x,y)}{\partial(u,v)} \right| du\, dv
+\]
+となる。この行列式 $\dfrac{\partial(x,y)}{\partial(u,v)}$ を変換のヤコビ行列式（ヤコビアン）と呼ぶ。これより重積分の変数変換公式
+\[
+\iint_{D} f(x,y)\, dx\, dy = \iint_{D'} f\bigl(x(u,v), y(u,v)\bigr) \left| \frac{\partial(x,y)}{\partial(u,v)} \right| du\, dv
+\]
+が得られる（ここで $D'$ は $D$ を $(u,v)$ 平面に写した領域）。3変数以上の場合も同様に、$n$ 個の像ベクトルが張る平行多面体の体積として $n \times n$ 行列式が現れ、
+\[
+dx_{1}\cdots dx_{n} = \left| \frac{\partial(x_{1}, \ldots, x_{n})}{\partial(u_{1}, \ldots, u_{n})} \right| du_{1} \cdots du_{n}
+\]
+となる。
+
+\medskip
+\noindent
+実用上は、逆変換 $u = u(x,y),\ v = v(x,y)$ が簡単な形をしているときは、まず
+\[
+\frac{\partial(u,v)}{\partial(x,y)}
+\]
+を計算し、逆関数定理により
+\[
+\frac{\partial(x,y)}{\partial(u,v)} = \left( \frac{\partial(u,v)}{\partial(x,y)} \right)^{-1}
+\]
+（行列式の逆数）の関係を用いて $\dfrac{\partial(x,y)}{\partial(u,v)}$ を求めてもよい。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+極座標変換 $x = r\cos\theta,\ y = r\sin\theta$ および球座標変換 $x = r\sin\theta\cos\varphi,\ y = r\sin\theta\sin\varphi,\ z = r\cos\theta$ について、それぞれのヤコビ行列式 $\dfrac{\partial(x,y)}{\partial(r,\theta)}$ および $\dfrac{\partial(x,y,z)}{\partial(r,\theta,\varphi)}$ を求めよ。
+\end{mondaiboxS}
+\kaitou
+\textbf{(i) 極座標。}
+\[
+\frac{\partial(x,y)}{\partial(r,\theta)} = \det \begin{pmatrix} \dfrac{\partial x}{\partial r} & \dfrac{\partial x}{\partial \theta} \\[2mm] \dfrac{\partial y}{\partial r} & \dfrac{\partial y}{\partial \theta} \end{pmatrix}
+= \det \begin{pmatrix} \cos\theta & -r\sin\theta \\ \sin\theta & r\cos\theta \end{pmatrix}
+= r\cos^{2}\theta + r\sin^{2}\theta
+\]
+よって
+\[
+\boxed{\; \frac{\partial(x,y)}{\partial(r,\theta)} = r \;}
+\]
+（検算: $r \ge 0$ のとき面積要素 $r\, dr\, d\theta$ は常に非負であり、原点 $r=0$ で $0$ になることも幾何的に正しい。）
+
+\medskip
+\noindent
+\textbf{(ii) 球座標。}
+\[
+\frac{\partial(x,y,z)}{\partial(r,\theta,\varphi)}
+= \det \begin{pmatrix}
+\sin\theta\cos\varphi & r\cos\theta\cos\varphi & -r\sin\theta\sin\varphi \\
+\sin\theta\sin\varphi & r\cos\theta\sin\varphi & r\sin\theta\cos\varphi \\
+\cos\theta & -r\sin\theta & 0
+\end{pmatrix}
+\]
+第3行に沿って余因子展開すると
+\[
+= \cos\theta \det\begin{pmatrix} r\cos\theta\cos\varphi & -r\sin\theta\sin\varphi \\ r\cos\theta\sin\varphi & r\sin\theta\cos\varphi \end{pmatrix}
+- (-r\sin\theta) \det\begin{pmatrix} \sin\theta\cos\varphi & -r\sin\theta\sin\varphi \\ \sin\theta\sin\varphi & r\sin\theta\cos\varphi \end{pmatrix}
+\]
+第1項の行列式は $r^{2}\sin\theta\cos\theta\cos^{2}\varphi + r^{2}\sin\theta\cos\theta\sin^{2}\varphi = r^{2}\sin\theta\cos\theta$、
+第2項の行列式は $r\sin^{2}\theta\cos^{2}\varphi + r\sin^{2}\theta\sin^{2}\varphi = r\sin^{2}\theta$ であるから、
+\[
+= \cos\theta \cdot r^{2}\sin\theta\cos\theta + r\sin\theta \cdot r\sin^{2}\theta
+= r^{2}\sin\theta\cos^{2}\theta + r^{2}\sin^{3}\theta
+= r^{2}\sin\theta(\cos^{2}\theta + \sin^{2}\theta)
+\]
+よって
+\[
+\boxed{\; \frac{\partial(x,y,z)}{\partial(r,\theta,\varphi)} = r^{2}\sin\theta \;}
+\]
+（検算: $\theta \in [0,\pi]$ で $\sin\theta \ge 0$ なので体積要素 $r^{2}\sin\theta\, dr\, d\theta\, d\varphi$ は非負。$r=0$ または $\theta=0,\pi$（$z$軸上）で退化して $0$ になることも座標特異点の位置と一致し、球の体積 $\int_0^{2\pi}\!\!\int_0^{\pi}\!\!\int_0^{a} r^2\sin\theta\, dr\, d\theta\, d\varphi = 2\pi \cdot 2 \cdot \dfrac{a^3}{3} = \dfrac{4}{3}\pi a^3$ という既知の公式を再現する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+1次変換 $u = x+y,\ v = x-y$ を用いて、次の積分を計算せよ。
+\[
+I = \iint_{D} (x^{2} - y^{2})\, e^{x+y}\, dx\, dy, \qquad D = \{(x,y) \mid 0 \le x+y \le 1,\ 0 \le x-y \le 1\}
+\]
+\end{mondaiboxS}
+\kaitou
+$u = x+y,\ v = x-y$ とおくと、逆変換は
+\[
+x = \frac{u+v}{2}, \qquad y = \frac{u-v}{2}
+\]
+であり、
+\[
+\frac{\partial(u,v)}{\partial(x,y)} = \det \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} = -2
+\]
+であるから、逆関数定理より
+\[
+\frac{\partial(x,y)}{\partial(u,v)} = \frac{1}{\partial(u,v)/\partial(x,y)} = -\frac{1}{2}, \qquad
+\left| \frac{\partial(x,y)}{\partial(u,v)} \right| = \frac{1}{2}
+\]
+（検算: 直接 $x_u = \tfrac12,\ x_v = \tfrac12,\ y_u = \tfrac12,\ y_v = -\tfrac12$ を用いて
+$\det\begin{pmatrix}1/2 & 1/2 \\ 1/2 & -1/2\end{pmatrix} = -\tfrac14 - \tfrac14 = -\tfrac12$ となり、同じ値を得る。）
+
+また
+\[
+x^{2} - y^{2} = (x+y)(x-y) = uv
+\]
+であり、積分領域は $D' = \{(u,v) \mid 0 \le u \le 1,\ 0 \le v \le 1\}$（単位正方形）に写る。したがって
+\[
+I = \iint_{D'} uv\, e^{u} \cdot \frac{1}{2}\, du\, dv
+= \frac{1}{2} \left( \int_{0}^{1} u\, e^{u}\, du \right) \left( \int_{0}^{1} v\, dv \right)
+\]
+部分積分により
+\[
+\int_{0}^{1} u\, e^{u}\, du = \bigl[ u e^{u} - e^{u} \bigr]_{0}^{1} = (e - e) - (0 - 1) = 1
+\]
+また $\displaystyle \int_{0}^{1} v\, dv = \frac{1}{2}$ であるから
+\[
+I = \frac{1}{2} \cdot 1 \cdot \frac{1}{2} = \boxed{\; \frac{1}{4} \;}
+\]
+（検算: 数値積分によっても $I = 1/4 = 0.25$ と一致することを確認できる。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+領域 $D = \{(x,y) \mid x^{2} + y^{2} \le 4,\ x \ge 0,\ y \ge 0\}$ 上で、極座標変換を用いて次の積分を計算せよ。
+\[
+I = \iint_{D} \frac{1}{\sqrt{4 - x^{2} - y^{2}}}\, dx\, dy
+\]
+\end{mondaiboxS}
+\kaitou
+極座標変換 $x = r\cos\theta,\ y = r\sin\theta$ を用いる。問1(i)より $\left|\dfrac{\partial(x,y)}{\partial(r,\theta)}\right| = r$ である。領域 $D$ は第1象限内の半径 $2$ の円板の内部であるから、
+\[
+D' = \{(r,\theta) \mid 0 \le r \le 2,\ 0 \le \theta \le \tfrac{\pi}{2}\}
+\]
+に対応する。また $x^{2}+y^{2} = r^{2}$ より被積分関数は $\dfrac{1}{\sqrt{4-r^{2}}}$ となるから、
+\[
+I = \int_{0}^{\pi/2} \int_{0}^{2} \frac{1}{\sqrt{4-r^{2}}} \cdot r\, dr\, d\theta
+\]
+$r$ に関する積分は、$t = 4 - r^{2}$ とおくと $dt = -2r\, dr$ より
+\[
+\int_{0}^{2} \frac{r}{\sqrt{4-r^{2}}}\, dr
+= \left[ -\sqrt{4-r^{2}} \right]_{0}^{2}
+= -0 - (-2) = 2
+\]
+（$r \to 2^{-}$ でも被積分関数は可積分特異点であり、この広義積分は収束する。）よって
+\[
+I = \int_{0}^{\pi/2} 2\, d\theta = 2 \cdot \frac{\pi}{2} = \boxed{\; \pi \;}
+\]
+（検算: 極座標での数値積分によっても $I = \pi \approx 3.1416$ と一致することを確認できる。）
+
+\end{document}

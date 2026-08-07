@@ -1,0 +1,156 @@
+% 分野別類題: ラプラス変換による初期値問題 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- ラプラス変換による初期値問題}
+
+\daimon{【解法】ラプラス変換による初期値問題の解き方と導出}
+
+\noindent
+関数 $f(t)$（$t \ge 0$）のラプラス変換を
+\[
+\mathcal{L}[f(t)](s) = F(s) = \int_{0}^{\infty} e^{-st} f(t)\,dt
+\]
+と定義する。初期値問題をラプラス変換で解く手続きは次のとおりである。
+
+\medskip
+\noindent
+\textbf{1. 微分のラプラス変換}
+
+部分積分により
+\[
+\mathcal{L}[y'(t)](s) = sY(s) - y(0)
+\]
+であり、これを繰り返し用いると
+\[
+\mathcal{L}[y''(t)](s) = s^{2}Y(s) - s\,y(0) - y'(0)
+\]
+が得られる（$Y(s) = \mathcal{L}[y(t)](s)$）。したがって定数係数線形微分方程式は、初期条件を代入した上でラプラス変換すると $Y(s)$ についての代数方程式になる。
+
+\medskip
+\noindent
+\textbf{2. 基本変換表}
+\[
+\mathcal{L}[1] = \frac{1}{s}, \qquad
+\mathcal{L}[e^{at}] = \frac{1}{s-a}, \qquad
+\mathcal{L}[t\,e^{at}] = \frac{1}{(s-a)^{2}}
+\]
+\[
+\mathcal{L}[\sin \omega t] = \frac{\omega}{s^{2}+\omega^{2}}, \qquad
+\mathcal{L}[\cos \omega t] = \frac{s}{s^{2}+\omega^{2}}
+\]
+
+\medskip
+\noindent
+\textbf{3. 単位階段関数（ヘヴィサイド関数）とデルタ関数}
+
+単位階段関数 $u(t-a)$（$t<a$ で $0$、$t \ge a$ で $1$）については第二移動定理
+\[
+\mathcal{L}[u(t-a)\,f(t-a)](s) = e^{-as} F(s)
+\]
+が成り立つ。特に $\mathcal{L}[u(t-a)](s) = \dfrac{e^{-as}}{s}$ である。また、ディラックのデルタ関数 $\delta(t-a)$（$a>0$）については
+\[
+\mathcal{L}[\delta(t-a)](s) = e^{-as}
+\]
+であり、$y'' + \omega^{2} y = \delta(t-a)$ のように用いると、外力は $t=a$ で $y'$ に大きさ $1$ の飛び（ジャンプ）を与える瞬間的な衝撃として作用する。
+
+\medskip
+\noindent
+\textbf{4. 手続きのまとめ}
+
+(i) 方程式全体をラプラス変換し、初期条件を代入して $Y(s)$ についての代数方程式を作る。
+(ii) $Y(s)$ について解く。
+(iii) $Y(s)$ を部分分数分解し、基本変換表（および移動定理）を逆に用いて逆ラプラス変換 $y(t) = \mathcal{L}^{-1}[Y(s)](t)$ を求める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$y'' + 3y' + 2y = e^{-t}, \quad y(0) = 0,\ y'(0) = 0$ を解け。
+\end{mondaiboxS}
+\kaitou
+両辺をラプラス変換する。$y(0)=y'(0)=0$ より
+\[
+s^{2}Y(s) + 3sY(s) + 2Y(s) = \frac{1}{s+1}
+\]
+左辺をまとめて
+\[
+(s^{2}+3s+2)\,Y(s) = (s+1)(s+2)\,Y(s) = \frac{1}{s+1}
+\]
+よって
+\[
+Y(s) = \frac{1}{(s+1)^{2}(s+2)}
+\]
+部分分数分解を
+\[
+Y(s) = \frac{A}{s+1} + \frac{B}{(s+1)^{2}} + \frac{C}{s+2}
+\]
+とおくと、$1 = A(s+1)(s+2) + B(s+2) + C(s+1)^{2}$。
+$s=-1$ を代入して $B=1$、$s=-2$ を代入して $C=1$。$s^{2}$ の係数を比較して $0 = A+C$ より $A=-1$。したがって
+\[
+Y(s) = -\frac{1}{s+1} + \frac{1}{(s+1)^{2}} + \frac{1}{s+2}
+\]
+逆ラプラス変換して
+\[
+\boxed{\; y(t) = -e^{-t} + t\,e^{-t} + e^{-2t} \;}
+\]
+（検算: $y(0) = -1+0+1=0$。$y'(t) = 2e^{-t} - t e^{-t} - 2e^{-2t}$ より $y'(0) = 2-0-2=0$。$y''(t) = -3e^{-t}+t e^{-t}+4e^{-2t}$ であり、
+$y''+3y'+2y = (-3e^{-t}+te^{-t}+4e^{-2t}) + 3(2e^{-t}-te^{-t}-2e^{-2t}) + 2(-e^{-t}+te^{-t}+e^{-2t}) = e^{-t}$
+となり、右辺 $e^{-t}$ と一致する。)
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$y'' + y = \delta(t-\pi), \quad y(0) = 0,\ y'(0) = 0$ を解け。
+\end{mondaiboxS}
+\kaitou
+両辺をラプラス変換すると
+\[
+s^{2}Y(s) + Y(s) = e^{-\pi s}
+\quad\Longrightarrow\quad
+Y(s) = \frac{e^{-\pi s}}{s^{2}+1}
+\]
+$\mathcal{L}^{-1}\!\left[\dfrac{1}{s^{2}+1}\right] = \sin t$ であるから、第二移動定理より
+\[
+y(t) = u(t-\pi)\,\sin(t-\pi)
+\]
+$\sin(t-\pi) = -\sin t$ であるから、$t<\pi$ では $y(t)=0$、$t \ge \pi$ では $y(t) = -\sin t$ である。まとめて
+\[
+\boxed{\; y(t) = u(t-\pi)\,\sin(t-\pi) =
+\begin{cases}
+0 & (0 \le t < \pi) \\
+-\sin t & (t \ge \pi)
+\end{cases} \;}
+\]
+（検算: $t \ne \pi$ では $y''+y=0$ を満たす（$\sin$ は同次方程式の解）。$y$ は $t=\pi$ で連続（$y(\pi^{-})=0$、$y(\pi^{+})=-\sin\pi=0$）。$y'(t) = -\cos t\ (t>\pi)$ より $y'(\pi^{+})=-\cos\pi=1$、一方 $y'(\pi^{-})=0$ であるから $y'$ は $t=\pi$ で大きさ $1$ の飛びを持ち、これは $\delta(t-\pi)$ の係数 $1$ と一致する。)
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$y'' + 4y = u(t-1), \quad y(0) = 0,\ y'(0) = 0$ を解け。
+\end{mondaiboxS}
+\kaitou
+両辺をラプラス変換すると
+\[
+s^{2}Y(s) + 4Y(s) = \frac{e^{-s}}{s}
+\quad\Longrightarrow\quad
+Y(s) = e^{-s}\cdot\frac{1}{s(s^{2}+4)}
+\]
+まず $\dfrac{1}{s(s^{2}+4)}$ を部分分数分解する。$\dfrac{1}{s(s^{2}+4)} = \dfrac{A}{s} + \dfrac{Bs+C}{s^{2}+4}$ とおくと
+$1 = A(s^{2}+4) + (Bs+C)s$。$s=0$ より $A = \dfrac{1}{4}$。$s^{2}$ の係数比較で $0 = A+B$ より $B=-\dfrac{1}{4}$。$s^{1}$ の係数比較で $C=0$。よって
+\[
+\frac{1}{s(s^{2}+4)} = \frac{1}{4}\cdot\frac{1}{s} - \frac{1}{4}\cdot\frac{s}{s^{2}+4}
+\]
+逆ラプラス変換すると
+\[
+\mathcal{L}^{-1}\!\left[\frac{1}{s(s^{2}+4)}\right] = \frac{1}{4}\left(1 - \cos 2t\right)
+\]
+第二移動定理より
+\[
+\boxed{\; y(t) = \frac{1}{4}\bigl(1 - \cos 2(t-1)\bigr)\,u(t-1) \;}
+\]
+（検算: $t<1$ では $y=0$ で $y''+4y=0$（右辺も $0$）。$t>1$ では $y = \dfrac{1}{4}(1-\cos 2(t-1))$、$y' = \dfrac{1}{2}\sin 2(t-1)$、$y'' = \cos 2(t-1)$ であり、
+$y''+4y = \cos 2(t-1) + \bigl(1-\cos 2(t-1)\bigr) = 1$
+となり右辺 $u(t-1)=1$ と一致する。また $t=1$ で $y(1^{-})=0=y(1^{+})$、$y'(1^{-})=0=y'(1^{+})$ となり連続的につながる。)
+
+\end{document}

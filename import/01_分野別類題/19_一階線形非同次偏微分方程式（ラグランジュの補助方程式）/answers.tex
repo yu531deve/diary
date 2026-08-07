@@ -1,0 +1,161 @@
+% 分野別類題: 1階線形非同次偏微分方程式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 1階線形非同次偏微分方程式}
+
+\daimon{【解法】ラグランジュの補助方程式による解き方と導出}
+
+\noindent
+未知関数 $u = u(x,y)$ に関する1階の準線形偏微分方程式
+\[
+P(x,y,u)\,u_{x} + Q(x,y,u)\,u_{y} = R(x,y,u)
+\]
+を考える（$P, Q, R$ は $u$ に依存してもよい）。この方程式は、$(x,y,u)$ 空間内のベクトル場 $(P,Q,R)$ に接する曲面 $u = u(x,y)$ を求める問題とみなせる。
+
+このとき、連立常微分方程式（ラグランジュの補助方程式）
+\[
+\frac{dx}{P} = \frac{dy}{Q} = \frac{du}{R}
+\]
+の解曲線（特性曲線）が、求める解曲面を埋め尽くす。補助方程式から、互いに独立な2つの第一積分
+\[
+\varphi(x,y,u) = c_{1}, \qquad \psi(x,y,u) = c_{2}
+\]
+（$c_{1}, c_{2}$ は積分定数）が得られたとすると、もとの偏微分方程式の一般解は
+\[
+F(\varphi, \psi) = 0 \qquad \text{（$F$ は任意の関数）}
+\]
+または、これを $\varphi$ について解いた形 $\varphi = f(\psi)$（$f$ は任意関数）で表される。
+
+第一積分の求め方は、補助方程式の等しい比の組み合わせを選び、変数分離や比例式の性質（$\dfrac{dx}{P} = \dfrac{dy}{Q}$ のように $u$ を含まない2式の組、あるいは $\dfrac{a\,dx + b\,dy + c\,du}{aP+bQ+cR}$ が $0/0$ になるような乗数 $a,b,c$ を選ぶ方法など）を用いて、それぞれ積分可能な形に帰着させる。
+
+初期条件（初期曲線上での $u$ の値）が与えられている場合は、一般解 $\varphi = f(\psi)$ に初期曲線のパラメータ表示を代入して未知関数 $f$ の具体形を決定する。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$x\,u_{x} + y\,u_{y} = u$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+補助方程式は
+\[
+\frac{dx}{x} = \frac{dy}{y} = \frac{du}{u}
+\]
+最初の2式 $\dfrac{dx}{x} = \dfrac{dy}{y}$ を積分すると
+\[
+\ln x = \ln y + c_{1}' \quad\Longrightarrow\quad \varphi = \frac{x}{y} = c_{1}
+\]
+次に $\dfrac{dx}{x} = \dfrac{du}{u}$ を積分すると
+\[
+\ln x = \ln u + c_{2}' \quad\Longrightarrow\quad \psi = \frac{x}{u} = c_{2}
+\]
+よって一般解は $\psi = f(\varphi)$、すなわち $\dfrac{x}{u} = f\!\left(\dfrac{x}{y}\right)$ の形になる。これを $u$ について解き、$h(t) = 1/f(1/t)$ とおいて整理すると
+\[
+\boxed{\; u = x\,\varphi_{0}\!\left(\frac{y}{x}\right) \;}
+\qquad (\varphi_{0} \text{ は任意関数})
+\]
+
+（検算）$u = x\,\varphi_{0}(y/x)$ とおくと
+\[
+u_{x} = \varphi_{0}\!\left(\frac{y}{x}\right) - \frac{y}{x}\,\varphi_{0}'\!\left(\frac{y}{x}\right), \qquad
+u_{y} = \varphi_{0}'\!\left(\frac{y}{x}\right)
+\]
+であるから
+\[
+x\,u_{x} + y\,u_{y}
+= x\varphi_{0} - y\varphi_{0}' + y\varphi_{0}'
+= x\varphi_{0}\!\left(\frac{y}{x}\right) = u
+\]
+となり、方程式を満たす。
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$u_{x} + u_{y} = u$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+補助方程式は
+\[
+\frac{dx}{1} = \frac{dy}{1} = \frac{du}{u}
+\]
+最初の2式 $dx = dy$ を積分すると
+\[
+\varphi = x - y = c_{1}
+\]
+次に $dx = \dfrac{du}{u}$ を積分すると
+\[
+x = \ln u + c_{2}' \quad\Longrightarrow\quad \psi = u\,e^{-x} = c_{2}
+\]
+よって一般解は $\psi = f(\varphi)$、すなわち
+\[
+\boxed{\; u = e^{x}\,f(x - y) \;}
+\qquad (f \text{ は任意関数})
+\]
+
+（検算）$u = e^{x} f(x-y)$ とおくと
+\[
+u_{x} = e^{x} f(x-y) + e^{x} f'(x-y), \qquad
+u_{y} = -e^{x} f'(x-y)
+\]
+であるから
+\[
+u_{x} + u_{y} = e^{x} f(x-y) + e^{x} f'(x-y) - e^{x} f'(x-y) = e^{x} f(x-y) = u
+\]
+となり、方程式を満たす。
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$x\,u_{x} - y\,u_{y} = u^{2}, \quad u(x,1) = x \quad (x > 0)$ を解け。
+\end{mondaiboxS}
+\kaitou
+補助方程式は
+\[
+\frac{dx}{x} = \frac{dy}{-y} = \frac{du}{u^{2}}
+\]
+最初の2式 $\dfrac{dx}{x} = -\dfrac{dy}{y}$ を積分すると
+\[
+\ln x = -\ln y + c_{1}' \quad\Longrightarrow\quad \varphi = xy = c_{1}
+\]
+次に $\dfrac{dx}{x} = \dfrac{du}{u^{2}}$ を積分すると
+\[
+\ln x = -\frac{1}{u} + c_{2}' \quad\Longrightarrow\quad \psi = \frac{1}{u} + \ln x = c_{2}
+\]
+よって一般解は $\psi = g(\varphi)$、すなわち
+\[
+\frac{1}{u} + \ln x = g(xy)
+\]
+の形になる。初期条件 $u(x,1) = x$（$y=1$）を代入すると、このとき $xy = x$ であり
+\[
+\frac{1}{x} + \ln x = g(x)
+\]
+したがって $g(s) = \dfrac{1}{s} + \ln s$。これを一般解に戻すと（$s = xy$）
+\[
+\frac{1}{u} + \ln x = \frac{1}{xy} + \ln(xy) = \frac{1}{xy} + \ln x + \ln y
+\]
+\[
+\Longrightarrow \quad \frac{1}{u} = \frac{1}{xy} + \ln y
+\]
+よって
+\[
+\boxed{\; u = \frac{xy}{1 + xy\ln y} \;}
+\]
+
+（検算1: 初期条件）$y=1$ とすると $u = \dfrac{x}{1 + x\ln 1} = \dfrac{x}{1+0} = x$ となり、$u(x,1)=x$ を満たす。
+
+（検算2: 方程式）$w = 1/u = \dfrac{1}{xy} + \ln y$ とおくと
+\[
+w_{x} = -\frac{1}{x^{2}y}, \qquad w_{y} = -\frac{1}{xy^{2}} + \frac{1}{y}
+\]
+$w = 1/u$ より $u_{x} = -u^{2} w_{x}$, $u_{y} = -u^{2} w_{y}$ であるから
+\[
+x\,u_{x} - y\,u_{y}
+= -u^{2}\left(x w_{x} - y w_{y}\right)
+= -u^{2}\left(-\frac{1}{xy} - \left(-\frac{1}{xy} + 1\right)\right)
+= -u^{2}\left(-\frac{1}{xy} + \frac{1}{xy} - 1\right)
+= u^{2}
+\]
+となり、方程式 $x u_{x} - y u_{y} = u^{2}$ を満たすことが確認できる。
+
+\end{document}

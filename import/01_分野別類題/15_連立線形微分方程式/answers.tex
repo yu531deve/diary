@@ -1,0 +1,170 @@
+% 分野別類題: 連立線形微分方程式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 連立線形微分方程式}
+
+\daimon{【解法】連立線形微分方程式の解き方と導出}
+
+\noindent
+2 元の連立 1 階線形微分方程式
+\[
+\frac{d}{dt}\begin{pmatrix} x \\ y \end{pmatrix}
+= A \begin{pmatrix} x \\ y \end{pmatrix},
+\qquad
+A = \begin{pmatrix} a & b \\ c & d \end{pmatrix}
+\]
+（$A$ は定数行列）を考える。
+
+\medskip
+\noindent
+\textbf{(1) 固有値・固有ベクトルによる解法}
+
+\noindent
+$A$ の固有値 $\lambda$ と固有ベクトル $\mathbf{v}$ を、特性方程式
+\[
+\det(A - \lambda I) = \lambda^{2} - (\operatorname{tr} A)\lambda + \det A = 0
+\]
+から求める。$A\mathbf{v} = \lambda \mathbf{v}$ を満たす $\mathbf{v} \neq \mathbf{0}$ に対して、
+\[
+\begin{pmatrix} x \\ y \end{pmatrix} = \mathbf{v}\, e^{\lambda t}
+\]
+は方程式を満たす（これは実際に代入すれば確かめられる：左辺 $= \lambda \mathbf{v} e^{\lambda t}$、右辺 $= A\mathbf{v} e^{\lambda t} = \lambda \mathbf{v} e^{\lambda t}$）。
+
+\smallskip
+\noindent
+\emph{相異なる実固有値 $\lambda_{1} \neq \lambda_{2}$ の場合}: 対応する固有ベクトルを $\mathbf{v}_{1}, \mathbf{v}_{2}$ とすると、一般解は
+\[
+\begin{pmatrix} x \\ y \end{pmatrix}
+= C_{1}\, \mathbf{v}_{1}\, e^{\lambda_{1} t} + C_{2}\, \mathbf{v}_{2}\, e^{\lambda_{2} t}
+\]
+（$\mathbf{v}_{1}, \mathbf{v}_{2}$ は一次独立なので、これが解空間の基底を与える）。
+
+\smallskip
+\noindent
+\emph{複素固有値 $\lambda = \alpha \pm i\beta$ の場合}: 固有ベクトルも複素数となり $\mathbf{v} = \mathbf{p} + i\mathbf{q}$ とおける。複素解
+\[
+\mathbf{v}\,e^{(\alpha+i\beta)t}
+= e^{\alpha t}(\mathbf{p} + i\mathbf{q})(\cos\beta t + i\sin\beta t)
+\]
+の実部・虚部はそれぞれ実数解となり、一般解は
+\[
+\begin{pmatrix} x \\ y \end{pmatrix}
+= e^{\alpha t}\Big[ C_{1}(\mathbf{p}\cos\beta t - \mathbf{q}\sin\beta t) + C_{2}(\mathbf{p}\sin\beta t + \mathbf{q}\cos\beta t) \Big]
+\]
+（$C_1, C_2$ は実の任意定数）と表せる。
+
+\medskip
+\noindent
+\textbf{(2) 消去法（1 変数の 2 階線形方程式への帰着）との対応}
+
+\noindent
+$x' = ax + by,\ y' = cx + dy$ （$b \neq 0$）から、第 1 式より $y = \dfrac{x' - ax}{b}$ とし、これを第 2 式に代入すると $x$ のみの 2 階線形方程式
+\[
+x'' - (a+d)x' + (ad - bc)x = 0
+\]
+が得られる。この特性方程式 $\mu^{2} - (a+d)\mu + (ad-bc) = 0$ は、行列 $A$ の特性方程式 $\lambda^{2} - (\operatorname{tr} A)\lambda + \det A = 0$ と完全に一致する（$\operatorname{tr} A = a+d$, $\det A = ad - bc$）。したがって消去法で得られる特性根は、行列の固有値そのものであり、両者は同一の解を与える。
+
+\medskip
+\noindent
+初期条件が与えられた場合は、一般解に $t = 0$（または指定の初期時刻）を代入して定数 $C_{1}, C_{2}$ を定める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$\dfrac{dx}{dt} = x + 2y,\quad \dfrac{dy}{dt} = 2x + y$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+係数行列は $A = \begin{pmatrix} 1 & 2 \\ 2 & 1 \end{pmatrix}$。特性方程式は
+\[
+\det(A - \lambda I) = (1-\lambda)^{2} - 4 = \lambda^{2} - 2\lambda - 3 = (\lambda - 3)(\lambda + 1) = 0
+\]
+より固有値は $\lambda_{1} = 3,\ \lambda_{2} = -1$。
+
+\noindent
+$\lambda_{1} = 3$ に対して $(1-3)x + 2y = 0 \Rightarrow x = y$ より固有ベクトル $\mathbf{v}_{1} = \begin{pmatrix} 1 \\ 1 \end{pmatrix}$。
+
+\noindent
+$\lambda_{2} = -1$ に対して $(1+1)x + 2y = 0 \Rightarrow x = -y$ より固有ベクトル $\mathbf{v}_{2} = \begin{pmatrix} 1 \\ -1 \end{pmatrix}$。
+
+\noindent
+よって一般解は
+\[
+\boxed{\;
+x(t) = C_{1} e^{3t} + C_{2} e^{-t}, \qquad
+y(t) = C_{1} e^{3t} - C_{2} e^{-t}
+\;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $x' = 3C_{1}e^{3t} - C_{2}e^{-t}$ に対し $x + 2y = C_{1}e^{3t}+C_{2}e^{-t}+2C_{1}e^{3t}-2C_{2}e^{-t} = 3C_{1}e^{3t}-C_{2}e^{-t} = x'$。また $y' = 3C_{1}e^{3t}+C_{2}e^{-t}$ に対し $2x+y = 2C_{1}e^{3t}+2C_{2}e^{-t}+C_{1}e^{3t}-C_{2}e^{-t} = 3C_{1}e^{3t}+C_{2}e^{-t} = y'$。いずれも一致するので正しい。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$\dfrac{dx}{dt} = x - y,\quad \dfrac{dy}{dt} = x + y$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+係数行列は $A = \begin{pmatrix} 1 & -1 \\ 1 & 1 \end{pmatrix}$。特性方程式は
+\[
+\det(A - \lambda I) = (1-\lambda)^{2} + 1 = \lambda^{2} - 2\lambda + 2 = 0
+\]
+より固有値は $\lambda = 1 \pm i$。
+
+\noindent
+$\lambda = 1 + i$ に対して $(1 - (1+i))x - y = 0 \Rightarrow -ix - y = 0 \Rightarrow y = -ix$ より固有ベクトル $\mathbf{v} = \begin{pmatrix} 1 \\ -i \end{pmatrix}$。
+
+\noindent
+複素解 $\mathbf{v}\,e^{(1+i)t} = e^{t}(\cos t + i \sin t)\begin{pmatrix} 1 \\ -i \end{pmatrix}$ の実部・虚部を成分ごとに計算すると
+\[
+\begin{pmatrix} x \\ y \end{pmatrix}
+= e^{t}\begin{pmatrix} \cos t \\ \sin t \end{pmatrix} + i\, e^{t}\begin{pmatrix} \sin t \\ -\cos t \end{pmatrix}
+\]
+したがって実部 $e^{t}(\cos t, \sin t)$ と虚部 $e^{t}(\sin t, -\cos t)$ はそれぞれ実数解であり、一般解は
+\[
+\boxed{\;
+x(t) = e^{t}(C_{1}\cos t + C_{2}\sin t), \qquad
+y(t) = e^{t}(C_{1}\sin t - C_{2}\cos t)
+\;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $x' = e^{t}(C_{1}\cos t+C_{2}\sin t) + e^{t}(-C_{1}\sin t+C_{2}\cos t) = e^{t}[(C_{1}+C_{2})\cos t+(C_{2}-C_{1})\sin t]$。一方 $x-y = e^{t}(C_{1}\cos t+C_{2}\sin t) - e^{t}(C_{1}\sin t-C_{2}\cos t) = e^{t}[(C_{1}+C_{2})\cos t+(C_{2}-C_{1})\sin t]$ で一致。$y' = e^{t}(C_{1}\sin t-C_{2}\cos t)+e^{t}(C_{1}\cos t+C_{2}\sin t) = e^{t}[(C_{1}-C_{2})\cos t+(C_{1}+C_{2})\sin t]$。一方 $x+y = e^{t}(C_{1}\cos t+C_{2}\sin t)+e^{t}(C_{1}\sin t-C_{2}\cos t) = e^{t}[(C_{1}-C_{2})\cos t+(C_{1}+C_{2})\sin t]$ で一致。よって正しい。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$\dfrac{dx}{dt} = 4x - 2y,\quad \dfrac{dy}{dt} = x + y,\quad x(0) = 1,\ y(0) = 0$ を解け。
+\end{mondaiboxS}
+\kaitou
+係数行列は $A = \begin{pmatrix} 4 & -2 \\ 1 & 1 \end{pmatrix}$。特性方程式は
+\[
+\det(A - \lambda I) = (4-\lambda)(1-\lambda) + 2 = \lambda^{2} - 5\lambda + 6 = (\lambda-2)(\lambda-3) = 0
+\]
+より固有値は $\lambda_{1} = 3,\ \lambda_{2} = 2$。
+
+\noindent
+$\lambda_{1} = 3$ に対して $(4-3)x - 2y = 0 \Rightarrow x = 2y$ より固有ベクトル $\mathbf{v}_{1} = \begin{pmatrix} 2 \\ 1 \end{pmatrix}$。
+
+\noindent
+$\lambda_{2} = 2$ に対して $(4-2)x - 2y = 0 \Rightarrow x = y$ より固有ベクトル $\mathbf{v}_{2} = \begin{pmatrix} 1 \\ 1 \end{pmatrix}$。
+
+\noindent
+一般解は
+\[
+x(t) = 2C_{1}e^{3t} + C_{2}e^{2t}, \qquad
+y(t) = C_{1}e^{3t} + C_{2}e^{2t}
+\]
+初期条件 $x(0) = 1,\ y(0) = 0$ を代入すると
+\[
+2C_{1} + C_{2} = 1, \qquad C_{1} + C_{2} = 0
+\]
+これを解いて $C_{1} = 1,\ C_{2} = -1$。したがって
+\[
+\boxed{\;
+x(t) = 2e^{3t} - e^{2t}, \qquad
+y(t) = e^{3t} - e^{2t}
+\;}
+\]
+（検算: $x(0) = 2-1 = 1$, $y(0) = 1-1 = 0$ で初期条件を満たす。$x' = 6e^{3t}-2e^{2t}$ に対し $4x-2y = 4(2e^{3t}-e^{2t})-2(e^{3t}-e^{2t}) = 8e^{3t}-4e^{2t}-2e^{3t}+2e^{2t} = 6e^{3t}-2e^{2t} = x'$。$y' = 3e^{3t}-2e^{2t}$ に対し $x+y = (2e^{3t}-e^{2t})+(e^{3t}-e^{2t}) = 3e^{3t}-2e^{2t} = y'$。いずれも一致するので正しい。）
+
+\end{document}

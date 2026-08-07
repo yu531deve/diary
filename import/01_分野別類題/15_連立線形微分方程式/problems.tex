@@ -1,0 +1,28 @@
+% 分野別類題: 連立線形微分方程式（dx/dt = Ax）
+% 係数行列の固有値・固有ベクトルによる解法。実固有値・複素固有値・初期値問題を扱う 3 問。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- 連立線形微分方程式}
+
+\shijibun{次の連立常微分方程式を解き、導出過程を示せ。係数行列 $A$ の固有値・固有ベクトルを求め、それらを用いて一般解を構成すること。}
+
+\shomon{問1.}{次の連立微分方程式の一般解を $x(t)$, $y(t)$ の形で求めよ。}
+\[
+\frac{dx}{dt} = x + 2y, \qquad \frac{dy}{dt} = 2x + y
+\]
+
+\shomon{問2.}{次の連立微分方程式の一般解を求めよ。}
+\[
+\frac{dx}{dt} = x - y, \qquad \frac{dy}{dt} = x + y
+\]
+
+\shomon{問3.}{次の初期値問題を解け。}
+\[
+\frac{dx}{dt} = 4x - 2y, \qquad \frac{dy}{dt} = x + y, \qquad x(0) = 1,\ \ y(0) = 0
+\]
+
+\end{document}

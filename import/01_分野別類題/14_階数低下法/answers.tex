@@ -1,0 +1,161 @@
+% 分野別類題: 階数低下法 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 階数低下法}
+
+\daimon{【解法】階数低下法の解き方と導出}
+
+\noindent
+2階常微分方程式は、一般には解くのが難しいが、次の3つの典型的な場合には1階の方程式に帰着させて解くことができる（階数低下法）。
+
+\medskip
+\noindent
+\textbf{(i) $y$ を含まない型 $F(x, y', y'') = 0$}
+
+\noindent
+$p = y'$ とおくと $p' = y''$ であるから、方程式は
+\[
+F(x, p, p') = 0
+\]
+という $p$ に関する1階の方程式になる。これを解いて $p = p(x)$ を求めた後、
+\[
+y = \int p(x)\,dx + C_{2}
+\]
+により $y$ を求める。
+
+\medskip
+\noindent
+\textbf{(ii) $x$ を含まない型 $F(y, y', y'') = 0$}
+
+\noindent
+$p = y'$ とおき、$y$ を独立変数とみなして合成関数の微分を用いると
+\[
+y'' = \frac{dp}{dx} = \frac{dp}{dy}\cdot\frac{dy}{dx} = p\,\frac{dp}{dy}
+\]
+であるから、方程式は
+\[
+F\left(y,\ p,\ p\frac{dp}{dy}\right) = 0
+\]
+という $p$ と $y$ に関する1階の方程式になる。これを解いて $p = p(y)$（すなわち $\dfrac{dy}{dx} = p(y)$）を求めた後、変数分離して
+\[
+\int \frac{dy}{p(y)} = x + C_{2}
+\]
+により $y$ を（陰関数として、あるいは可能なら陽に）求める。
+
+\medskip
+\noindent
+\textbf{(iii) 既知の1解から第2解を求める型}
+
+\noindent
+2階線形同次方程式
+\[
+y'' + P(x)\,y' + Q(x)\,y = 0
+\]
+の1つの解 $y_{1}$（$y_{1} \not\equiv 0$）が既知のとき、$y = y_{1}(x)\,v(x)$ とおいて代入すると、$y_{1}$ が解であることから $v$ を含まない項（$v$ の係数の項）が消え、$v$ に関する方程式は $v''$ と $v'$ のみを含む形になる。すなわち $w = v'$ とおけば $w$ に関する1階線形方程式に帰着し、階数が1つ下がる。これを解いて $v$ を求めれば、
+\[
+y_{2} = y_{1}\,v
+\]
+が $y_{1}$ と1次独立な第2の解となり、一般解は $y = C_{1} y_{1} + C_{2} y_{2}$ で与えられる。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$x\,y'' = y'$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$y$ を含まない型なので $p = y'$ とおくと $p' = y''$ であるから
+\[
+x\,p' = p
+\]
+$p \neq 0$ のとき変数分離して
+\[
+\frac{dp}{p} = \frac{dx}{x}
+\quad\Longrightarrow\quad
+\ln|p| = \ln|x| + C_{1}
+\quad\Longrightarrow\quad
+p = C_{1}' x
+\]
+（$p \equiv 0$ すなわち $y$ が定数の場合も $C_{1}' = 0$ として含まれる。）よって $y' = C_{1}' x$ であるから、積分して
+\[
+y = \frac{C_{1}'}{2}x^{2} + C_{2}
+\]
+定数を $A = \dfrac{C_{1}'}{2}$ とおき直せば
+\[
+\boxed{\; y = A\,x^{2} + B \;}
+\qquad (A,\ B \text{ は任意定数})
+\]
+（検算: $y' = 2Ax$, $y'' = 2A$ より $x\,y'' = 2Ax = y'$。成立。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$y\,y'' = (y')^{2}, \quad y(0) = 1,\ y'(0) = 2$ を解け。
+\end{mondaiboxS}
+\kaitou
+$x$ を含まない型なので $p = y'$, $y'' = p\dfrac{dp}{dy}$ とおくと
+\[
+y\,p\,\frac{dp}{dy} = p^{2}
+\]
+$p \neq 0$（$y'(0) = 2 \neq 0$ よりこの範囲で妥当）のとき両辺を $p$ で割って
+\[
+y\,\frac{dp}{dy} = p
+\quad\Longrightarrow\quad
+\frac{dp}{p} = \frac{dy}{y}
+\quad\Longrightarrow\quad
+\ln|p| = \ln|y| + C_{1}
+\quad\Longrightarrow\quad
+p = C_{1}'\,y
+\]
+すなわち $\dfrac{dy}{dx} = C_{1}'\,y$。再び変数分離して
+\[
+\frac{dy}{y} = C_{1}'\,dx
+\quad\Longrightarrow\quad
+y = C_{2}\,e^{C_{1}' x}
+\]
+初期条件 $y(0) = 1$ より $C_{2} = 1$。また $y' = C_{1}' C_{2} e^{C_{1}' x}$ に $x=0$ を代入して $y'(0) = C_{1}' C_{2} = C_{1}' = 2$。よって
+\[
+\boxed{\; y = e^{2x} \;}
+\]
+（検算: $y' = 2e^{2x}$, $y'' = 4e^{2x}$ より $y\,y'' = e^{2x}\cdot 4e^{2x} = 4e^{4x} = (2e^{2x})^{2} = (y')^{2}$。また $y(0)=1$, $y'(0)=2$ も満たす。成立。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$x^{2} y'' - 2x\,y' + 2y = 0 \ (x \neq 0)$ は $y_{1} = x$ を解にもつ。第2の解 $y_{2}$ と一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$y_{1} = x$ が解であることは、$y_{1}' = 1$, $y_{1}'' = 0$ を代入して
+$x^{2}\cdot 0 - 2x\cdot 1 + 2x = -2x + 2x = 0$
+より確認できる。
+
+$y = x\,v(x)$ とおくと
+\[
+y' = v + x v', \qquad y'' = 2v' + x v''
+\]
+これを方程式に代入すると
+\[
+x^{2}(2v' + x v'') - 2x(v + x v') + 2x v = 0
+\]
+\[
+2x^{2} v' + x^{3} v'' - 2x v - 2x^{2} v' + 2x v = 0
+\]
+$-2x^2 v'$ と $2x^2 v'$ が打ち消し合い、$-2xv$ と $2xv$ も打ち消し合うので
+\[
+x^{3} v'' = 0
+\quad\Longrightarrow\quad
+v'' = 0 \quad (x \neq 0)
+\]
+よって $v' = C_{1}$、積分して $v = C_{1} x + C_{2}$。したがって
+\[
+y = x\,v = C_{1} x^{2} + C_{2} x
+\]
+$y_{1} = x$ に対応する項 $C_{2}x$ を除いた $y_{2} = x^{2}$ が第2の解であり、一般解は
+\[
+\boxed{\; y = C_{1} x^{2} + C_{2}\,x \;}
+\qquad (C_{1},\ C_{2} \text{ は任意定数})
+\]
+（検算: $y_{2} = x^{2}$ について $y_{2}' = 2x$, $y_{2}'' = 2$ より $x^{2}\cdot 2 - 2x\cdot 2x + 2x^{2} = 2x^{2} - 4x^{2} + 2x^{2} = 0$。成立。$y_{1} = x$ と $y_{2} = x^{2}$ はロンスキアン $W = x\cdot 2x - 1\cdot x^{2} = x^{2} \neq 0\ (x\neq0)$ より1次独立。）
+
+\end{document}

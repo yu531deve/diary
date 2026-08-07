@@ -1,0 +1,97 @@
+% 分野別類題: 一次同次線形偏微分方程式 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- 一次同次線形偏微分方程式}
+
+\daimon{【解法】一次同次線形偏微分方程式の解き方と導出}
+
+\noindent
+一次同次線形偏微分方程式とは、未知関数 $u(x,y)$ に関する次の形の1階偏微分方程式である。
+\[
+P(x,y)\frac{\partial u}{\partial x} + Q(x,y)\frac{\partial u}{\partial y} = 0
+\]
+これは、ベクトル場 $(P, Q)$ 方向の方向微分が $0$、すなわち「$u$ は特性曲線に沿って一定」であることを意味する。特性曲線は
+\[
+\frac{dx}{P(x,y)} = \frac{dy}{Q(x,y)}
+\]
+（特性方程式）を解いて得られる曲線族 $\varphi(x,y) = C$ である。実際、特性曲線上で
+\[
+\frac{du}{dt} = \frac{\partial u}{\partial x}\frac{dx}{dt} + \frac{\partial u}{\partial y}\frac{dy}{dt}
+= P\frac{\partial u}{\partial x} + Q\frac{\partial u}{\partial y} = 0
+\]
+となるから、$u$ の値は各特性曲線ごとに定まる。したがって一般解は、任意の（$C^{1}$ 級）関数 $F$ を用いて
+\[
+u(x,y) = F\bigl(\varphi(x,y)\bigr)
+\]
+と表される。条件（初期値・境界値）が与えられた場合は、それを代入して $F$ の形を定める。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+$x\dfrac{\partial u}{\partial x} - y\dfrac{\partial u}{\partial y} = 0$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+特性方程式は
+\[
+\frac{dx}{x} = \frac{dy}{-y}
+\]
+両辺を積分して $\ln|x| = -\ln|y| + C_{1}$、すなわち
+\[
+xy = C
+\]
+が特性曲線である。したがって一般解は、任意関数 $F$ を用いて
+\[
+\boxed{\; u(x,y) = F(xy) \;}
+\]
+（検算: $u_x = y\,F'(xy)$, $u_y = x\,F'(xy)$ より $x u_x - y u_y = xy\,F' - xy\,F' = 0$。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+$y\dfrac{\partial u}{\partial x} + x\dfrac{\partial u}{\partial y} = 0$ の一般解を求めよ。
+\end{mondaiboxS}
+\kaitou
+特性方程式は
+\[
+\frac{dx}{y} = \frac{dy}{x}
+\quad\Longleftrightarrow\quad
+x\,dx = y\,dy
+\]
+両辺を積分して $\dfrac{x^{2}}{2} = \dfrac{y^{2}}{2} + C_{1}$、すなわち
+\[
+x^{2} - y^{2} = C
+\]
+が特性曲線である。したがって一般解は、任意関数 $F$ を用いて
+\[
+\boxed{\; u(x,y) = F(x^{2} - y^{2}) \;}
+\]
+（検算: $u_x = 2x\,F'$, $u_y = -2y\,F'$ より $y u_x + x u_y = 2xy\,F' - 2xy\,F' = 0$。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+$\dfrac{\partial u}{\partial x} + 2x\dfrac{\partial u}{\partial y} = 0$ の一般解を求め、条件 $u(0,y) = \sin y$ を満たす解を求めよ。
+\end{mondaiboxS}
+\kaitou
+特性方程式は
+\[
+\frac{dx}{1} = \frac{dy}{2x}
+\quad\Longleftrightarrow\quad
+\frac{dy}{dx} = 2x
+\]
+積分して $y = x^{2} + C$、すなわち
+\[
+y - x^{2} = C
+\]
+が特性曲線である。したがって一般解は、任意関数 $F$ を用いて
+\[
+u(x,y) = F(y - x^{2})
+\]
+条件 $u(0,y) = \sin y$ を課すと $F(y) = \sin y$ と定まるから、求める解は
+\[
+\boxed{\; u(x,y) = \sin\left(y - x^{2}\right) \;}
+\]
+
+\end{document}

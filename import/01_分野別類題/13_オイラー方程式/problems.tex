@@ -1,0 +1,28 @@
+% 分野別類題: オイラー方程式（2階線形・変数係数: x^2 y'' + a x y' + b y = f(x)）
+% x = e^t の置換で定数係数化して解く問題 3 問（同次2問＋非同次1問）。
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex problems.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\kamokumei{類題演習 --- オイラー方程式}
+
+\shijibun{次の常微分方程式を解き、導出過程を示せ。（オイラー方程式 $x^{2}y'' + axy' + by = f(x)$ は $x = e^{t}$（$x>0$）と置換すると定数係数線形微分方程式に帰着できる。）}
+
+\shomon{問1.}{次の常微分方程式の一般解を求めよ（$x>0$）。}
+\[
+x^{2}y'' - 2xy' + 2y = 0
+\]
+
+\shomon{問2.}{次の常微分方程式の一般解を求めよ（$x>0$）。}
+\[
+x^{2}y'' + xy' + y = 0
+\]
+
+\shomon{問3.}{次の非同次オイラー方程式の初期値問題を解け（$x>0$）。}
+\[
+x^{2}y'' - xy' + y = \ln x, \qquad y(1) = 1,\quad y'(1) = 0
+\]
+
+\end{document}

@@ -1,0 +1,173 @@
+% 分野別類題: log・三角・有理関数の積分 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- Integrals of Logarithmic, Trigonometric and Rational Functions}
+
+\daimon{【解法】対数・三角・有理関数の積分の解き方と導出}
+
+\noindent
+\textbf{(1) 対数関数の積分（部分積分）}\\
+部分積分の公式は
+\[
+\int u\, v' \, dx = uv - \int u'\, v \, dx
+\]
+である。$\int \log x \, dx$ では $u = \log x$, $v' = 1$ として $v = x$ を用いると
+\[
+\int \log x \, dx = x\log x - \int x \cdot \frac{1}{x}\, dx = x\log x - x + C
+\]
+一般に $\displaystyle\int \frac{\log x}{x^{\alpha}}\, dx$（$\alpha \neq 1$）も、$u = \log x$, $v' = x^{-\alpha}$（$v = \dfrac{x^{1-\alpha}}{1-\alpha}$）とおく部分積分により
+\[
+\int \frac{\log x}{x^{\alpha}}\, dx
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \int \frac{x^{1-\alpha}}{1-\alpha}\cdot\frac{1}{x}\, dx
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{x^{1-\alpha}}{(1-\alpha)^{2}} + C
+\]
+と求まる（$\alpha = 1$ のときは $\dfrac{1}{x}$ の原始関数が対数になるため、$\displaystyle\int \frac{\log x}{x}\, dx = \frac{(\log x)^{2}}{2} + C$ と別扱いになる）。
+
+\noindent
+\textbf{(2) 三角関数の積分（$\tan x$ と置換積分）}\\
+$\tan x = \dfrac{\sin x}{\cos x}$ であるから、$t = \cos x$（$dt = -\sin x\, dx$）と置換すると
+\[
+\int \tan x \, dx = \int \frac{\sin x}{\cos x}\, dx = -\int \frac{dt}{t} = -\log|t| + C = -\log|\cos x| + C
+\]
+これは $\log|\sec x| + C$ とも書ける。
+
+\noindent
+\textbf{(3) 三角関数の積分（半角公式）}\\
+半角公式 $\sin^{2} x = \dfrac{1 - \cos 2x}{2}$ を用いると
+\[
+\int \sin^{2} x \, dx = \int \frac{1 - \cos 2x}{2}\, dx = \frac{x}{2} - \frac{\sin 2x}{4} + C
+\]
+（同様に $\cos^{2} x = \dfrac{1+\cos 2x}{2}$ から $\displaystyle\int \cos^{2} x\, dx = \dfrac{x}{2} + \dfrac{\sin 2x}{4} + C$ が得られる。）
+
+\noindent
+\textbf{(4) 有理関数の積分（部分分数分解）}\\
+分母が異なる1次式の積 $(x-a)(x-b)$（$a \neq b$）に因数分解できる有理関数は
+\[
+\frac{px+q}{(x-a)(x-b)} = \frac{A}{x-a} + \frac{B}{x-b}
+\]
+の形に分解できる。両辺に $(x-a)(x-b)$ を掛けて $x = a, b$ を代入すれば $A, B$ が定まり、各項は
+\[
+\int \frac{A}{x-a}\, dx = A\log|x-a| + C
+\]
+のように対数関数として積分できる。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+次の不定積分を求めよ。
+\end{mondaiboxS}
+\[
+\int \log x \, dx
+\]
+\kaitou
+部分積分により $u = \log x$, $v' = 1$（$v = x$）とすると
+\[
+\int \log x \, dx = x\log x - \int x\cdot\frac{1}{x}\, dx = x\log x - \int 1 \, dx
+\]
+よって
+\[
+\boxed{\; \int \log x \, dx = x\log x - x + C \;}
+\]
+（検算: $\dfrac{d}{dx}(x\log x - x) = \log x + x\cdot\dfrac{1}{x} - 1 = \log x + 1 - 1 = \log x$ となり被積分関数と一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+次の不定積分を求めよ。
+\end{mondaiboxS}
+\[
+\int \tan x \, dx
+\]
+\kaitou
+$\tan x = \dfrac{\sin x}{\cos x}$ であるから $t = \cos x$（$dt = -\sin x \, dx$）と置換すると
+\[
+\int \tan x \, dx = \int \frac{\sin x}{\cos x}\, dx = -\int \frac{dt}{t} = -\log|t| + C
+\]
+よって
+\[
+\boxed{\; \int \tan x \, dx = -\log|\cos x| + C \;}
+\]
+（検算: $\dfrac{d}{dx}\bigl(-\log|\cos x|\bigr) = -\dfrac{-\sin x}{\cos x} = \dfrac{\sin x}{\cos x} = \tan x$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+次の不定積分を求めよ。
+\end{mondaiboxS}
+\[
+\int \sin^{2} x \, dx
+\]
+\kaitou
+半角公式 $\sin^{2} x = \dfrac{1-\cos 2x}{2}$ を用いると
+\[
+\int \sin^{2} x \, dx = \int \frac{1-\cos 2x}{2}\, dx = \frac{1}{2}\int dx - \frac{1}{2}\int \cos 2x \, dx = \frac{x}{2} - \frac{1}{2}\cdot\frac{\sin 2x}{2} + C
+\]
+よって
+\[
+\boxed{\; \int \sin^{2} x \, dx = \frac{x}{2} - \frac{\sin 2x}{4} + C \;}
+\]
+（検算: $\dfrac{d}{dx}\left(\dfrac{x}{2} - \dfrac{\sin 2x}{4}\right) = \dfrac{1}{2} - \dfrac{2\cos 2x}{4} = \dfrac{1-\cos 2x}{2} = \sin^{2}x$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問4}
+次の不定積分を、$\alpha$ の値によって場合分けして求めよ。
+\end{mondaiboxS}
+\[
+\int \frac{\log x}{x^{\alpha}} \, dx \qquad (\alpha \text{ は実数の定数})
+\]
+\kaitou
+\textbf{(i) $\alpha = 1$ のとき.}\ $\displaystyle\int \frac{\log x}{x}\, dx$ は $t = \log x$（$dt = \dfrac{1}{x}dx$）と置換すると
+\[
+\int \frac{\log x}{x}\, dx = \int t \, dt = \frac{t^{2}}{2} + C
+\]
+よって
+\[
+\boxed{\; \int \frac{\log x}{x}\, dx = \frac{(\log x)^{2}}{2} + C \;}
+\]
+（検算: $\dfrac{d}{dx}\dfrac{(\log x)^{2}}{2} = \log x \cdot \dfrac{1}{x} = \dfrac{\log x}{x}$ で一致。）
+
+\noindent
+\textbf{(ii) $\alpha \neq 1$ のとき.}\ 部分積分で $u = \log x$, $v' = x^{-\alpha}$（$v = \dfrac{x^{1-\alpha}}{1-\alpha}$）とすると
+\[
+\int \frac{\log x}{x^{\alpha}}\, dx
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \int \frac{x^{1-\alpha}}{1-\alpha}\cdot \frac{1}{x}\, dx
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{1}{1-\alpha}\int x^{-\alpha}\, dx
+\]
+\[
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{x^{1-\alpha}}{(1-\alpha)^{2}} + C
+\]
+よって
+\[
+\boxed{\; \int \frac{\log x}{x^{\alpha}}\, dx = \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{x^{1-\alpha}}{(1-\alpha)^{2}} + C \quad (\alpha \neq 1) \;}
+\]
+（検算: $\dfrac{d}{dx}\left[\dfrac{x^{1-\alpha}}{1-\alpha}\log x\right] = x^{-\alpha}\log x + \dfrac{x^{-\alpha}}{1-\alpha}$、$\dfrac{d}{dx}\left[-\dfrac{x^{1-\alpha}}{(1-\alpha)^{2}}\right] = -\dfrac{x^{-\alpha}}{1-\alpha}$ であり、両者を加えると $x^{-\alpha}\log x = \dfrac{\log x}{x^{\alpha}}$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問5}
+次の不定積分を、部分分数分解を用いて求めよ。
+\end{mondaiboxS}
+\[
+\int \frac{x+1}{x^{2}+x-2} \, dx
+\]
+\kaitou
+分母を因数分解すると $x^{2}+x-2 = (x+2)(x-1)$ であるから
+\[
+\frac{x+1}{(x+2)(x-1)} = \frac{A}{x+2} + \frac{B}{x-1}
+\]
+とおく。両辺に $(x+2)(x-1)$ を掛けると
+\[
+x+1 = A(x-1) + B(x+2)
+\]
+$x=1$ を代入すると $2 = 3B$ より $B = \dfrac{2}{3}$。$x=-2$ を代入すると $-1 = -3A$ より $A = \dfrac{1}{3}$。よって
+\[
+\int \frac{x+1}{x^{2}+x-2}\, dx = \int \left(\frac{1/3}{x+2} + \frac{2/3}{x-1}\right) dx = \frac{1}{3}\log|x+2| + \frac{2}{3}\log|x-1| + C
+\]
+よって
+\[
+\boxed{\; \int \frac{x+1}{x^{2}+x-2}\, dx = \frac{1}{3}\log|x+2| + \frac{2}{3}\log|x-1| + C \;}
+\]
+（検算: $\dfrac{d}{dx}\left[\dfrac{1}{3}\log|x+2| + \dfrac{2}{3}\log|x-1|\right] = \dfrac{1}{3(x+2)} + \dfrac{2}{3(x-1)} = \dfrac{(x-1) + 2(x+2)}{3(x+2)(x-1)} = \dfrac{3x+3}{3(x^{2}+x-2)} = \dfrac{x+1}{x^{2}+x-2}$ となり一致する。）
+
+\end{document}

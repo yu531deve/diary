@@ -1,0 +1,177 @@
+% 分野別類題: べき級数解法 解答例
+% コンパイル: TEXINPUTS="../../../00_common:$TEXINPUTS" latexmk -xelatex answers.tex
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+\usepackage{shoakubox}
+
+\begin{document}
+
+\kamokumei{類題演習 解答例 --- べき級数解法}
+
+\daimon{【解法】べき級数解法の解き方と導出}
+
+\noindent
+2階線形常微分方程式
+\[
+y'' + P(x)\,y' + Q(x)\,y = 0
+\]
+において $x=0$ が正則点（$P,Q$ が $x=0$ で正則）であるとき、解は
+\[
+y = \sum_{n=0}^{\infty} a_n x^{n}
+\]
+の形の収束べき級数として存在する。これを方程式に代入し、各べき $x^{m}$ の係数を $0$ とおくことで、係数 $a_n$ の間の漸化式（通常は2項間または3項間の関係式）が得られる。$a_0, a_1$ は初期条件（または任意定数）として自由に選べ、それ以降の係数はすべて漸化式によって $a_0, a_1$ から一意に定まる。
+
+\medskip
+\noindent
+\textbf{基本手続き}
+\begin{enumerate}
+\item $y = \sum_{n=0}^{\infty} a_n x^n$ とおき、
+\[
+y' = \sum_{n=1}^{\infty} n a_n x^{n-1}, \qquad
+y'' = \sum_{n=2}^{\infty} n(n-1) a_n x^{n-2}
+\]
+を用意する。
+\item $y''$ の和の添字を $n \to n+2$ とずらして
+\[
+y'' = \sum_{n=0}^{\infty} (n+2)(n+1) a_{n+2}\, x^{n}
+\]
+の形に揃える（$xy'$ や $x^2 y''$ などが混じる項も、同様に $x^n$ の係数として揃える）。
+\item 方程式全体を $x^{n}$ の係数ごとにまとめ、$n$ 次の係数を $0$ とおくことで漸化式を得る。
+\item $a_0, a_1$（初期条件が与えられていればそれらの値、なければ任意定数）から漸化式を用いて $a_2, a_3, \dots$ を順次計算する。
+\item 特別な場合として、漸化式の右辺が $n = n_0$ である係数を境に恒等的に $0$ になる（$n(n+1) = \ell(\ell+1)$ や $n = \ell$ のような「量子化条件」を満たす）とき、級数は有限項で止まり多項式解（ルジャンドル多項式・エルミート多項式など）を与える。
+\end{enumerate}
+
+\medskip
+\noindent
+\textbf{ルジャンドル方程式の一般漸化式}\quad
+$(1-x^2)y'' - 2xy' + n(n+1)y = 0$ に $y=\sum a_k x^k$ を代入すると
+\[
+\sum_{k=0}^{\infty}(k+2)(k+1)a_{k+2}x^{k}
+-\sum_{k=0}^{\infty} k(k-1)a_k x^{k}
+-2\sum_{k=0}^{\infty} k a_k x^k
++ n(n+1)\sum_{k=0}^{\infty} a_k x^k = 0
+\]
+（$(1-x^2)y''$ の $x^2 y''$ 部分は添字をずらさずそのまま $k(k-1)a_k x^k$ となることに注意）。$x^k$ の係数をまとめると
+\[
+(k+2)(k+1)a_{k+2} = \big[k(k-1) + 2k - n(n+1)\big]a_k = \big[k(k+1) - n(n+1)\big]a_k
+\]
+すなわち
+\[
+a_{k+2} = \frac{k(k+1) - n(n+1)}{(k+1)(k+2)}\,a_k
+\]
+
+\medskip
+\noindent
+\textbf{エルミート方程式の一般漸化式}\quad
+$y'' - 2xy' + 2ny = 0$ に $y = \sum a_k x^k$ を代入すると
+\[
+\sum_{k=0}^{\infty}(k+2)(k+1)a_{k+2}x^k - 2\sum_{k=0}^{\infty} k a_k x^k + 2n\sum_{k=0}^{\infty} a_k x^k = 0
+\]
+より
+\[
+(k+2)(k+1)a_{k+2} = (2k - 2n)a_k
+\quad\Longrightarrow\quad
+a_{k+2} = \frac{2(k-n)}{(k+1)(k+2)}\,a_k
+\]
+$n$ が非負整数のとき、$k=n$ で右辺が $0$ となるため、$a_n$ から先の同じ偶奇の係数はすべて $0$ になり、多項式解（エルミート多項式）が得られる。
+
+\clearpage
+\begin{mondaiboxS}{問1}
+エアリー方程式 $y'' - xy = 0$ の級数解 $y = \sum_{n=0}^{\infty} a_n x^n$ について、係数 $a_n$ の漸化式を導け。さらに $a_0, a_1$ を任意定数として、$a_2$ から $a_7$ までを求めよ。
+\end{mondaiboxS}
+\kaitou
+$y = \sum_{n=0}^{\infty} a_n x^n$ より
+\[
+y'' = \sum_{n=0}^{\infty} (n+2)(n+1)a_{n+2}\,x^{n}, \qquad
+xy = \sum_{n=0}^{\infty} a_n x^{n+1} = \sum_{m=1}^{\infty} a_{m-1}\,x^{m}
+\]
+$y''-xy=0$ の $x^m$ の係数を比較すると、$m=0$ のとき
+\[
+2\cdot 1\cdot a_2 = 0 \quad\Longrightarrow\quad a_2 = 0
+\]
+$m\ge 1$ のとき
+\[
+(m+2)(m+1)a_{m+2} = a_{m-1}
+\quad\Longrightarrow\quad
+a_{m+2} = \frac{a_{m-1}}{(m+1)(m+2)} \qquad (m \ge 1)
+\]
+これが漸化式である。これを用いて逐次計算する。
+\[
+a_3 = \frac{a_0}{3\cdot 2} = \frac{a_0}{6}, \qquad
+a_4 = \frac{a_1}{4\cdot 3} = \frac{a_1}{12}, \qquad
+a_5 = \frac{a_2}{5\cdot 4} = 0
+\]
+\[
+a_6 = \frac{a_3}{6\cdot 5} = \frac{a_0}{6\cdot 30} = \frac{a_0}{180}, \qquad
+a_7 = \frac{a_4}{7\cdot 6} = \frac{a_1}{12\cdot 42} = \frac{a_1}{504}
+\]
+よって
+\[
+\boxed{\;
+a_2 = 0,\quad a_3=\frac{a_0}{6},\quad a_4=\frac{a_1}{12},\quad a_5=0,\quad a_6=\frac{a_0}{180},\quad a_7=\frac{a_1}{504}
+\;}
+\]
+（検算: 例えば $a_6$ は漸化式で $m=4$ を用いて $a_6 = a_3/(5\cdot 6) = (a_0/6)/30 = a_0/180$ となり一致する。）
+
+\clearpage
+\begin{mondaiboxS}{問2}
+ルジャンドル方程式 $(1-x^2)y'' - 2xy' + n(n+1)y = 0$ において $n=2$ とする。係数の漸化式を導き、$a_1=0$ の場合に得られる多項式解を $a_0$ で表せ。またこれを $x=1$ で値 $1$ をとるように正規化した多項式 $P_2(x)$ を求めよ。
+\end{mondaiboxS}
+\kaitou
+【解法】で示した一般漸化式
+\[
+a_{k+2} = \frac{k(k+1)-n(n+1)}{(k+1)(k+2)}\,a_k
+\]
+に $n=2$（$n(n+1)=6$）を代入すると
+\[
+a_{k+2} = \frac{k(k+1)-6}{(k+1)(k+2)}\,a_k
+\]
+$a_1=0$ とすると奇数次の係数はすべて $0$（$a_3=a_5=\cdots=0$）。偶数次は
+\[
+k=0:\quad a_2 = \frac{0-6}{1\cdot 2}a_0 = -3a_0
+\]
+\[
+k=2:\quad a_4 = \frac{2\cdot 3 - 6}{3\cdot 4}a_2 = \frac{0}{12}a_2 = 0
+\]
+以降 $a_6=a_8=\cdots=0$ も同様に $0$ となるから、級数は $a_0, a_2$ の2項で止まり
+\[
+y = a_0 + a_2 x^{2} = a_0\left(1 - 3x^{2}\right)
+\]
+これが求める多項式解である。$x=1$ で値 $1$ をとるように定数 $a_0$ を定めると
+\[
+a_0(1-3) = 1 \quad\Longrightarrow\quad a_0 = -\frac{1}{2}
+\]
+よって
+\[
+\boxed{\; P_2(x) = -\frac{1}{2}\left(1-3x^{2}\right) = \frac{3x^{2}-1}{2} \;}
+\]
+（検算: $(1-x^2)y''-2xy'+6y$ に $y=\frac{3x^2-1}{2}$ を代入すると、$y'=3x$, $y''=3$ より
+$(1-x^2)\cdot 3 - 2x\cdot 3x + 6\cdot\frac{3x^2-1}{2} = 3-3x^2-6x^2+9x^2-3 = 0$ となり方程式を満たす。また $P_2(1)=\frac{3-1}{2}=1$ で正規化条件も満たす。）
+
+\clearpage
+\begin{mondaiboxS}{問3}
+エルミート方程式 $y'' - 2xy' + 2ny = 0$ において $n=2$ とし、初期条件 $y(0)=-2,\ y'(0)=0$ を満たす解を求めよ。
+\end{mondaiboxS}
+\kaitou
+$y=\sum_{k=0}^{\infty}a_k x^k$ とおくと $a_0 = y(0) = -2$, $a_1 = y'(0) = 0$ である。【解法】で示した一般漸化式に $n=2$ を代入すると
+\[
+a_{k+2} = \frac{2(k-2)}{(k+1)(k+2)}\,a_k
+\]
+$a_1=0$ より奇数次の係数はすべて $0$。偶数次は
+\[
+k=0:\quad a_2 = \frac{2(0-2)}{1\cdot 2}a_0 = \frac{-4}{2}a_0 = -2a_0 = -2\cdot(-2) = 4
+\]
+\[
+k=2:\quad a_4 = \frac{2(2-2)}{3\cdot 4}a_2 = \frac{0}{12}a_2 = 0
+\]
+以降 $a_6=a_8=\cdots=0$ となるから級数は有限項で終わり、多項式解
+\[
+y = a_0 + a_2 x^{2} = -2 + 4x^{2}
+\]
+が得られる。よって
+\[
+\boxed{\; y = 4x^{2} - 2 \;}
+\]
+（検算: $y'=8x,\ y''=8$ より $y''-2xy'+4y = 8 - 2x\cdot 8x + 4(4x^2-2) = 8-16x^2+16x^2-8 = 0$ となり方程式を満たす。また $y(0)=-2,\ y'(0)=0$ も満たしている。なお $y=4x^2-2$ はエルミート多項式 $H_2(x)=4x^2-2$ に一致する。）
+
+\end{document}
