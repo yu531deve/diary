@@ -29,6 +29,10 @@ export type ProblemMeta = {
   field: FieldMeta;
   tags: string[];
   difficulty: string;
+  /** meta.yaml の updated（YYYY-MM-DD の文字列）。無ければ空文字 */
+  updated: string;
+  /** meta.yaml の created（YYYY-MM-DD の文字列）。無ければ空文字 */
+  created: string;
 };
 
 /**
@@ -60,6 +64,8 @@ export function parseMetaYaml(text: string): ProblemMeta {
     },
     tags,
     difficulty: get("difficulty"),
+    updated: get("updated"),
+    created: get("created"),
   };
 }
 
