@@ -1,0 +1,280 @@
+---
+// site/src/components/LoadingCurtain.astro
+//
+// issue #64: 初回ローディング演出（design/04_loading.dc.html 相当）。
+// トップページにのみ挿入する独立コンポーネント。#63（トップ本体の並行改修）との
+// コンフリクトを避けるため、index.astro への差分は「このコンポーネントの import と
+// 1 行の挿入」に留める。
+//
+// 必須条件（Yu 裁定）:
+//   (a) sessionStorage により同一セッション内の再訪では表示しない
+//   (b) prefers-reduced-motion: reduce では演出を停止し、Diary の静止形のみを表示する
+//
+// 実装は site/src/lib/particles（#62）の ParticleEngine / textShape / circleRim /
+// delayedEase をそのまま利用する。particles/ 配下は変更していない。
+---
+
+<div id="loading-curtain" aria-hidden="true">
+	<canvas id="loading-curtain-fx"></canvas>
+	<div class="loading-curtain-ui">
+		<div class="loading-curtain-meta">
+			<span class="loading-curtain-phase" id="loading-curtain-phase">LOADING PROBLEMS</span>
+			<span class="loading-curtain-bar">
+				<span class="loading-curtain-bar-fill" id="loading-curtain-bar-fill"></span>
+			</span>
+		</div>
+		<span class="loading-curtain-pct" id="loading-curtain-pct">000</span>
+	</div>
+	<div class="loading-curtain-label">DIARY — SELF-MADE MATHEMATICS</div>
+</div>
+
+<style>
+	#loading-curtain {
+		position: fixed;
+		inset: 0;
+		z-index: 999;
+		background: #05060a;
+		opacity: 1;
+		transition: opacity 0.9s ease;
+		pointer-events: auto;
+	}
+
+	#loading-curtain.is-done {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	#loading-curtain-fx {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.loading-curtain-ui {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		padding: 0 48px 40px;
+	}
+
+	.loading-curtain-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	.loading-curtain-phase {
+		font: 500 10px "IBM Plex Mono", monospace;
+		letter-spacing: 0.32em;
+		color: #52e0f5;
+	}
+
+	.loading-curtain-bar {
+		display: block;
+		width: 320px;
+		height: 1px;
+		background: rgba(255, 255, 255, 0.14);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.loading-curtain-bar-fill {
+		position: absolute;
+		inset: 0;
+		background: #52e0f5;
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 0.2s linear;
+	}
+
+	.loading-curtain-pct {
+		font: 500 76px "IBM Plex Mono", monospace;
+		line-height: 0.85;
+		letter-spacing: -0.02em;
+		color: #eef2f6;
+	}
+
+	.loading-curtain-label {
+		position: absolute;
+		left: 48px;
+		top: 40px;
+		font: 400 10px "IBM Plex Mono", monospace;
+		color: #4a5361;
+		letter-spacing: 0.2em;
+	}
+
+	@media (max-width: 640px) {
+		.loading-curtain-ui {
+			padding: 0 24px 28px;
+		}
+		.loading-curtain-bar {
+			width: 180px;
+		}
+		.loading-curtain-pct {
+			font-size: 48px;
+		}
+		.loading-curtain-label {
+			left: 24px;
+			top: 24px;
+		}
+	}
+</style>
+
+<script>
+	import {
+		ParticleEngine,
+		textShape,
+		circleRim,
+		delayedEase,
+		lerpPoint,
+	} from "../lib/particles";
+
+	const STORAGE_KEY = "diary:loading-curtain-shown";
+	const DURATION_MS = 3200;
+
+	function init() {
+		const root = document.getElementById("loading-curtain");
+		if (!root) return;
+
+		// (a) 同一セッション内の再訪ではスキップする。
+		let alreadyShown = false;
+		try {
+			alreadyShown = window.sessionStorage.getItem(STORAGE_KEY) === "1";
+		} catch {
+			// sessionStorage が使えない環境（プライベートモード等）ではスキップせず、
+			// 演出を出したうえで以降の書き込みも黙って諦める。
+			alreadyShown = false;
+		}
+
+		if (alreadyShown) {
+			root.remove();
+			return;
+		}
+
+		try {
+			window.sessionStorage.setItem(STORAGE_KEY, "1");
+		} catch {
+			// noop: 書き込めなくても表示自体は継続する。
+		}
+
+		const canvas = document.getElementById(
+			"loading-curtain-fx",
+		) as HTMLCanvasElement | null;
+		const phaseEl = document.getElementById("loading-curtain-phase");
+		const barFillEl = document.getElementById(
+			"loading-curtain-bar-fill",
+		) as HTMLElement | null;
+		const pctEl = document.getElementById("loading-curtain-pct");
+		if (!canvas) {
+			root.remove();
+			return;
+		}
+
+		const engine = new ParticleEngine(canvas);
+		const reducedMotion = engine.reducedMotion;
+
+		const w = canvas.clientWidth || window.innerWidth;
+		const h = canvas.clientHeight || window.innerHeight;
+
+		const targets = textShape("Diary", {
+			width: w,
+			height: h,
+			fontPx: Math.min(w * 0.2, 300),
+			centerY: h * 0.46,
+			gap: 5,
+		});
+		const starts = circleRim(targets.length, {
+			cx: w / 2,
+			cy: h / 2,
+			radius: Math.max(w, h) * 0.75,
+		});
+		const delays = targets.map(() => Math.random() * 0.42);
+
+		engine.setParticleCount(targets.length);
+
+		function updateUI(raw: number) {
+			const pct = String(Math.round(raw * 100)).padStart(3, "0");
+			if (pctEl) pctEl.textContent = pct;
+			if (barFillEl) barFillEl.style.transform = `scaleX(${raw})`;
+			if (phaseEl) {
+				phaseEl.textContent =
+					raw < 0.35
+						? "LOADING PROBLEMS"
+						: raw < 0.7
+							? "BUILDING INDEX"
+							: raw < 0.95
+								? "READY"
+								: "WELCOME";
+			}
+		}
+
+		function finish() {
+			root!.classList.add("is-done");
+			window.setTimeout(() => {
+				root!.remove();
+			}, 900);
+		}
+
+		if (reducedMotion) {
+			// (b) reduced-motion: アニメーションせず、Diary の静止形を 1 回描画してすぐ消す。
+			updateUI(1);
+			engine.start((i) => targets[i]);
+			finish();
+			return;
+		}
+
+		const t0 = performance.now();
+
+		engine.start((i, frame) => {
+			const raw = Math.min((frame.now - t0) / DURATION_MS, 1);
+			const e = delayedEase(raw, delays[i]);
+			const target = lerpPoint(starts[i], targets[i], e);
+
+			// raw > 0.86 で放出しつつフェードする演出（design 04 の out フェーズ相当）。
+			const out = Math.max((raw - 0.86) / 0.14, 0);
+			if (out > 0) {
+				const k = out * out;
+				return {
+					x: target.x + (target.x - frame.width / 2) * k * 1.4,
+					y: target.y + (target.y - frame.height / 2) * k * 1.4 - k * 60,
+				};
+			}
+			return target;
+		});
+
+		// UI（フェーズ表示・進捗バー・カウンタ）は演出とは別に requestAnimationFrame で更新する。
+		let uiRaf = 0;
+		function tickUI(now: number) {
+			const raw = Math.min((now - t0) / DURATION_MS, 1);
+			updateUI(raw);
+			if (raw < 1) {
+				uiRaf = requestAnimationFrame(tickUI);
+			} else {
+				engine.stop();
+				finish();
+			}
+		}
+		uiRaf = requestAnimationFrame(tickUI);
+
+		window.addEventListener(
+			"beforeunload",
+			() => {
+				cancelAnimationFrame(uiRaf);
+				engine.stop();
+			},
+			{ once: true },
+		);
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", init);
+	} else {
+		init();
+	}
+</script>

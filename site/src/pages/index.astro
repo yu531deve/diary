@@ -5,6 +5,7 @@
 // パーティクル演出等の High-fidelity 実装は別 issue（design/01_top_scroll 系）で行う。
 import { listPublishedProblems } from "../lib/dist-content";
 import { computeSiteStats } from "../lib/site-data";
+import LoadingCurtain from "../components/LoadingCurtain.astro";
 
 const problems = listPublishedProblems();
 const stats = computeSiteStats();
@@ -45,6 +46,7 @@ const stats = computeSiteStats();
 		</style>
 	</head>
 	<body>
+		<LoadingCurtain />
 		<nav>
 			<a href="/fields/">分野から探す</a>
 		</nav>
