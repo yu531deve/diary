@@ -1,90 +1,957 @@
 ---
-// トップページ（仮）。#61 でビルド時データ生成ユーティリティ（site-data.ts）
-// 経由に置き換え。content/ 配下の status: published な問題一覧に加え、
-// 公開問題数・分野数・分野別問題数・新着一覧を実データから算出して表示する。
-// パーティクル演出等の High-fidelity 実装は別 issue（design/01_top_scroll 系）で行う。
-import { listPublishedProblems } from "../lib/dist-content";
+// トップページ（#63 M1-D2: design/01_top_scroll.dc.html の High-fidelity 実装）。
+//
+// - スクロール駆動パーティクル演出は site/src/lib/particles/（#62）を使用。
+//   このページでは新規に canvas 描画ロジックを書かない（不足があれば改修せず
+//   README に不足を記録して回避策を取る運用。site/CLAUDE.md 例外規定参照）。
+// - 統計・分野・新着は #61 の site-data.ts 経由で実データから生成する
+//   （0042 / 18 のような数値のハードコード禁止。design/README.md 実装時の注意 6）。
+// - prefers-reduced-motion: reduce では演出を停止し、Diary の静止形のみを表示する。
+//   キャプション等のテキストは通常表示のまま（site/CLAUDE.md 必須条件）。
+// - モバイル幅（<=860px）ではスクロール演出を出さず、静的ヒーロー（#c1 相当）に
+//   差し替える（#68 で軽量版に差し替え予定。当面はこの静的ヒーローで可）。
 import { computeSiteStats } from "../lib/site-data";
 import LoadingCurtain from "../components/LoadingCurtain.astro";
 
-const problems = listPublishedProblems();
 const stats = computeSiteStats();
+
+const fieldRows = stats.byField.map((f, i) => ({
+	no: String(i + 1).padStart(2, "0"),
+	major: f.major,
+	count: f.count,
+}));
+
+const recent = stats.recent;
+
+function difficultyDots(difficulty: string): boolean[] {
+	const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
+	return Array.from({ length: 5 }, (_, i) => i < n);
+}
+
+function formatDate(d: string): string {
+	return d ? d.replaceAll("-", ".") : "";
+}
+
+const problemsPadded = String(stats.problemCount).padStart(4, "0");
+const fieldsPadded = String(stats.fieldCount).padStart(2, "0");
+
+const issueHref =
+	"https://github.com/yu531deve/diary/issues/new?labels=typo&title=" +
+	encodeURIComponent("[誤植報告] トップページ");
 ---
 
+<!doctype html>
 <html lang="ja">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
+		<meta
+			name="description"
+			content="自作の大学入試数学問題を公開しています。解く価値のある一問を、1000問へ。"
+		/>
 		<title>Diary — 自作入試数学問題集</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&display=swap"
+			rel="stylesheet"
+		/>
 		<style>
 			:root {
-				color-scheme: light dark;
-				font-family: system-ui, sans-serif;
+				color-scheme: dark;
+			}
+			* {
+				box-sizing: border-box;
 			}
 			body {
-				max-width: 40rem;
-				margin: 0 auto;
-				padding: 1.5rem;
-				line-height: 1.6;
-			}
-			h1 {
-				font-size: 1.5rem;
-			}
-			ul {
-				padding-left: 1.2rem;
+				margin: 0;
+				background: #05060a;
+				color: #eef2f6;
+				font-family: "Noto Sans JP", sans-serif;
 			}
 			a {
 				color: inherit;
+				text-decoration: none;
 			}
-			.stats {
+			a:hover {
+				opacity: 0.8;
+			}
+			::selection {
+				background: #52e0f5;
+				color: #05060a;
+			}
+
+			@keyframes scrollpulse {
+				0%,
+				100% {
+					transform: translateY(0);
+					opacity: 0.9;
+				}
+				50% {
+					transform: translateY(8px);
+					opacity: 0.4;
+				}
+			}
+
+			/* ---------- 固定ヘッダー ---------- */
+			.site-nav {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 20;
 				display: flex;
-				gap: 1.5rem;
-				font-variant-numeric: tabular-nums;
+				align-items: center;
+				justify-content: space-between;
+				padding: 26px 48px;
+				background: linear-gradient(180deg, rgba(5, 6, 10, 0.85), rgba(5, 6, 10, 0));
+			}
+			.site-nav .brand {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+			.site-nav .brand strong {
+				font: 700 19px "Space Grotesk", sans-serif;
+			}
+			.site-nav .brand span {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.site-nav .links {
+				display: flex;
+				align-items: center;
+				gap: 32px;
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+			.site-nav .kbd {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 7px 14px;
+				border: 1px solid rgba(255, 255, 255, 0.14);
+				border-radius: 999px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+			}
+			.site-nav .kbd span {
+				color: #4a5361;
+			}
+
+			/* ---------- カスタムカーソル ---------- */
+			#cur {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 34px;
+				height: 34px;
+				border: 1px solid rgba(82, 224, 245, 0.8);
+				border-radius: 50%;
+				pointer-events: none;
+				z-index: 60;
+				mix-blend-mode: screen;
+			}
+			#curdot {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: #52e0f5;
+				pointer-events: none;
+				z-index: 60;
+			}
+			@media (hover: none), (pointer: coarse) {
+				#cur,
+				#curdot {
+					display: none;
+				}
+			}
+
+			/* ---------- スクロール演出トラック ---------- */
+			#track {
+				position: relative;
+				height: 560vh;
+			}
+			#stage {
+				position: sticky;
+				top: 0;
+				height: 100vh;
+				overflow: hidden;
+			}
+			#fx {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				display: block;
+			}
+			.caption {
+				position: absolute;
+				opacity: 0;
+			}
+			#c1 {
+				left: 0;
+				right: 0;
+				top: 64vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 18px;
+				opacity: 1;
+			}
+			#c1 .eyebrow {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.34em;
+				color: #52e0f5;
+				text-align: center;
+			}
+			#c1 p {
+				margin: 0;
+				font-size: 18px;
+				font-weight: 500;
+				color: #c3ccd8;
+				letter-spacing: 0.06em;
+				text-align: center;
+			}
+			#c1 .scroll-hint {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				margin-top: 14px;
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.3em;
+			}
+			#c1 .scroll-hint i {
+				display: block;
+				width: 1px;
+				height: 34px;
+				background: linear-gradient(180deg, #52e0f5, transparent);
+				animation: scrollpulse 2s ease-in-out infinite;
+			}
+			#c2 {
+				left: 48px;
+				top: 0;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				gap: 20px;
+				max-width: 440px;
+			}
+			#c2 .eyebrow {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.24em;
+				color: #52e0f5;
+			}
+			#c2 h2 {
+				margin: 0;
+				font-size: 40px;
+				font-weight: 900;
+				line-height: 1.35;
+				text-wrap: pretty;
+			}
+			#c2 .formula {
+				font: italic 400 21px "STIX Two Text", serif;
+				color: #aab6d4;
+			}
+			#c2 p {
+				margin: 0;
+				font-size: 14px;
+				line-height: 1.9;
+				color: #7d8794;
+			}
+			#c3 {
+				left: 0;
+				right: 0;
+				top: 66vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 12px;
+			}
+			#c3 .eyebrow {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #52e0f5;
+			}
+			#c3 p {
+				margin: 0;
+				font-size: 19px;
+				font-weight: 500;
+				color: #c3ccd8;
+			}
+			#c4 {
+				left: 0;
+				right: 0;
+				top: 0;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 26px;
+				pointer-events: none;
+			}
+			#c4 h2 {
+				margin: 0;
+				font-size: 56px;
+				font-weight: 900;
+				letter-spacing: 0.02em;
+				text-align: center;
+				text-wrap: pretty;
+			}
+			#c4 .cta {
+				display: flex;
+				gap: 14px;
+			}
+			#c4 .cta a.primary {
+				padding: 15px 32px;
+				background: #52e0f5;
+				color: #06232a;
+				font-weight: 700;
+				font-size: 14px;
+				border-radius: 2px;
+			}
+			#c4 .cta a.secondary {
+				padding: 15px 32px;
+				border: 1px solid rgba(255, 255, 255, 0.25);
+				color: #dfe6ee;
+				font-size: 14px;
+				border-radius: 2px;
+			}
+
+			.scene-indicator {
+				position: absolute;
+				right: 48px;
+				top: 50%;
+				transform: translateY(-50%);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 14px;
+			}
+			.scene-indicator .num {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				letter-spacing: 0.2em;
+			}
+			.scene-indicator .bar {
+				display: block;
+				width: 1px;
+				height: 120px;
+				background: rgba(255, 255, 255, 0.12);
+				position: relative;
+				overflow: hidden;
+			}
+			.scene-indicator .bar i {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: #52e0f5;
+				transform: scaleY(0);
+				transform-origin: top;
+			}
+
+			.stage-stats {
+				position: absolute;
+				left: 48px;
+				bottom: 32px;
+				display: flex;
+				gap: 36px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.12em;
+			}
+			.stage-stats strong {
+				color: #dfe6ee;
+				font-weight: 400;
+			}
+			.stage-stats .goal strong {
+				color: #52e0f5;
+			}
+
+			/* ---------- モバイル用の静的ヒーロー ---------- */
+			#mobile-hero {
+				display: none;
+				padding: 140px 24px 90px;
+				text-align: center;
+				flex-direction: column;
+				align-items: center;
+				gap: 18px;
+			}
+			#mobile-hero .eyebrow {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.28em;
+				color: #52e0f5;
+			}
+			#mobile-hero h1 {
+				margin: 0;
+				font-size: 34px;
+				font-weight: 900;
+				line-height: 1.3;
+				text-wrap: pretty;
+			}
+			#mobile-hero p {
+				margin: 0;
+				font-size: 15px;
+				line-height: 1.9;
+				color: #c3ccd8;
+			}
+			#mobile-hero .stats {
+				display: flex;
+				gap: 24px;
+				margin-top: 8px;
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.1em;
+			}
+			#mobile-hero .stats strong {
+				color: #dfe6ee;
+				font-weight: 400;
+			}
+
+			/* ---------- スクロール後のセクション ---------- */
+			.after-stage {
+				position: relative;
+				z-index: 1;
+				background: #05060a;
+			}
+			.fields-section,
+			.new-section {
+				padding: 40px 48px 90px;
+				max-width: 1400px;
+				margin: 0 auto;
+			}
+			.fields-section {
+				padding-top: 120px;
+			}
+			.section-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				margin-bottom: 34px;
+			}
+			.section-head h2 {
+				margin: 0;
+				font: 500 12px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #7d8794;
+			}
+			.section-head a {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+			}
+			.new-section > h2 {
+				margin: 0 0 24px;
+				font: 500 12px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #7d8794;
+			}
+
+			.field-list,
+			.new-list {
+				display: flex;
+				flex-direction: column;
+			}
+			.field-row {
+				display: flex;
+				align-items: baseline;
+				gap: 36px;
+				padding: 26px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				transition: all 0.25s;
+			}
+			.field-list a.field-row:last-child {
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+			}
+			.field-row:hover {
+				color: #52e0f5;
+				padding-left: 26px;
+			}
+			.field-row .no {
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #4a5361;
+				width: 32px;
+				flex-shrink: 0;
+			}
+			.field-row .major {
+				font-size: 52px;
+				font-weight: 900;
+				letter-spacing: 0.02em;
+				line-height: 1.1;
+				text-wrap: pretty;
+			}
+			.field-row .count {
+				margin-left: auto;
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				white-space: nowrap;
+			}
+
+			.new-row {
+				display: flex;
+				align-items: center;
+				gap: 28px;
+				padding: 22px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+				transition: all 0.2s;
+			}
+			.new-list a.new-row:last-child {
+				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.new-row:hover {
+				background: rgba(82, 224, 245, 0.04);
+				padding-left: 14px;
+			}
+			.new-row .id {
+				font: 500 13px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				flex-shrink: 0;
+			}
+			.new-row .title {
+				flex: 1;
+				font-size: 17px;
+				font-weight: 500;
+			}
+			.new-row .pill {
+				font-size: 11px;
+				color: #7d8794;
+				padding: 4px 10px;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 999px;
+				white-space: nowrap;
+			}
+			.new-row .dots {
+				display: flex;
+				gap: 4px;
+				flex-shrink: 0;
+			}
+			.new-row .dots span {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: #2a3340;
+			}
+			.new-row .dots span.on {
+				background: #52e0f5;
+			}
+			.new-row .date {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #4a5361;
+				flex-shrink: 0;
+			}
+			.empty-note {
+				padding: 26px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+				color: #7d8794;
+				font-size: 14px;
+			}
+
+			.site-footer {
+				display: flex;
+				justify-content: space-between;
+				padding: 24px 48px;
+				border-top: 1px solid rgba(255, 255, 255, 0.07);
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #4a5361;
+				letter-spacing: 0.1em;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+
+			/* ---------- モバイル: 演出を静的ヒーローに差し替える ---------- */
+			@media (max-width: 860px) {
+				.site-nav {
+					padding: 18px 24px;
+				}
+				.site-nav .links {
+					gap: 16px;
+					font-size: 12px;
+				}
+				#track {
+					display: none;
+				}
+				#mobile-hero {
+					display: flex;
+				}
+				.fields-section,
+				.new-section {
+					padding-left: 24px;
+					padding-right: 24px;
+				}
+				.fields-section {
+					padding-top: 56px;
+				}
+				.field-row .major {
+					font-size: 30px;
+				}
+				.field-row {
+					gap: 16px;
+				}
+				.new-row {
+					flex-wrap: wrap;
+					gap: 10px;
+					padding: 18px 0;
+				}
+				.new-row .title {
+					flex-basis: 100%;
+					order: 1;
+				}
+				.site-footer {
+					padding: 20px 24px;
+					flex-direction: column;
+				}
+			}
+
+			/* ---------- 縮退: 演出停止・Diary の静止形のみ ---------- */
+			@media (prefers-reduced-motion: reduce) {
+				#track {
+					height: 100vh;
+				}
+				#stage {
+					position: relative;
+				}
+				#c2,
+				#c3,
+				#c4 {
+					display: none;
+				}
+				#c1 {
+					opacity: 1;
+					transform: none;
+				}
+				.scene-indicator,
+				#cur,
+				#curdot {
+					display: none;
+				}
+				.scroll-hint i {
+					animation: none;
+				}
 			}
 		</style>
 	</head>
 	<body>
 		<LoadingCurtain />
-		<nav>
-			<a href="/fields/">分野から探す</a>
+		<nav class="site-nav">
+			<div class="brand">
+				<strong>Diary</strong>
+				<span>SELF-MADE MATHEMATICS</span>
+			</div>
+			<div class="links">
+				<a href="/fields/">分野</a>
+				<a href="#new">新着</a>
+				<span class="kbd">検索<span>⌘K</span></span>
+			</div>
 		</nav>
-		<h1>Diary — 自作入試数学問題集</h1>
-		<p>自作の大学入試数学問題を公開しています。</p>
-		<p class="stats">
-			<span>PROBLEMS {stats.problemCount}</span>
-			<span>FIELDS {stats.fieldCount}</span>
-		</p>
-		<h2>分野別</h2>
-		<ul>
-			{
-				stats.byField.map((f) => (
-					<li>
-						{f.major}（{f.count}）
-					</li>
-				))
+
+		<div id="cur" aria-hidden="true"></div>
+		<div id="curdot" aria-hidden="true"></div>
+
+		<div id="track">
+			<div id="stage">
+				<canvas id="fx" aria-hidden="true"></canvas>
+
+				<div id="c1" class="caption">
+					<div class="eyebrow">ORIGINAL ENTRANCE-EXAM MATHEMATICS</div>
+					<p>自作の入試数学、1000問へ。解く価値のある一問を。</p>
+					<div class="scroll-hint">
+						<span>SCROLL</span>
+						<i></i>
+					</div>
+				</div>
+
+				<div id="c2" class="caption">
+					<div class="eyebrow">PROBLEM 0001</div>
+					<h2>放物線と直線で<br />囲まれた面積</h2>
+					<div class="formula">{"∫₋₁² {(x+2) − x²} dx = 9/2"}</div>
+					<p>すべての問題は完全自作。<br />ブラウザで読んで、PDF で解く。</p>
+				</div>
+
+				<div id="c3" class="caption">
+					<div class="eyebrow">GOAL</div>
+					<p>1000問を目指して、毎日つくる。</p>
+				</div>
+
+				<div id="c4" class="caption">
+					<h2>解く価値のある、一問を。</h2>
+					<div class="cta">
+						<a href="/fields/" class="primary">分野から探す</a>
+						<a href="#new" class="secondary">新着問題 →</a>
+					</div>
+				</div>
+
+				<div class="scene-indicator">
+					<span id="scn" class="num">01 / 04</span>
+					<span class="bar"><i id="prog"></i></span>
+				</div>
+
+				<div class="stage-stats">
+					<span>PROBLEMS <strong>{problemsPadded}</strong></span>
+					<span>FIELDS <strong>{fieldsPadded}</strong></span>
+					<span class="goal">GOAL <strong>1000+</strong></span>
+				</div>
+			</div>
+		</div>
+
+		<div id="mobile-hero">
+			<div class="eyebrow">ORIGINAL ENTRANCE-EXAM MATHEMATICS</div>
+			<h1>自作の入試数学、<br />1000問へ。</h1>
+			<p>解く価値のある一問を。すべての問題は完全自作。<br />ブラウザで読んで、PDF で解く。</p>
+			<div class="stats">
+				<span>PROBLEMS <strong>{problemsPadded}</strong></span>
+				<span>FIELDS <strong>{fieldsPadded}</strong></span>
+				<span>GOAL <strong>1000+</strong></span>
+			</div>
+		</div>
+
+		<div class="after-stage">
+			<section id="fields" class="fields-section">
+				<div class="section-head">
+					<h2>FIELDS — 分野から探す</h2>
+					<a href="/fields/">ALL {fieldsPadded} →</a>
+				</div>
+				<div class="field-list">
+					{
+						fieldRows.map((f) => (
+							<a href="/fields/" class="field-row">
+								<span class="no">{f.no}</span>
+								<span class="major">{f.major}</span>
+								<span class="count">{String(f.count).padStart(3, "0")} 問</span>
+							</a>
+						))
+					}
+				</div>
+			</section>
+
+			<section id="new" class="new-section">
+				<h2>LATEST — 新着問題</h2>
+				<div class="new-list">
+					{
+						recent.length === 0 ? (
+							<p class="empty-note">まだ公開された問題がありません。</p>
+						) : (
+							recent.map((p) => (
+								<a href={`/problems/${p.id}/`} class="new-row">
+									<span class="id">{p.id}</span>
+									<span class="title">{p.title}</span>
+									<span class="pill">
+										{p.field.major} / {p.field.minor}
+									</span>
+									<span class="dots">
+										{difficultyDots(p.difficulty).map((on) => (
+											<span class:list={[{ on }]} />
+										))}
+									</span>
+									<span class="date">{formatDate(p.updated)}</span>
+								</a>
+							))
+						)
+					}
+				</div>
+			</section>
+
+			<footer class="site-footer">
+				<span>© 2026 DIARY — PERSONAL USE ONLY</span>
+				<a href={issueHref} target="_blank" rel="noopener noreferrer">誤植報告 → GITHUB ISSUE</a>
+			</footer>
+		</div>
+
+		<script>
+			// トップページのスクロール駆動演出（design/01_top_scroll.dc.html 相当）。
+			// パーティクルの生成・補間・描画ロジックは site/src/lib/particles/
+			// （#62 の共通エンジン）に完全に委譲し、ここでは
+			// 「スクロール進捗の区間割り当て」「キャプション/固定 UI の DOM 更新」
+			// 「カスタムカーソルの追従」だけを行う。
+			import {
+				ParticleEngine,
+				textShape,
+				curvePoints,
+				randomScatter,
+				upwardScatter,
+				alignSets,
+				segmentProgress,
+				lerpPoint,
+				type SegmentTable,
+			} from "../lib/particles";
+
+			const track = document.getElementById("track") as HTMLDivElement | null;
+			const canvas = document.getElementById("fx") as HTMLCanvasElement | null;
+
+			// モバイル幅ではスクロール演出を出さない（#track は CSS で display:none）。
+			// canvas も動かさず、静的ヒーロー（#mobile-hero）だけを表示する。
+			const isMobile = window.matchMedia("(max-width: 860px)").matches;
+
+			if (canvas && track && !isMobile) {
+				const SEGMENTS: SegmentTable = [
+					[0, 0.14, 0, 1],
+					[0.14, 0.26, 1, 1],
+					[0.26, 0.42, 1, 2],
+					[0.42, 0.56, 2, 2],
+					[0.56, 0.7, 2, 3],
+					[0.7, 0.8, 3, 3],
+					[0.8, 1.001, 3, 4],
+				];
+
+				let sets: ReturnType<typeof alignSets>;
+				let sx: (u: number) => number;
+				let sy: (v: number) => number;
+				let builtKey = "";
+
+				function buildSets(w: number, h: number) {
+					const scatter = randomScatter(2000, w, h);
+					const diary = textShape("Diary", {
+						width: w,
+						height: h,
+						fontPx: Math.min(w * 0.24, 340),
+						centerY: h * 0.42,
+					});
+					// problem 0001 のグラフ: u ∈ [-2.2, 3.2], v ∈ [-1.5, 5.5]
+					// design の pw/L/R 計算を画面幅に対する比で単純化して踏襲する。
+					const L = w > 900 ? w * 0.46 : w * 0.08;
+					const R = w > 900 ? w * 0.98 : w * 0.92;
+					const T = h * 0.16;
+					const B = h * 0.86;
+					sx = (u: number) => L + ((u + 2.2) / 5.4) * (R - L);
+					sy = (v: number) => B - ((v + 1.5) / 7) * (B - T);
+					const graph = curvePoints([
+						{ from: -2.2, to: 3.2, step: 0.018, fn: (u) => ({ x: sx(u), y: sy(u * u) }) },
+						{ from: -2.2, to: 3.2, step: 0.026, fn: (u) => ({ x: sx(u), y: sy(u + 2) }) },
+						{ from: -1.5, to: 5.5, step: 0.09, fn: (v) => ({ x: sx(0), y: sy(v) }) },
+						{ from: -2.2, to: 3.2, step: 0.07, fn: (u) => ({ x: sx(u), y: sy(0) }) },
+					]);
+					const thousand = textShape("1000+", {
+						width: w,
+						height: h,
+						fontPx: Math.min(w * 0.22, 300),
+						centerY: h * 0.44,
+					});
+					const up = upwardScatter(2000, w, h);
+					return alignSets([scatter, diary, graph, thousand, up]);
+				}
+
+				function ensureSets() {
+					const w = window.innerWidth;
+					const h = window.innerHeight;
+					const key = `${w}x${h}`;
+					if (key !== builtKey) {
+						sets = buildSets(w, h);
+						builtKey = key;
+						engine.setParticleCount(sets[0].length);
+					}
+				}
+
+				const engine = new ParticleEngine(canvas, {
+					mouseRepel: { radius: 120, strength: 5 },
+				});
+				if (!engine.reducedMotion) {
+					engine.enableMouseTracking();
+				}
+				ensureSets();
+
+				const c1 = document.getElementById("c1");
+				const c2 = document.getElementById("c2");
+				const c3 = document.getElementById("c3");
+				const c4 = document.getElementById("c4");
+				const scn = document.getElementById("scn");
+				const prog = document.getElementById("prog");
+				const cur = document.getElementById("cur");
+				const curdot = document.getElementById("curdot");
+				let cx = 0;
+				let cy = 0;
+
+				function fade(p: number, a: number, b: number): number {
+					const fi = Math.min(Math.max((p - a) / 0.05, 0), 1);
+					const fo = Math.min(Math.max((b - p) / 0.05, 0), 1);
+					return Math.min(fi, fo);
+				}
+
+				function applyCaption(el: HTMLElement | null, opacity: number) {
+					if (!el) return;
+					el.style.opacity = String(opacity);
+					el.style.transform = `translateY(${(1 - opacity) * 26}px)`;
+					if (el.id === "c4") el.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
+				}
+
+				let currentP = 0;
+
+				function getScrollProgress(): number {
+					if (!track) return 0;
+					const r = track.getBoundingClientRect();
+					const denom = r.height - window.innerHeight;
+					if (denom <= 0) return 1;
+					return Math.min(Math.max(-r.top / denom, 0), 1);
+				}
+
+				engine.start(
+					(i) => {
+						if (engine.reducedMotion) {
+							// 静止形: Diary の文字形（セット 1）で止める。
+							return sets[1][i];
+						}
+						const { from, to, t } = segmentProgress(currentP, SEGMENTS);
+						return lerpPoint(sets[from][i], sets[to][i], t);
+					},
+					(frame) => {
+						if (engine.reducedMotion) return;
+
+						ensureSets();
+						currentP = getScrollProgress();
+						const { from, to, t } = segmentProgress(currentP, SEGMENTS);
+
+						// グラフ（セット 2）が支配的な間だけ、放物線と直線が囲む領域を塗る。
+						let weight = 0;
+						if (from === 2 && to === 2) weight = 1;
+						else if (to === 2) weight = t;
+						else if (from === 2) weight = 1 - t;
+						if (weight > 0.02 && sx && sy) {
+							const ctx = frame.ctx;
+							ctx.save();
+							ctx.globalAlpha = weight * 0.9;
+							ctx.beginPath();
+							ctx.moveTo(sx(-1), sy(1));
+							for (let u = -1; u <= 2.001; u += 0.05) ctx.lineTo(sx(u), sy(u + 2));
+							for (let u = 2; u >= -1.001; u -= 0.05) ctx.lineTo(sx(u), sy(u * u));
+							ctx.closePath();
+							ctx.fillStyle = "rgba(82,224,245,0.13)";
+							ctx.fill();
+							ctx.restore();
+						}
+
+						applyCaption(c1, fade(currentP, -1, 0.13));
+						applyCaption(c2, fade(currentP, 0.3, 0.58));
+						applyCaption(c3, fade(currentP, 0.6, 0.82));
+						applyCaption(c4, currentP > 0.86 ? Math.min((currentP - 0.86) / 0.05, 1) : 0);
+
+						if (scn) {
+							const n =
+								currentP < 0.26 ? 1 : currentP < 0.56 ? 2 : currentP < 0.8 ? 3 : 4;
+							const txt = `0${n} / 04`;
+							if (scn.textContent !== txt) scn.textContent = txt;
+						}
+						if (prog) prog.style.transform = `scaleY(${currentP})`;
+
+						if (cur && curdot) {
+							cx += (frame.mouse.x - cx) * 0.14;
+							cy += (frame.mouse.y - cy) * 0.14;
+							cur.style.transform = `translate(${cx - 17}px,${cy - 17}px)`;
+							curdot.style.transform = `translate(${frame.mouse.x - 3}px,${frame.mouse.y - 3}px)`;
+						}
+					}
+				);
+
+				window.addEventListener("resize", () => {
+					ensureSets();
+				});
 			}
-		</ul>
-		<h2>新着</h2>
-		<ul>
-			{
-				stats.recent.map((p) => (
-					<li>
-						<a href={`/problems/${p.id}/`}>{p.title}</a>
-					</li>
-				))
-			}
-		</ul>
-		<h2>全問題</h2>
-		<ul>
-			{
-				problems.map((p) => (
-					<li>
-						<a href={`/problems/${p.id}/`}>{p.title}</a>
-					</li>
-				))
-			}
-		</ul>
+		</script>
 	</body>
 </html>
