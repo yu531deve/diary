@@ -56,6 +56,19 @@ const WORK_DIR = path.join(DIST_HTML_DIR, ".work");
 
 const MODES = ["problem", "solution"];
 
+// latexmlc の --timeout（秒）。#55 の保険。
+// jlreq.cls.ltxml 導入前は、バインディング欠落時に OmniBus → expl3-code.tex
+// の生解釈へ流れ込み、latexmlc がハングして CI 全体を止めていた
+// （デプロイ run 31141724783 で観測）。jlreq.cls.ltxml によって通常はこの
+// 経路自体を通らなくなるが、将来別の未バインディング・パッケージで同様の
+// ハングが再発した場合に備え、1 問題あたりの上限を明示しておく。
+// 実測: ローカル（brew 版）で図なしの typical な問題1件の変換は数秒程度。
+// TikZ 図の SVG 化は build-html.js 側で別途事前処理されるため、latexmlc
+// 自体はテキスト＋数式のみを処理する。安全率を大きめに取り 120 秒とする
+// （通常時の実測の数十倍。ハング検知が目的であり、日常運用では到達しない
+// 想定の値）。
+const LATEXMLC_TIMEOUT_SEC = 120;
+
 // build-pdf.js と同じ簡易パーサー（meta.yaml は id / status 等の
 // フラットなキーのみを使う想定）。
 function parseSimpleMeta(raw) {
@@ -148,6 +161,7 @@ function convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbac
         "--format=html5",
         "--pmml", // MathML (Presentation) を出力に含める
         "--nodefaultresources",
+        `--timeout=${LATEXMLC_TIMEOUT_SEC}`,
         `--dest=${outPath}`,
         wrapperPath,
       ],
@@ -268,6 +282,52 @@ function main() {
     console.log(`[fallback] PDF 埋め込みフォールバックが発動した問題: ${fallbacks.length} 件`);
     for (const f of fallbacks) {
       console.log(`  ${f.id} (${f.mode}): ${f.reason}`);
+    }
+  }
+
+  // #55 追加要件: 1000 問規模になっても目視に頼らず正常系の劣化に
+  // 気づけるよう、成功件数とフォールバック件数（該当 ID 一覧つき）を
+  // 常に stdout に出力する。convertOne が成功として扱う変換（=通常の
+  // HTML 生成）は generated から fallbacks 分を差し引いて数える
+  // （generated にはフォールバックページのパスも積まれているため）。
+  const successCount = generated.length - fallbacks.length;
+  const fallbackIdList = [...new Set(fallbacks.map((f) => f.id))].sort();
+  const summaryLine = `HTML 変換: 成功 ${successCount} 件 / フォールバック ${fallbacks.length} 件${
+    fallbackIdList.length > 0 ? ` (${fallbackIdList.join(", ")})` : ""
+  }`;
+  console.log("");
+  console.log(summaryLine);
+
+  // CI（GitHub Actions）のジョブサマリにも同じ内容を追記する。
+  // ワークフローファイル自体は変更禁止のため、スクリプト側で
+  // GITHUB_STEP_SUMMARY（Actions が自動的に用意する環境変数。
+  // ローカル実行では未設定）が存在する場合にのみ書き込む。
+  const stepSummaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (stepSummaryPath) {
+    try {
+      const lines = [
+        "",
+        "## HTML 変換サマリ（#55）",
+        "",
+        `- 成功: ${successCount} 件`,
+        `- フォールバック: ${fallbacks.length} 件`,
+      ];
+      if (fallbackIdList.length > 0) {
+        lines.push(`  - 該当 ID: ${fallbackIdList.join(", ")}`);
+        lines.push("");
+        lines.push("| ID | mode | reason |");
+        lines.push("| --- | --- | --- |");
+        for (const f of fallbacks) {
+          lines.push(`| ${f.id} | ${f.mode} | ${f.reason} |`);
+        }
+      }
+      lines.push("");
+      fs.appendFileSync(stepSummaryPath, lines.join("\n") + "\n");
+    } catch (err) {
+      // サマリ書き込みの失敗はビルド自体を止める理由にはしない。
+      console.error(
+        `[warn] GITHUB_STEP_SUMMARY への書き込みに失敗しました: ${err.message}`
+      );
     }
   }
 
