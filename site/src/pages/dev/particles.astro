@@ -1,0 +1,189 @@
+---
+// site/src/pages/dev/particles.astro
+//
+// particles/ 共通エンジンの開発用デモページ。全ターゲット種
+// （テキスト形状 / 曲線点列 / ランダム散乱 / 円周）と、セット間補間・
+// マウス反発・reduced-motion 縮退の動作を目視確認するためのもの。
+// 本番のルーティング（/problems/ /solutions/ /fields/）とは無関係で、
+// issue #62 の受け入れ条件（デモページでの動作確認）のために置く。
+---
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>particles engine demo</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      margin: 0;
+      background: #05060a;
+      color: #eef2f6;
+      font-family: "IBM Plex Mono", monospace;
+    }
+    header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    header h1 {
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      margin: 0;
+      font-weight: 500;
+      color: #7d8794;
+    }
+    button {
+      background: #080a10;
+      color: #dfe6ee;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    button[aria-pressed="true"] {
+      background: #52e0f5;
+      color: #06232a;
+      border-color: #52e0f5;
+    }
+    label {
+      font-size: 12px;
+      color: #aeb6c2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stage {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+    }
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #status {
+      position: absolute;
+      left: 24px;
+      bottom: 16px;
+      font-size: 11px;
+      color: #5c6572;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PARTICLES ENGINE DEMO</h1>
+    <button data-target="scatter" aria-pressed="true">scatter</button>
+    <button data-target="text" aria-pressed="false">text (&quot;Diary&quot;)</button>
+    <button data-target="curve" aria-pressed="false">curve (y=x²)</button>
+    <button data-target="rim" aria-pressed="false">circleRim</button>
+    <label><input type="checkbox" id="mouseRepel" checked /> mouse repel</label>
+    <label><input type="checkbox" id="reducedMotion" /> force reduced-motion</label>
+  </header>
+  <div class="stage">
+    <canvas id="fx"></canvas>
+    <div id="status">loading…</div>
+  </div>
+
+  <script type="module">
+    import {
+      ParticleEngine,
+      textShape,
+      curvePoints,
+      randomScatter,
+      circleRim,
+      alignSets,
+    } from "../../lib/particles/index.ts";
+
+    const canvas = document.getElementById("fx");
+    const statusEl = document.getElementById("status");
+    const mouseRepelBox = document.getElementById("mouseRepel");
+    const reducedMotionBox = document.getElementById("reducedMotion");
+
+    let engine = null;
+    let sets = null;
+    let activeKey = "scatter";
+
+    function buildSets() {
+      const w = canvas.clientWidth || window.innerWidth;
+      const h = canvas.clientHeight || window.innerHeight;
+
+      const scatter = randomScatter(1400, w, h);
+      const text = textShape("Diary", {
+        width: w,
+        height: h,
+        fontPx: Math.min(w * 0.22, 300),
+        centerY: h * 0.46,
+        gap: 6,
+      });
+
+      const sx = (u) => w * 0.5 + u * Math.min(w, h) * 0.16;
+      const sy = (v) => h * 0.68 - v * Math.min(w, h) * 0.16;
+      const curve = curvePoints([
+        { from: -2.4, to: 2.4, step: 0.02, fn: (u) => ({ x: sx(u), y: sy(u * u) }) },
+      ]);
+
+      const rim = circleRim(1400, {
+        cx: w / 2,
+        cy: h / 2,
+        radius: Math.min(w, h) * 0.32,
+        radiusJitter: [0.9, 1.05],
+      });
+
+      return alignSets([scatter, text, curve, rim], 1400);
+    }
+
+    function setActive(key) {
+      activeKey = key;
+      document.querySelectorAll("button[data-target]").forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.target === key));
+      });
+    }
+
+    function targetIndexFor(key) {
+      return { scatter: 0, text: 1, curve: 2, rim: 3 }[key] ?? 0;
+    }
+
+    function start() {
+      if (engine) engine.stop();
+      sets = buildSets();
+
+      engine = new ParticleEngine(canvas, {
+        mouseRepel: mouseRepelBox.checked ? { radius: 120, strength: 5 } : false,
+        reducedMotion: reducedMotionBox.checked ? true : undefined,
+      });
+      if (mouseRepelBox.checked) engine.enableMouseTracking();
+      engine.setParticleCount(sets[0].length);
+
+      statusEl.textContent =
+        `particles: ${sets[0].length} / reducedMotion: ${engine.reducedMotion} / target: ${activeKey}`;
+
+      engine.start((i) => sets[targetIndexFor(activeKey)][i]);
+    }
+
+    document.querySelectorAll("button[data-target]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setActive(btn.dataset.target);
+        start();
+      });
+    });
+    mouseRepelBox.addEventListener("change", start);
+    reducedMotionBox.addEventListener("change", start);
+    window.addEventListener("resize", () => start());
+
+    start();
+  </script>
+</body>
+</html>
