@@ -10,6 +10,16 @@
 %   - \diarytitle{番号}{タイトル} マクロ
 %   - 全ページフッターへのライセンス表記の自動焼き込み
 %     （文言は本ファイル内 1 箇所のみで定義し、無効化コマンドは提供しない）
+% 【#72 で追加したスコープ】
+%   - design/05_pdf_sheets.dc.html の紙面デザイン移植
+%     （余白 20/18/16mm、明朝本文、印刷用シアンのアクセント、
+%      マストヘッド + タイトルブロックのレイアウト、
+%      図版用ハッチングスタイル、解答欄の罫線パターン）
+%   - フォントは design 側の Web フォント（Noto Serif/Sans JP,
+%     IBM Plex Mono, STIX Two Text）が devcontainer に存在しないため、
+%     texlive-full に同梱される原ノ味明朝/ゴシック（HaranoAji、
+%     jlreq の既定 CJK フォント）で代替する。色・余白・罫線・
+%     レイアウト構造は design の指定値をそのまま使う。
 %
 % 使い方:
 %   \documentclass[paper=a4]{jlreq}
@@ -24,12 +34,18 @@
 % を呼んでモードを切り替えてもよい。
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{diary}[2026/08/06 v0.1 Diary common style skeleton]
+\ProvidesPackage{diary}[2026/08/08 v0.2 Diary common style (design 05 port)]
 
 % ---- 依存パッケージ ----
 \RequirePackage{luatexja}
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
+\RequirePackage{xcolor}
+% 余白（design/README.md §5: 20/18/16mm）。jlreq 自体の版面ルーチンは
+% 変えず、geometry で上下左右のマージンだけ上書きする。
+% （マストヘッド・フッターのページ表示はこのマージン内に絶対座標で
+%  描くため、下記の値より少し広めに top / bottom を確保している。）
+\RequirePackage[top=26mm,bottom=28mm,left=18mm,right=18mm]{geometry}
 % atbegshi の \AtBeginShipout（shipout フック）で各ページに直接焼き込む
 % （\pagestyle とは無関係に動作するため、文書側で \pagestyle{empty} 等を
 % 指定してもフッターは消えない）。
@@ -38,11 +54,37 @@
 % （独自の output ルーチンを持つ）と lualatex の組み合わせでは 1 ページ目
 % にしか描画されなかった（jlreq との非互換）。atbegshi 単体は jlreq 配下
 % でも全ページで動作することを確認したため、これを直接使う。
+% マストヘッド・フッターのページ表示（#72 で追加）も同じ atbegshi の
+% 仕組みに乗せる（全ページで安定して描画するため）。
 \RequirePackage{atbegshi}
 % content/ 側の本文で tikzpicture 環境を使えるようにする（#36）。
 % よく使う tikzlibrary のみ読み込む（過剰な追加はしない）。
+% patterns はハッチング（design 05: 図版の被覆部の斜線塗り）用（#72）。
 \RequirePackage{tikz}
-\usetikzlibrary{calc,intersections}
+\usetikzlibrary{calc,intersections,patterns}
+% 解答欄の罫線を繰り返し描くための \foreach（#72）。
+\RequirePackage{pgffor}
+
+% ---- design 05 のカラートークン（PDF 用パレット）----
+% design/README.md §5 の「PDF 用（別パレット）」の値をそのまま定義する。
+\definecolor{diaryink}{HTML}{14161A}       % 本文
+\definecolor{diarysub}{HTML}{3A4048}       % 副文
+\definecolor{diarysub2}{HTML}{4A5058}
+\definecolor{diarymeta}{HTML}{6A7079}      % メタ情報
+\definecolor{diaryfaint}{HTML}{8A9099}     % 極弱
+\definecolor{diaryrule}{HTML}{C8CCD2}      % 罫線
+\definecolor{diaryrulelight}{HTML}{E8EBEF} % 解答欄の罫線
+\definecolor{diaryformulabg}{HTML}{F4F6F8} % 数式ブロック背景
+\definecolor{diaryaccent}{HTML}{0B6F80}    % 印刷用シアン
+\definecolor{diaryaccentbg}{HTML}{EEF7F9}  % アクセント背景
+
+% ---- 書体 ----
+% jlreq の既定 CJK フォント（HaranoAji Mincho/Gothic）をそのまま使う。
+% \mcfamily = 明朝（design 05 の「本文（和文）: Noto Serif JP」役）
+% \gtfamily = ゴシック（design 05 の「PDF UI: Noto Sans JP」役、
+%             ラベル・メタ情報・フッターに使う）
+% 本文全体の既定書体を明朝にする（白地・明朝という design 05 の方針）。
+\renewcommand{\kanjifamilydefault}{\mcdefault}
 
 % ---- モード管理 ----
 % \diary@mode / \diary@problemname / \diary@solutionname は \ifx で
@@ -80,15 +122,137 @@
 }
 
 % \begin{document} の直後に見出しを出したい場合に呼ぶ補助マクロ
+% （#72 以前との互換のため残す。\diarytitle を使う場合は不要）。
 \newcommand{\diaryprintheading}{%
-  {\bfseries\Large \diaryheading}\par\medskip
+  {\gtfamily\bfseries\Large \diaryheading}\par\medskip
+}
+
+% ---- マストヘッド（design 05: 上部の Diary ロゴ + ラベル行）----
+% 全ページに焼き込む。atbegshi の絶対座標配置は jlreq の output
+% ルーチンと衝突しないことを確認済み（ライセンスフッターと同じ手法）。
+% geometry の top=26mm で確保した上部余白の中（紙上端から 8mm の位置）に
+% 置き、本文が始まる位置（26mm）と重ならないようにする。
+\newcommand{\diary@mastheadlabel}{%
+  \ifx\diary@mode\diary@problemname
+    {\color{diarymeta}問題用紙 --- PROBLEM SHEET}%
+  \else
+    {\color{diaryaccent}解答用紙 --- SOLUTION}%
+  \fi
+}
+
+\newcommand{\diary@masthead}{%
+  \begin{minipage}{\dimexpr\paperwidth-36mm\relax}
+    \gtfamily
+    \noindent
+    \makebox[0.62\linewidth][l]{%
+      \raisebox{-0.1em}{\fontsize{15pt}{15pt}\selectfont\bfseries Diary}%
+      \hspace{5mm}%
+      {\fontsize{7.5pt}{7.5pt}\selectfont\color{diarymeta}%
+       SELF-MADE MATHEMATICS}%
+    }%
+    \hfill
+    {\fontsize{8pt}{8pt}\selectfont\diary@mastheadlabel}
+  \end{minipage}%
+  \par\vspace{1.6mm}%
+  \noindent\rule{\dimexpr\paperwidth-36mm\relax}{1pt}%
+}
+
+\AtBeginShipout{%
+  \AtBeginShipoutUpperLeft{%
+    \color{diaryink}%
+    \put(18mm,-8mm){%
+      \diary@masthead
+    }%
+  }%
+}
+
+% ---- フッターのページ表示（design 05: 「0001 — P.1 / 2」相当）----
+% 現行のビルド構成（problem.pdf / solution.pdf を別ファイルとして
+% 生成する）では、design 05 が想定する「1 冊子（問題+解答）を通した
+% 総ページ数」は 1 つの \AtBeginDocument からは分からない。ここでは
+% 「そのファイル自身のページ番号（\thepage）」に代え、design そのままの
+% 総ページ数表示は再現しない（PR 本文に明記する）。
+% ライセンス文言のブロック（\diary@licensefooter, 下記）の 1 行上
+% （紙下端から 2.3cm）に置き、既存のライセンス焼き込み（1.5cm の行）
+% には一切手を触れない。
+\newcommand{\diary@id}{}%
+\newcommand{\diarysetid}[1]{\renewcommand{\diary@id}{#1}}
+
+\AtBeginShipout{%
+  \AtBeginShipoutUpperLeft{%
+    \put(18mm,\dimexpr-\paperheight+2.3cm\relax){%
+      \makebox[\dimexpr\paperwidth-36mm\relax][r]{%
+        \gtfamily\fontsize{7pt}{7pt}\selectfont\color{diarymeta}%
+        \diary@id\ ---\ P.\thepage%
+      }%
+    }%
+  }%
 }
 
 % ---- タイトル表示マクロ ----
-% \diarytitle{問題番号}{タイトル} で「問題 0001　タイトル」のように出力する。
+% \diarytitle{問題番号}{タイトル} で「NO. 0001」の枠 + 大見出しの
+% タイトルブロックを出す（design 05 のヘッダー直下のブロックに相当）。
 % 問題番号は content/ 側の meta.yaml の id をそのまま渡す（振り直し・整形はしない）。
 \newcommand{\diarytitle}[2]{%
-  {\bfseries\Large \diaryheading\ #1\quad #2}\par\medskip
+  \diarysetid{#1}%
+  \vspace{4mm}%
+  \noindent
+  \begin{minipage}[t]{22mm}
+    \centering
+    \fboxsep=3mm\fboxrule=1.1pt
+    \fbox{%
+      \begin{minipage}[c][14mm][c]{14mm}
+        \centering
+        {\gtfamily\fontsize{6.5pt}{6.5pt}\selectfont\color{diarymeta}NO.}\\[1mm]
+        {\fontsize{15pt}{15pt}\selectfont\bfseries #1}
+      \end{minipage}%
+    }
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{\dimexpr\linewidth-26mm\relax}
+    {\gtfamily\bfseries\fontsize{16pt}{22pt}\selectfont #2}\par
+  \end{minipage}%
+  \par\vspace{6mm}%
+}
+
+% ---- 図版のハッチングスタイル（design 05: 被覆部の斜線塗り）----
+% content/ 側の tikzpicture から使えるよう、パターン適用済みの
+% tikz style を用意する（既存問題の .tex は書き換えないため、新規の
+% 図から任意に使えるようにするだけの提供に留める）。
+\tikzset{
+  diaryhatch/.style={
+    pattern=north east lines,
+    pattern color=diaryaccent!55!white
+  },
+  diaryregion/.style={
+    fill=diaryaccentbg,
+    draw=none
+  }
+}
+
+% ---- 解答欄（design 05: 罫線パターンの解答スペース）----
+% 問題モードのみ、本文末尾（\end{document} 直前）に自動で挿入する。
+% content/ 側の problem.tex には解答欄のマークアップを持たせない方針
+% （執筆規約に反しない）ため、sty 側でページ末に固定本数の横罫線を描く。
+\newcommand{\diary@answerlinecount}{7}
+\newcommand{\diary@answerlineskip}{9.6mm}
+
+\newcommand{\diary@answerarea}{%
+  \par\vspace{6mm}%
+  \noindent{\gtfamily\fontsize{8pt}{8pt}\selectfont\color{diarymeta}解答欄}\par
+  \vspace{1mm}%
+  \noindent\rule{\linewidth}{0.4pt}\vspace{2mm}\par
+  \noindent
+  \foreach \n in {1,...,\diary@answerlinecount}{%
+    \rule[0pt]{0pt}{\diary@answerlineskip}%
+    \leavevmode\leaders\hrule height0.4pt\hfill\kern0pt\\%
+  }%
+}
+
+\AtEndDocument{%
+  \ifx\diary@mode\diary@problemname
+    \diary@answerarea
+  \fi
 }
 
 % ---- ライセンスフッター ----
