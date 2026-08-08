@@ -18,6 +18,10 @@
 // 前後ナビは #61 の listPublishedProblems()（id 昇順）から算出する。
 // 数値のハードコード禁止（design/README.md 実装時の注意 6）: PROBLEMS 数・
 // 難易度ラベル等はすべて実データ（meta.yaml / docs/difficulty.md）に基づく。
+//
+// 関連問題セクション（#109）: computeRelatedProblems（site-data.ts）で
+// ビルド時に静的算出する。実行時 fetch は行わない。選定ロジック・
+// 「関連なしならセクション非表示」の担保はそちら側のコメント参照。
 import {
   listPublishedProblems,
   readProblemHtml,
@@ -26,6 +30,7 @@ import {
   DistNotFoundError,
   type ProblemMeta,
 } from "../../../lib/dist-content";
+import { computeRelatedProblems, type RelatedProblem } from "../../../lib/site-data";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
@@ -35,12 +40,18 @@ export async function getStaticPaths() {
       meta,
       prev: i > 0 ? problems[i - 1] : null,
       next: i < problems.length - 1 ? problems[i + 1] : null,
+      related: computeRelatedProblems(meta, problems),
     },
   }));
 }
 
-type Props = { meta: ProblemMeta; prev: ProblemMeta | null; next: ProblemMeta | null };
-const { meta, prev, next } = Astro.props;
+type Props = {
+  meta: ProblemMeta;
+  prev: ProblemMeta | null;
+  next: ProblemMeta | null;
+  related: RelatedProblem[];
+};
+const { meta, prev, next, related } = Astro.props;
 
 let problemHtml;
 try {
@@ -459,6 +470,56 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				background: #fff;
 			}
 
+			/* 関連問題（#109） */
+			.related-section {
+				padding: 40px 48px;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.related-heading {
+				margin: 0 0 20px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.18em;
+				color: #52e0f5;
+			}
+			.related-list {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+				gap: 1px;
+				background: rgba(255, 255, 255, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+			}
+			.related-card {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				padding: 18px 20px;
+				background: #05060a;
+				transition: background 0.2s;
+			}
+			.related-card:hover {
+				background: #0c0f16;
+			}
+			.related-card .related-id {
+				font: 500 12px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.04em;
+			}
+			.related-card .related-title {
+				font-size: 14px;
+				font-weight: 500;
+				line-height: 1.5;
+			}
+			.related-card .related-field {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.04em;
+			}
+			@media (max-width: 900px) {
+				.related-section {
+					padding: 32px 24px;
+				}
+			}
+
 			/* 前後ナビ */
 			.pager {
 				display: flex;
@@ -753,6 +814,25 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				</a>
 			</div>
 		</div>
+
+		{
+			related.length > 0 && (
+				<section class="related-section" aria-label="関連問題">
+					<h2 class="related-heading">RELATED PROBLEMS</h2>
+					<div class="related-list">
+						{related.map((r) => (
+							<a class="related-card" href={`/problems/${r.id}/`}>
+								<span class="related-id">{r.id}</span>
+								<span class="related-title">{r.title}</span>
+								<span class="related-field">
+									{r.field.major} / {r.field.minor}
+								</span>
+							</a>
+						))}
+					</div>
+				</section>
+			)
+		}
 
 		<div class="pager">
 			{
