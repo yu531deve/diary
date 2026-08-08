@@ -40,6 +40,14 @@
 \RequirePackage{luatexja}
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
+% ベクトルの太字イタリック表記 \bm{...} を content/ 側で使えるようにする（#167）。
+% \mathbf は直立体の太字になり、和書のベクトル表記の慣習（太字イタリック）に
+% 反するため不採用（#57 対応。import/ の対角化・最小二乗法・線積分の 3 テーマが
+% \bm を使用しており、diary.sty がこれを読み込まないとビルドできない）。
+% amsmath / amssymb の直後、他パッケージより前に読み込む
+% （bm は数式フォントのボールド化のため amsmath 系との親和性を優先し、
+%  xcolor・geometry・tikz など非数式系パッケージの影響を受けない位置に置く）。
+\RequirePackage{bm}
 \RequirePackage{xcolor}
 % 余白（design/README.md §5: 20/18/16mm）。jlreq 自体の版面ルーチンは
 % 変えず、geometry で上下左右のマージンだけ上書きする。
@@ -85,6 +93,16 @@
 %             ラベル・メタ情報・フッターに使う）
 % 本文全体の既定書体を明朝にする（白地・明朝という design 05 の方針）。
 \renewcommand{\kanjifamilydefault}{\mcdefault}
+
+% ---- 数学記法マクロ ----
+% \rank: \operatorname{rank} の短縮（#128 のレビュー提案、#167 で採用）。
+% 線形代数分野で頻出する演算子で、\operatorname{rank} を毎回書く手間を省く。
+% amsmath の \operatorname を利用するだけで独自の組版ロジックは持たない。
+\newcommand{\rank}{\operatorname{rank}}
+% \dd: 積分の微分要素 \mathrm{d}（直立体）の短縮（#128 のレビュー提案、#167 で採用）。
+% 例: \int_E f \, \dd x。積分は微分積分学に限らず確率統計・偏微分方程式など
+% 全分野の問題に頻出するため、短縮による記述量削減の効果が大きいと判断した。
+\newcommand{\dd}{\mathrm{d}}
 
 % ---- モード管理 ----
 % \diary@mode / \diary@problemname / \diary@solutionname は \ifx で
