@@ -792,10 +792,13 @@ const issueHref =
 			const isMobile = window.matchMedia("(max-width: 860px)").matches;
 
 			if (canvas && track && !isMobile) {
+				// Yu 指示(2026-08-08): 冒頭は「Diary 静止 → 散らばり」の順に変更
+				// (ローディング演出が Diary 収束で終わるため、地続きに見せる)。
+				// 以降(グラフ → 1000+ → 上方拡散)は design/README.md のまま。
 				const SEGMENTS: SegmentTable = [
-					[0, 0.14, 0, 1],
-					[0.14, 0.26, 1, 1],
-					[0.26, 0.42, 1, 2],
+					[0, 0.14, 1, 1],
+					[0.14, 0.26, 1, 0],
+					[0.26, 0.42, 0, 2],
 					[0.42, 0.56, 2, 2],
 					[0.56, 0.7, 2, 3],
 					[0.7, 0.8, 3, 3],
