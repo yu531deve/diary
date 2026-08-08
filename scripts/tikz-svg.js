@@ -89,6 +89,65 @@ function buildStandaloneTex(tikzSource, libraryLines) {
   ].join("\n");
 }
 
+// dvisvgm が出力する SVG は PDF（白地）前提の黒線で、そのままダーク
+// テーマのサイト（背景 #05060a）に置くと視認できない（#82 / #83）。
+// dist/{id}/fig-*.svg は HTML 表示専用の成果物（PDF は scripts/build-pdf.js
+// が別経路で lualatex から直接生成するため、この関数の対象にならない）
+// なので、ここで安全に色を書き換えてよい。
+//
+// 変換方式は issue #83 の案 (b)（ビルド時に stroke/fill をダークパレット
+// へ置換）を採用した。理由:
+//   - <img src="fig-N.svg"> として埋め込んでいるため、CSS の currentColor
+//     はページ側の color を継承できない（インライン SVG や <object> ではない）。
+//     そのため CSS フィルタ（#82 の暫定対応）でしか制御できていなかった。
+//   - dvisvgm の出力は色数が少なく（既定線=黒、\fill[red] などの明示色の
+//     み）、正規表現による色値の総当たり置換で十分に安全・決定的に変換できる。
+//   - PDF 用の diary.sty をテーマ変数化する案 (c) は執筆規約に波及するため
+//     別 issue が前提（本 issue のスコープ外）。
+//
+// design/README.md の配色仕様に合わせたパレット:
+//   直線・軸・地の文字（既定の黒） -> rgba(226,236,244,.85) 相当の明色
+//   \fill[red] 等の強調点              -> ダーク背景でも視認できる明るい赤
+const WEB_FOREGROUND = "#e2ecf4"; // rgb(226,236,244) 直線・軸・ラベルの既定色
+const WEB_ACCENT_RED = "#ff6b6b"; // \fill[red] 等の強調点（明るい赤に変換）
+
+// 変換ロジックのバージョン。ロジックを変更したら値を上げること。
+// computeFigureHash に混ぜ込むことで、tikz ソース・プリアンブル・
+// diary.sty に変更がなくても、変換方式が変われば .cache/ の古いエントリ
+// を確実に無効化しキャッシュキーを変える（#83 の要求）。
+const SVG_WEB_COLOR_TRANSFORM_VERSION = "web-color-v1";
+
+// dvisvgm が黒として出力しうる表記ゆれ（16進 3/6 桁・named color）を
+// まとめて一つのパターンにする。
+const BLACK_COLOR_RE = /#000000|#000\b|\bblack\b/gi;
+const RED_COLOR_RE = /#ff0000|#f00\b|\bred\b/gi;
+
+/**
+ * dvisvgm が出力した PDF 前提（黒線）の SVG を、Web のダークテーマで
+ * 視認できる配色に変換する。PDF 側の生成物には一切触れない。
+ *
+ * @param {string} svgContent dvisvgm が出力した生の SVG 文字列
+ * @returns {string} 色変換済みの SVG 文字列
+ */
+function transformSvgColorsForWeb(svgContent) {
+  let result = svgContent
+    .replace(BLACK_COLOR_RE, WEB_FOREGROUND)
+    .replace(RED_COLOR_RE, WEB_ACCENT_RED);
+
+  // dvisvgm は既定色（黒）の要素に明示的な fill/stroke 属性を付けない
+  // ことがある（テキストの <use> 参照など）。ルート <svg> に既定 fill を
+  // 設定し、明示的な色指定を持たない要素はそちらを継承するようにする。
+  result = result.replace(
+    /<svg\b(?![^>]*\sfill=)/,
+    `<svg fill='${WEB_FOREGROUND}'`
+  );
+
+  return (
+    `<!-- diary: HTML 表示専用に色変換済み（issue #83）。PDF 側の図はこの変換の対象外。 -->\n` +
+    result
+  );
+}
+
 function computeFigureHash(tikzSource, libraryLines, styContent) {
   const hash = crypto.createHash("sha256");
   hash.update("tikz:\n");
@@ -97,6 +156,8 @@ function computeFigureHash(tikzSource, libraryLines, styContent) {
   hash.update(libraryLines.join("\n"));
   hash.update("\ndiary.sty:\n");
   hash.update(styContent);
+  hash.update("\nweb-color-transform:\n");
+  hash.update(SVG_WEB_COLOR_TRANSFORM_VERSION);
   return hash.digest("hex");
 }
 
@@ -230,7 +291,11 @@ function buildSvgsForId(id, figures, outDir, workDirBase) {
     try {
       const workDir = path.join(workDirBase, fig.name);
       const rendered = renderSvg(fig.source, libraryLines, workDir, fig.name);
-      fs.copyFileSync(rendered, svgOutPath);
+      // dvisvgm の生出力（PDF 前提の黒線）はここでのみダークテーマ用に
+      // 色変換する。PDF 側は scripts/build-pdf.js が別経路で lualatex
+      // から直接出力するため、この変換の影響を受けない。
+      const rawSvg = fs.readFileSync(rendered, "utf8");
+      fs.writeFileSync(svgOutPath, transformSvgColorsForWeb(rawSvg));
       idCache[fig.name] = { hash };
       built.push(fig.name);
       console.log(`[svg-ok] ${id}/${fig.name} -> ${path.relative(REPO_ROOT, svgOutPath)}`);
@@ -294,5 +359,6 @@ module.exports = {
   extractTikzPictures,
   buildSvgsForId,
   replacePlaceholdersInHtml,
+  transformSvgColorsForWeb,
   PLACEHOLDER_PREFIX,
 };
