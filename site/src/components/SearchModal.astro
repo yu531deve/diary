@@ -112,6 +112,20 @@ const MAX_RESULTS = 50;
 		color: #eef2f6;
 		font-size: 19px;
 		font-family: "Noto Sans JP", system-ui, sans-serif;
+		border-radius: 3px;
+	}
+	/*
+	 * issue #146(#124 a11y 監査): 上の outline: none で入力欄からブラウザ
+	 * デフォルトのフォーカスリングが失われていたが、代替スタイルが無かった。
+	 * キーボード操作時(:focus-visible)にアクセントカラー #52e0f5 の
+	 * box-shadow リングを表示する。モーダル背景 #080a10 に対して
+	 * コントラスト比 12.57:1（非テキスト要素の基準 3:1 を大きく上回る）。
+	 * マウスでの単純クリックでは表示を乱さないよう :focus ではなく
+	 * :focus-visible を使う。
+	 */
+	.search-modal-inputrow input:focus-visible {
+		outline: 2px solid #52e0f5;
+		outline-offset: 2px;
 	}
 	.search-modal-inputrow input::placeholder {
 		color: #4a5361;
