@@ -2,8 +2,8 @@ id: "0001"
 title: "放物線と直線で囲まれた面積"
 status: published
 field:
-  major: "微分積分"
-  minor: "定積分"
+  major: "微分積分学"
+  minor: "一変数の微分積分"
 tags: ["面積"]
 difficulty: 2
 created: 2026-08-06
