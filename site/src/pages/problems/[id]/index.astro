@@ -894,6 +894,17 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 		</div>
 
 		<script>
+			// issue #152: 横スクロールする数式（.ltx_Math）にキーボードフォーカスを
+			// 通す。実際にスクロールが発生している要素にだけ tabindex を振る
+			// （全数式に振るとタブ移動が過剰になるため）。
+			import { markScrollableMath } from "../../../lib/scrollable-math";
+
+			const applyScrollableMath = () => {
+				markScrollableMath(document, ".problem-body .ltx_Math");
+			};
+			applyScrollableMath();
+			window.addEventListener("resize", applyScrollableMath);
+
 			// issue #69: 保存(☆)ボタン。localStorage 任意機能（lib/save-store.ts）。
 			// localStorage が使えない環境では isStorageAvailable() が false を返し、
 			// ボタンは disabled のまま（マークアップ側の既定値）で、他の機能
