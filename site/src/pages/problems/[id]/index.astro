@@ -382,12 +382,13 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			.figure-panel .fig-body img {
 				max-width: 100%;
 				max-height: 100%;
-				/* dvisvgm 産 SVG は PDF 前提の黒線のため、ダーク背景 (#080a10) では
-				   そのままだと視認できない。CSS フィルタで白黒反転してから
-				   青系に色相回転し、design/README.md の図配色（シアン基調）に
-				   近づける。PDF 側の SVG ファイル自体は変更しない（表示側のみ）。
-				   issue #82 の案 1（CSS フィルタ、最小工数）。 */
-				filter: invert(0.92) hue-rotate(180deg);
+				/* #82 の暫定対応（CSS フィルタでの白黒反転 + 色相回転）は
+				   #83 でビルド時の SVG 色変換（scripts/tikz-svg.js の
+				   transformSvgColorsForWeb）に置き換えたため撤去した。
+				   dist/{id}/fig-*.svg は生成時点で既にダークテーマ配色
+				   （既定線を rgba(226,236,244,.85) 相当に、強調点の赤を
+				   明るい赤に変換）になっている。PDF 側の SVG は元の黒線の
+				   まま（scripts/build-pdf.js は別経路のため影響を受けない）。 */
 			}
 			.figure-panel .fig-empty {
 				font-size: 12px;
