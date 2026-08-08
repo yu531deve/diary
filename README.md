@@ -40,6 +40,7 @@ make pdf       # 問題・解答 PDF の差分ビルド
 make html      # HTML 変換(フォールバック込み)
 make build     # 上記すべて + サイトビルド
 make preview   # ローカルプレビュー(http://localhost:4321)
+make check     # CI(.github/workflows/build.yml)と同じ devcontainer イメージで make build を実行し検証(#171)
 ```
 
 運用ルールは [CLAUDE.md](CLAUDE.md)、要件定義は [docs/requirements.md](docs/requirements.md)、難易度基準は [docs/difficulty.md](docs/difficulty.md) を参照。
