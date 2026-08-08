@@ -4,11 +4,10 @@
 // support.js ランタイムは移植せず、DOM 構造・スタイル値だけを読み取って
 // 再実装している（design/README.md 準拠）。
 //
-// - 難易度の定義（5 段階のラベル）は docs/difficulty.md v1.0 の基準（数値の
-//   意味づけ）をベースに、#129（サイト内文言の院試向け更新）で表示文言のみ
-//   大学院入試向けに書き換えている。docs/difficulty.md 側の文言更新は別途
-//   Yu の判断（docs/import-guide.md 参照）。design プロトタイプのサンプル
-//   文言は使わない。
+// - 難易度の定義（5 段階のラベル）は docs/difficulty.md v2.0（#166、知識の深さ ×
+//   発想の要求度の 2 軸）の基準文と一致させている。表示ラベルは基準文の要約であり、
+//   docs/difficulty.md の表を変更した場合はこのラベルも同時に更新すること。
+//   design プロトタイプのサンプル文言は使わない。
 // - ライセンス節は content/LICENSE.md（個人利用のみ許可・再配布/商用利用/
 //   教育機関配布/改変物公開の禁止）と整合させている。
 // - 統計（PROBLEMS / FIELDS / GOAL）は #61 の site-data.ts 経由で実データから
@@ -26,11 +25,11 @@ const problemsPadded = String(stats.problemCount).padStart(4, "0");
 const fieldsPadded = String(stats.fieldCount);
 
 const difficultyLevels = [
-	{ n: 1, label: "教科書の章末レベル。定義が分かっていれば解ける" },
-	{ n: 2, label: "標準的な院試の基礎科目で完答が期待される" },
-	{ n: 3, label: "標準的な院試の専門科目で完答が期待される" },
-	{ n: 4, label: "難関大学院の院試。部分点は取れるが完答は上位層" },
-	{ n: 5, label: "最難関大学院の難問。捨て問判断も戦略のうち" },
+	{ n: 1, label: "学部教養の定義・定理をそのまま当てはめれば解ける" },
+	{ n: 2, label: "学部教養〜専門科目の定石を 1〜2 個、素直に適用すれば解ける" },
+	{ n: 3, label: "標準的な院試の専門科目。複数の定石を自分で組み立てる必要がある" },
+	{ n: 4, label: "発展的・複数分野にまたがる内容。非自明な着眼が要る。上位層でも部分点どまり" },
+	{ n: 5, label: "最難関の院試レベル。複数の非自明な着眼が要る。捨て問判断も戦略のうち" },
 ];
 
 const typoIssueHref =
