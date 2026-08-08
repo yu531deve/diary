@@ -41,24 +41,25 @@ updated: 2026-08-04   # 内容変更時に必ず更新
 - TikZ 図は `problem.tex` / `solution.tex` 内に直接書く。ビルドが自動で SVG 化する
 - 新しいタグ・分野が必要な場合は勝手に辞書へ追加せず、issue を立てる（保護ファイルのため）
 - プリアンブルを書けない（`\usepackage` 禁止）ため、`diary.sty` が読み込む
-  `amsmath` / `amssymb` の範囲内で書く。それ以外のパッケージが要る表記は避け、
+  `amsmath` / `amssymb` / `bm` の範囲内で書く。それ以外のパッケージが要る表記は避け、
   代替が思いつかない場合は issue で相談する
 
-### 大学以降の記法の書き方（`diary.sty` に専用マクロは未定義。標準コマンドを使う）
+### 大学以降の記法の書き方
 
-- **ベクトル**: `\boldsymbol{x}`（amsmath 提供）を使う。矢印表記 `\vec{x}` でもよいが、
-  1 問題内で統一する
+- **ベクトル**: `\bm{x}`（`bm` パッケージ、太字イタリック。#167 で `diary.sty` に追加）を使う。
+  `\boldsymbol{x}`（amsmath 提供）や矢印表記 `\vec{x}` でもよいが、1 問題内で統一する。
+  `\mathbf{x}` は直立体の太字になり和書の慣習に反するため使わない
 - **行列**: `pmatrix` / `bmatrix` 環境（amsmath 提供）を使う。成分表示は
   `A = (a_{ij})_{1 \le i,j \le n}` のように書く
-- **作用素・関数名**: `\det`, `\dim`, `\ker`, `\operatorname{rank}` のように、
-  amsmath 標準の演算子コマンドまたは `\operatorname{...}` を使う（独自定義せず本文内で
-  そのつど `\operatorname{}` を使う）
-- **測度・積分**: ルベーグ積分・測度は `\int_E f \, \mathrm{d}\mu` のように
-  積分変数の直立体（`\mathrm{d}x`）で書く。集合の記法は標準の `\in`, `\subset`,
-  `\mathcal{F}` などで表す
+- **作用素・関数名**: `\det`, `\dim`, `\ker`, `\rank`（`\operatorname{rank}` の短縮。
+  `diary.sty` が提供。#167 で追加）のように、amsmath 標準の演算子コマンドまたは
+  `\operatorname{...}` を使う
+- **測度・積分**: ルベーグ積分・測度は `\int_E f \, \dd \mu` のように積分変数の
+  直立体（`\dd x`。`\mathrm{d}x` の短縮、`diary.sty` が提供。#167 で追加）で書く。
+  集合の記法は標準の `\in`, `\subset`, `\mathcal{F}` などで表す
 - **集合・空間の記号**: 数の集合は `\mathbb{R}`, `\mathbb{C}`, `\mathbb{N}` のように
   `amssymb` の `\mathbb{}` を使う
-- 上記の書き方で表現できない専用マクロ（例: `\rank`, `\vv{}` などの短縮コマンド）が
+- 上記の書き方で表現できない専用マクロ（例: `\vv{}` などの短縮コマンド）が
   欲しい場合は、`diary.sty` を変更せず issue を立てて提案する（本 issue の PR 本文にも
   提案を記載する）
 
