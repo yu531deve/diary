@@ -1,0 +1,27 @@
+\diarytitle{0002}{ベルヌーイ型微分方程式の一般解（1/x^m の形）}
+
+この方程式は $y' + P(x)y = Q(x)y^{n}$ の形（ベルヌーイ型）であり、$u = y^{1-n}$ の置換により線形方程式に帰着できる。
+
+$n = 2$ のベルヌーイ型。両辺を $y^{2}$ で割ると
+\[
+y^{-2}\frac{dy}{dx} + \frac{1}{x}\,y^{-1} = x
+\]
+$u = y^{-1}$ とおくと $\dfrac{du}{dx} = -y^{-2}\dfrac{dy}{dx}$ より
+\[
+-\frac{du}{dx} + \frac{u}{x} = x
+\quad\Longleftrightarrow\quad
+\frac{du}{dx} - \frac{u}{x} = -x
+\]
+積分因子は $\mu = \exp\left(-\displaystyle\int \frac{dx}{x}\right) = \dfrac{1}{x}$ であるから
+\[
+\frac{d}{dx}\left(\frac{u}{x}\right) = -1
+\quad\Longrightarrow\quad
+\frac{u}{x} = -x + C
+\quad\Longrightarrow\quad
+u = Cx - x^{2}
+\]
+$u = y^{-1}$ を戻して
+\[
+\boxed{\; y = \frac{1}{Cx - x^{2}} \;}
+\qquad (C \text{ は任意定数})
+\]
