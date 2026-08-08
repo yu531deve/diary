@@ -1,0 +1,504 @@
+---
+// About ページ /about/（#68 M1-D7: design/02_desktop_screens.dc.html の
+// E 画面「About」を Astro + 素の HTML/CSS/JS に書き直したもの）。
+// support.js ランタイムは移植せず、DOM 構造・スタイル値だけを読み取って
+// 再実装している（design/README.md 準拠）。
+//
+// - 難易度の定義（5 段階のラベル）は docs/difficulty.md v1.0 の文言をそのまま使う
+//   （design プロトタイプのサンプル文言は使わない）。
+// - ライセンス節は content/LICENSE.md（個人利用のみ許可・再配布/商用利用/
+//   教育機関配布/改変物公開の禁止）と整合させている。
+// - 統計（PROBLEMS / FIELDS / GOAL）は #61 の site-data.ts 経由で実データから
+//   算出する。数値のハードコード禁止（design/README.md 実装時の注意 6）。
+// - 「01 作問方針」の文面のみ仮文面。Yu の原稿に差し替え予定（PR 本文に明記）。
+// - このページはヘッダー等の共有コンポーネントを新設せず、/fields/ と同じ方針で
+//   ページ内に閉じた実装にしている（#67 と並行作業中のため）。
+import { computeSiteStats } from "../../lib/site-data";
+
+const stats = computeSiteStats();
+const problemsPadded = String(stats.problemCount).padStart(4, "0");
+const fieldsPadded = String(stats.fieldCount);
+
+const difficultyLevels = [
+	{ n: 1, label: "教科書の章末レベル。定義が分かっていれば解ける" },
+	{ n: 2, label: "共通テスト〜標準私大レベル" },
+	{ n: 3, label: "標準的な国公立二次で完答が期待される" },
+	{ n: 4, label: "難関大二次。部分点は取れるが完答は上位層" },
+	{ n: 5, label: "最難関大の難問。捨て問判断も戦略のうち" },
+];
+
+const typoIssueHref =
+	"https://github.com/yu531deve/diary/issues/new?labels=typo&title=" +
+	encodeURIComponent("[誤植報告] ");
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>About — Diary</title>
+		<meta
+			name="description"
+			content="Diary について。作問方針・難易度の定義・PDF の使い方・ライセンス・誤植報告の案内です。"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&display=swap"
+		/>
+		<style>
+			:root {
+				color-scheme: dark;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				background: #05060a;
+				color: #eef2f6;
+				font-family:
+					"Noto Sans JP",
+					system-ui,
+					sans-serif;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			::selection {
+				background: #52e0f5;
+				color: #05060a;
+			}
+
+			.page {
+				max-width: 1440px;
+				margin: 0 auto;
+			}
+
+			/* ヘッダー */
+			.site-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 22px 48px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+			}
+			.site-header .brand {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+			.site-header .brand .logo {
+				font: 700 19px "Space Grotesk", sans-serif;
+			}
+			.site-header .brand .tagline {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.site-nav {
+				display: flex;
+				align-items: center;
+				gap: 30px;
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+			.site-nav a {
+				white-space: nowrap;
+			}
+			.site-nav a.active {
+				color: #52e0f5;
+			}
+			.site-nav .search-chip {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 7px 14px;
+				border: 1px solid rgba(255, 255, 255, 0.14);
+				border-radius: 999px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+			}
+			.site-nav .search-chip kbd {
+				color: #4a5361;
+				font: inherit;
+			}
+
+			/* ヒーロー */
+			.hero {
+				padding: 80px 48px 40px;
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+			}
+			.hero .label {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #52e0f5;
+			}
+			.hero h1 {
+				margin: 0;
+				font-size: 72px;
+				font-weight: 900;
+				line-height: 1.12;
+				letter-spacing: 0.01em;
+				max-width: 900px;
+				text-wrap: pretty;
+			}
+			.hero p {
+				margin: 0;
+				max-width: 620px;
+				font-size: 16px;
+				line-height: 2.1;
+				color: #aeb6c2;
+			}
+
+			/* 3 カラム / 2 カラム 共通 */
+			.section-no {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.22em;
+				color: #52e0f5;
+			}
+			.col-body {
+				margin: 0;
+				font-size: 15px;
+				line-height: 2.1;
+				color: #c3ccd8;
+			}
+			.tentative {
+				display: inline-block;
+				margin-top: 4px;
+				font: 400 10px "IBM Plex Mono", monospace;
+				letter-spacing: 0.1em;
+				color: #7d8794;
+			}
+
+			.cols-3 {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+			}
+			.cols-3 > div,
+			.cols-2 > div {
+				display: flex;
+				flex-direction: column;
+				gap: 24px;
+				padding: 44px 48px;
+				border-right: 1px solid rgba(255, 255, 255, 0.08);
+			}
+			.cols-3 > div:last-child,
+			.cols-2 > div:last-child {
+				border-right: none;
+			}
+
+			.diff-list {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+			.diff-row {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+			}
+			.diff-dots {
+				display: flex;
+				gap: 4px;
+				flex-shrink: 0;
+			}
+			.diff-dots span {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: #2a3340;
+			}
+			.diff-dots span.on {
+				background: #52e0f5;
+			}
+			.diff-row .diff-label {
+				font-size: 14px;
+				color: #c3ccd8;
+			}
+
+			.pdf-links {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+				background: rgba(255, 255, 255, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				margin-top: auto;
+			}
+			.pdf-links .pdf-row {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 14px 16px;
+				background: #05060a;
+				font-size: 13px;
+				transition: background 0.2s;
+			}
+			.pdf-links .pdf-row .tag {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.14em;
+				flex-shrink: 0;
+			}
+
+			.cols-2 {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+			}
+			.cols-2 > div {
+				gap: 20px;
+			}
+			.report-cta {
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+				padding: 14px 24px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				align-self: flex-start;
+				font-size: 13px;
+				color: #dfe6ee;
+				transition: all 0.2s;
+			}
+			.report-cta:hover {
+				border-color: #52e0f5;
+				color: #52e0f5;
+				opacity: 1;
+			}
+
+			/* 統計 + CTA */
+			.stats-cta {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 52px 48px;
+				flex-wrap: wrap;
+				gap: 24px;
+			}
+			.stats-cta .stats {
+				display: flex;
+				gap: 56px;
+				flex-wrap: wrap;
+			}
+			.stat {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+			.stat .num {
+				font: 500 44px "IBM Plex Mono", monospace;
+				color: #eef2f6;
+			}
+			.stat.accent .num {
+				color: #52e0f5;
+			}
+			.stat .name {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.stats-cta .cta {
+				padding: 16px 34px;
+				background: #52e0f5;
+				color: #06232a;
+				font-weight: 700;
+				font-size: 14px;
+				border-radius: 2px;
+			}
+			.stats-cta .cta:hover {
+				opacity: 0.85;
+			}
+
+			.site-footer {
+				display: flex;
+				justify-content: space-between;
+				padding: 24px 48px;
+				border-top: 1px solid rgba(255, 255, 255, 0.07);
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #4a5361;
+				letter-spacing: 0.1em;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+
+			@media (max-width: 720px) {
+				.site-header {
+					padding: 16px 24px;
+					gap: 12px;
+				}
+				.site-header .brand .tagline {
+					display: none;
+				}
+				.site-nav {
+					gap: 12px;
+					font-size: 12px;
+				}
+				.site-nav .search-chip {
+					padding: 6px 10px;
+				}
+				.site-nav .search-chip span:not(.sr-only) {
+					display: none;
+				}
+				.hero {
+					padding: 40px 24px 28px;
+				}
+				.hero h1 {
+					font-size: 34px;
+					line-height: 1.25;
+				}
+				.hero p {
+					font-size: 14px;
+					line-height: 1.9;
+				}
+				.cols-3,
+				.cols-2 {
+					grid-template-columns: 1fr;
+				}
+				.cols-3 > div,
+				.cols-2 > div {
+					padding: 32px 24px;
+					border-right: none;
+					border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				}
+				.cols-3 > div:last-child,
+				.cols-2 > div:last-child {
+					border-bottom: none;
+				}
+				.stats-cta {
+					padding: 36px 24px;
+					flex-direction: column;
+					align-items: flex-start;
+				}
+				.stats-cta .stats {
+					gap: 32px;
+				}
+				.stat .num {
+					font-size: 32px;
+				}
+				.stats-cta .cta {
+					width: 100%;
+					text-align: center;
+				}
+				.site-footer {
+					padding: 20px 24px;
+					flex-direction: column;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page">
+			<header class="site-header">
+				<div class="brand">
+					<span class="logo">Diary</span>
+					<span class="tagline">SELF-MADE MATHEMATICS</span>
+				</div>
+				<nav class="site-nav">
+					<a href="/fields/">分野</a>
+					<a href="/#new">新着</a>
+					<a href="/about/" class="active">About</a>
+					<span class="search-chip">検索<kbd>⌘K</kbd></span>
+				</nav>
+			</header>
+
+			<section class="hero">
+				<span class="label">ABOUT</span>
+				<h1>解く価値のある一問を、<br />毎日つくる。</h1>
+				<p>
+					Diary は、大学入試数学の問題を自作して公開する個人サイトです。過去問の転載は一切なく、掲載しているすべての問題は自作。Web
+					で読み、PDF で解けます。
+				</p>
+			</section>
+
+			<div class="cols-3">
+				<div>
+					<span class="section-no">01 — 作問方針</span>
+					<p class="col-body">
+						計算量で殴らせない。手が止まる場所が一箇所だけある問題を目指しています。設定は短く、聞くことは明確に。誘導は最小限に留め、(1)
+						が (2) の伏線になる構成を基本形にしています。
+					</p>
+					<span class="tentative">※ 仮文面（Yu が加筆・修正予定）</span>
+				</div>
+				<div>
+					<span class="section-no">02 — 難易度の定義</span>
+					<div class="diff-list">
+						{
+							difficultyLevels.map((d) => (
+								<div class="diff-row">
+									<span class="diff-dots">
+										{Array.from({ length: 5 }, (_, i) => (
+											<span class:list={[{ on: i < d.n }]} />
+										))}
+									</span>
+									<span class="diff-label">{d.label}</span>
+								</div>
+							))
+						}
+					</div>
+				</div>
+				<div>
+					<span class="section-no">03 — PDF の使い方</span>
+					<p class="col-body">
+						各問題ページから「問題（印刷用）」と「問題＋解答」の 2 種類の PDF
+						をダウンロードできます。すべての PDF に個人利用限定のライセンス表記を焼き込んでおり、印刷して書き込みながら解ける紙面設計です。
+					</p>
+					<div class="pdf-links">
+						<div class="pdf-row">
+							<span class="tag">PDF</span>
+							<span>各問題ページの「問題（印刷用）」「問題＋解答」からダウンロード</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="cols-2">
+				<div>
+					<span class="section-no">04 — ライセンス</span>
+					<p class="col-body">
+						問題・解答・解説とそこから生成される PDF・HTML・SVG
+						等の成果物は、個人の学習・演習を目的とした閲覧・ダウンロード・印刷のみ許可しています。再配布、商用利用、学校・塾・予備校等の教育機関での配布、改変物の公開はいずれも禁止です。
+					</p>
+				</div>
+				<div>
+					<span class="section-no">05 — 誤植・不備の報告</span>
+					<p class="col-body">
+						問題文の誤り、解答の不備を見つけたら GitHub Issue でお知らせください。問題番号を添えていただけると助かります。
+					</p>
+					<a class="report-cta" href={typoIssueHref} target="_blank" rel="noopener noreferrer">
+						GitHub Issue を開く →
+					</a>
+				</div>
+			</div>
+
+			<div class="stats-cta">
+				<div class="stats">
+					<div class="stat accent">
+						<span class="num">{problemsPadded}</span>
+						<span class="name">PROBLEMS</span>
+					</div>
+					<div class="stat">
+						<span class="num">{fieldsPadded}</span>
+						<span class="name">FIELDS</span>
+					</div>
+					<div class="stat">
+						<span class="num">1000+</span>
+						<span class="name">GOAL</span>
+					</div>
+				</div>
+				<a class="cta" href="/fields/">分野から探す</a>
+			</div>
+
+			<footer class="site-footer">
+				<span>© 2026 DIARY — PERSONAL USE ONLY</span>
+				<a href={typoIssueHref} target="_blank" rel="noopener noreferrer">誤植報告 → GITHUB ISSUE</a>
+			</footer>
+		</div>
+	</body>
+</html>
