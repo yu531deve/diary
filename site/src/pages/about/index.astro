@@ -16,6 +16,7 @@
 //   ただし ⌘K 検索モーダル（#70）のみ共有コンポーネントとして差し込む。
 import { computeSiteStats } from "../../lib/site-data";
 import SearchModal from "../../components/SearchModal.astro";
+import BottomTabNav from "../../components/BottomTabNav.astro";
 
 const stats = computeSiteStats();
 const problemsPadded = String(stats.problemCount).padStart(4, "0");
@@ -391,6 +392,7 @@ const typoIssueHref =
 				.site-footer {
 					padding: 20px 24px;
 					flex-direction: column;
+					padding-bottom: 90px;
 				}
 			}
 		</style>
@@ -504,5 +506,7 @@ const typoIssueHref =
 				<a href={typoIssueHref} target="_blank" rel="noopener noreferrer">誤植報告 → GITHUB ISSUE</a>
 			</footer>
 		</div>
+
+		<BottomTabNav />
 	</body>
 </html>

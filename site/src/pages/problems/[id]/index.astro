@@ -550,6 +550,71 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 					height: 60vh;
 				}
 			}
+
+			/* ---------- モバイル固定アクションバー(design/03_mobile.dc.html M問題) ---------- */
+			.mobile-action-bar {
+				display: none;
+			}
+			@media (max-width: 860px) {
+				.mobile-action-bar {
+					position: fixed;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					z-index: 200;
+					display: flex;
+					gap: 10px;
+					padding: 14px 24px calc(22px + env(safe-area-inset-bottom, 0px));
+					background: rgba(5, 6, 10, 0.96);
+					border-top: 1px solid rgba(255, 255, 255, 0.1);
+					-webkit-backdrop-filter: blur(12px);
+					backdrop-filter: blur(12px);
+				}
+				.mobile-action-bar .solve-btn {
+					flex: 1;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					height: 52px;
+					background: #52e0f5;
+					color: #06232a;
+					font-weight: 700;
+					font-size: 14px;
+					border-radius: 3px;
+				}
+				.mobile-action-bar .pdf-btn,
+				.mobile-action-bar .save-btn {
+					width: 52px;
+					height: 52px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					border: 1px solid rgba(255, 255, 255, 0.2);
+					border-radius: 3px;
+					color: #aeb6c2;
+					background: none;
+					font-family: inherit;
+					cursor: pointer;
+				}
+				.mobile-action-bar .pdf-btn {
+					font: 400 10px "IBM Plex Mono", monospace;
+				}
+				.mobile-action-bar .save-btn {
+					font-size: 16px;
+				}
+				.mobile-action-bar .save-btn.is-saved {
+					color: #52e0f5;
+					border-color: rgba(82, 224, 245, 0.5);
+				}
+				.mobile-action-bar .save-btn:disabled {
+					opacity: 0.35;
+					cursor: not-allowed;
+				}
+				/* アクションバー分、本文末尾が隠れないように余白を足す */
+				body {
+					padding-bottom: 96px;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -711,5 +776,52 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				)
 			}
 		</div>
+
+		<div class="mobile-action-bar">
+			<a class="solve-btn" href={solutionHref}>解答を見る</a>
+			{
+				pdfAvailable && (
+					<a class="pdf-btn" href={pdfHref} download aria-label="問題PDFをダウンロード">PDF</a>
+				)
+			}
+			<button
+				type="button"
+				class="save-btn"
+				id="mobile-save-btn"
+				data-problem-id={meta.id}
+				aria-pressed="false"
+				aria-label="この問題を保存"
+				disabled
+			>
+				☆
+			</button>
+		</div>
+
+		<script>
+			// issue #69: 保存(☆)ボタン。localStorage 任意機能（lib/save-store.ts）。
+			// localStorage が使えない環境では isStorageAvailable() が false を返し、
+			// ボタンは disabled のまま（マークアップ側の既定値）で、他の機能
+			// （解答を見る・PDF）には一切影響しない。
+			import { isStorageAvailable, isSaved, toggleSaved } from "../../../lib/save-store";
+
+			const btn = document.getElementById("mobile-save-btn") as HTMLButtonElement | null;
+			if (btn) {
+				const id = btn.dataset.problemId ?? "";
+				if (id && isStorageAvailable()) {
+					btn.disabled = false;
+					const sync = () => {
+						const saved = isSaved(id);
+						btn.classList.toggle("is-saved", saved);
+						btn.setAttribute("aria-pressed", saved ? "true" : "false");
+						btn.textContent = saved ? "★" : "☆";
+					};
+					sync();
+					btn.addEventListener("click", () => {
+						toggleSaved(id);
+						sync();
+					});
+				}
+			}
+		</script>
 	</body>
 </html>
