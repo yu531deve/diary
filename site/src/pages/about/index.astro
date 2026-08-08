@@ -4,8 +4,11 @@
 // support.js ランタイムは移植せず、DOM 構造・スタイル値だけを読み取って
 // 再実装している（design/README.md 準拠）。
 //
-// - 難易度の定義（5 段階のラベル）は docs/difficulty.md v1.0 の文言をそのまま使う
-//   （design プロトタイプのサンプル文言は使わない）。
+// - 難易度の定義（5 段階のラベル）は docs/difficulty.md v1.0 の基準（数値の
+//   意味づけ）をベースに、#129（サイト内文言の院試向け更新）で表示文言のみ
+//   大学院入試向けに書き換えている。docs/difficulty.md 側の文言更新は別途
+//   Yu の判断（docs/import-guide.md 参照）。design プロトタイプのサンプル
+//   文言は使わない。
 // - ライセンス節は content/LICENSE.md（個人利用のみ許可・再配布/商用利用/
 //   教育機関配布/改変物公開の禁止）と整合させている。
 // - 統計（PROBLEMS / FIELDS / GOAL）は #61 の site-data.ts 経由で実データから
@@ -24,10 +27,10 @@ const fieldsPadded = String(stats.fieldCount);
 
 const difficultyLevels = [
 	{ n: 1, label: "教科書の章末レベル。定義が分かっていれば解ける" },
-	{ n: 2, label: "共通テスト〜標準私大レベル" },
-	{ n: 3, label: "標準的な国公立二次で完答が期待される" },
-	{ n: 4, label: "難関大二次。部分点は取れるが完答は上位層" },
-	{ n: 5, label: "最難関大の難問。捨て問判断も戦略のうち" },
+	{ n: 2, label: "標準的な院試の基礎科目で完答が期待される" },
+	{ n: 3, label: "標準的な院試の専門科目で完答が期待される" },
+	{ n: 4, label: "難関大学院の院試。部分点は取れるが完答は上位層" },
+	{ n: 5, label: "最難関大学院の難問。捨て問判断も戦略のうち" },
 ];
 
 const typoIssueHref =
@@ -418,7 +421,7 @@ const typoIssueHref =
 				<span class="label">ABOUT</span>
 				<h1>解く価値のある一問を、<br />毎日つくる。</h1>
 				<p>
-					Diary は、大学入試数学の問題を自作して公開する個人サイトです。過去問の転載は一切なく、掲載しているすべての問題は自作。Web
+					Diary は、理工系大学院入試の数学問題を自作して公開する個人サイトです。過去問の転載は一切なく、掲載しているすべての問題は自作。Web
 					で読み、PDF で解けます。
 				</p>
 			</section>
