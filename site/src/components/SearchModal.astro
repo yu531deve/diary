@@ -40,6 +40,10 @@ const MAX_RESULTS = 50;
 				autocomplete="off"
 				spellcheck="false"
 				aria-label="検索クエリ"
+				role="combobox"
+				aria-expanded="true"
+				aria-controls="search-modal-results"
+				aria-autocomplete="list"
 			/>
 			<button type="button" class="esc-key" data-search-close>ESC</button>
 		</div>
@@ -47,7 +51,12 @@ const MAX_RESULTS = 50;
 			<span class="filter-label">FILTER</span>
 			<div class="search-modal-filters" id="search-modal-filters"></div>
 		</div>
-		<div class="search-modal-results" id="search-modal-results"></div>
+		<div
+			class="search-modal-results"
+			id="search-modal-results"
+			role="listbox"
+			aria-label="検索結果"
+		></div>
 		<div class="search-modal-footer">
 			<span>↑↓ 移動 · ↵ 開く</span>
 			<span id="search-modal-count">00 RESULTS</span>
@@ -365,6 +374,7 @@ const MAX_RESULTS = 50;
 			if (visible.length === 0) {
 				resultsEl.innerHTML =
 					'<div class="search-modal-empty">該当する問題が見つかりません。</div>';
+				input.removeAttribute("aria-activedescendant");
 				return;
 			}
 
@@ -372,6 +382,9 @@ const MAX_RESULTS = 50;
 			visible.forEach((entry, i) => {
 				const row = document.createElement("a");
 				row.href = `/problems/${entry.id}/`;
+				row.id = `search-result-option-${i}`;
+				row.setAttribute("role", "option");
+				row.setAttribute("aria-selected", i === activeIndex ? "true" : "false");
 				row.className = "search-result-row" + (i === activeIndex ? " is-active" : "");
 				row.dataset.index = String(i);
 
@@ -410,16 +423,26 @@ const MAX_RESULTS = 50;
 				note.textContent = `他 ${all.length - MAX_RESULTS} 件（上位 ${MAX_RESULTS} 件のみ表示）`;
 				resultsEl.appendChild(note);
 			}
+
+			input.setAttribute("aria-activedescendant", `search-result-option-${activeIndex}`);
 		}
 
+		// ロービングハイライト（#148）: 検索結果は <a> の一覧で、矢印キー操作中も
+		// DOM フォーカスは input に置いたままにする（Enter や文字入力を継続できる
+		// ようにするため）。そのためスクリーンリーダーには CSS クラスだけでは
+		// 現在位置が伝わらない。input に aria-activedescendant を設定し、各行に
+		// id と role="option" を付けて現在アクティブな行を明示する。
 		function updateActiveRow() {
 			const rows = resultsEl.querySelectorAll(".search-result-row");
 			rows.forEach((row) => {
 				const i = Number(row.dataset.index);
-				row.classList.toggle("is-active", i === activeIndex);
+				const isActive = i === activeIndex;
+				row.classList.toggle("is-active", isActive);
+				row.setAttribute("aria-selected", isActive ? "true" : "false");
 			});
 			const activeRow = rows[activeIndex];
 			if (activeRow) activeRow.scrollIntoView({ block: "nearest" });
+			input.setAttribute("aria-activedescendant", `search-result-option-${activeIndex}`);
 		}
 
 		function open() {
@@ -452,6 +475,43 @@ const MAX_RESULTS = 50;
 			else close();
 		}
 
+		// フォーカストラップ（#124 a11y 監査 / #148）: aria-modal="true" にふさわしく
+		// Tab / Shift+Tab をモーダル内の先頭・末尾の要素で折り返す。フォーカス可能な
+		// 要素は検索結果の増減（フィルタ・入力）で毎回変わるため、Tab のたびに
+		// 動的に取得する。
+		const modal = root.querySelector(".search-modal");
+
+		function getFocusable() {
+			if (!modal) return [];
+			return Array.from(
+				modal.querySelectorAll('input, button, a[href]')
+			).filter(
+				(el) =>
+					!el.hasAttribute("disabled") &&
+					el.tabIndex !== -1 &&
+					el.offsetParent !== null
+			);
+		}
+
+		function handleTab(e) {
+			const focusable = getFocusable();
+			if (focusable.length === 0) return;
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			const current = document.activeElement;
+			if (e.shiftKey) {
+				if (current === first || !modal?.contains(current)) {
+					e.preventDefault();
+					last.focus();
+				}
+			} else {
+				if (current === last || !modal?.contains(current)) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+		}
+
 		input.addEventListener("input", () => {
 			query = input.value;
 			activeIndex = 0;
@@ -467,6 +527,10 @@ const MAX_RESULTS = 50;
 			if (e.key === "Escape") {
 				e.preventDefault();
 				close();
+				return;
+			}
+			if (e.key === "Tab") {
+				handleTab(e);
 				return;
 			}
 			if (e.key === "ArrowDown") {
