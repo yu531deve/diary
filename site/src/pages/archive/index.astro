@@ -1,0 +1,428 @@
+---
+// 全問題アーカイブページ /archive/（#108）。公開日（meta.yaml の created）
+// 降順の全問題一覧を、年・月区切りで表示する。
+//
+// トップの分野別索引が主構成・時系列は補助という方針（issue #108 背景、
+// Yu 確定 2026-08-07）の「補助」の受け皿。ヘッダー/下部タブへの導線追加は
+// Yu 確認待ちのため、本 PR ではこのページ本体のみを実装し、ナビからの
+// リンクは追加しない（issue #108 の指示どおり）。
+//
+// 実データからの生成: listPublishedProblems()（dist-content.ts、#61 と同じ
+// 経路）で content/ から status: published の問題を読み、created 降順
+// （同値は id 降順）に並べたうえで年・月ごとにグルーピングする。
+// 数値・件数のハードコード禁止（design/README.md 実装時の注意 6 / #61 踏襲）。
+//
+// レイアウト・CSS トークンは /fields/ index.astro に合わせている
+// （新しいスタイル体系を作らない、という依頼どおり）。
+import { listPublishedProblems } from "../../lib/dist-content";
+import type { ProblemMeta } from "../../lib/dist-content";
+import { computeSiteStats } from "../../lib/site-data";
+import SearchModal from "../../components/SearchModal.astro";
+import BottomTabNav from "../../components/BottomTabNav.astro";
+
+const stats = computeSiteStats();
+
+// 公開日として created を使う（updated は内容変更時に更新される値で、
+// 「公開日」の意味には created の方が適切。content/CLAUDE.md 参照）。
+// created が空の問題（不整合データ）は一覧末尾にまとめて出す。
+const problems = [...listPublishedProblems()].sort((a, b) => {
+	if (a.created !== b.created) {
+		if (!a.created) return 1;
+		if (!b.created) return -1;
+		return a.created < b.created ? 1 : -1;
+	}
+	return a.id < b.id ? 1 : -1;
+});
+
+function difficultyDots(difficulty: string): boolean[] {
+	const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
+	return Array.from({ length: 5 }, (_, i) => i < n);
+}
+
+function formatDate(d: string): string {
+	return d ? d.replaceAll("-", ".") : "日付未設定";
+}
+
+type MonthGroup = {
+	key: string;
+	year: string;
+	month: string;
+	items: ProblemMeta[];
+};
+
+// created の年・月でグルーピングする。すでに created 降順に並んでいるので
+// 出現順にグループを作れば年・月も自然に降順になる。created が無い問題は
+// 「日付未設定」グループにまとめる。
+const groups: MonthGroup[] = [];
+for (const p of problems) {
+	const m = p.created.match(/^(\d{4})-(\d{2})/);
+	const key = m ? `${m[1]}-${m[2]}` : "unknown";
+	let group = groups.find((g) => g.key === key);
+	if (!group) {
+		group = m
+			? { key, year: m[1], month: m[2], items: [] }
+			: { key, year: "", month: "", items: [] };
+		groups.push(group);
+	}
+	group.items.push(p);
+}
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>アーカイブ — Diary</title>
+		<meta
+			name="description"
+			content="自作入試数学問題を公開日の新しい順にすべて一覧できます。"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&display=swap"
+		/>
+		<style>
+			:root {
+				color-scheme: dark;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				background: #05060a;
+				color: #eef2f6;
+				font-family:
+					"Noto Sans JP",
+					system-ui,
+					sans-serif;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			::selection {
+				background: #52e0f5;
+				color: #05060a;
+			}
+
+			.page {
+				max-width: 1080px;
+				margin: 0 auto;
+				padding-bottom: 96px;
+			}
+
+			/* ヘッダー */
+			.site-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 22px 48px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+			}
+			.site-header .brand {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+			.site-header .brand .logo {
+				font: 700 19px "Space Grotesk", sans-serif;
+			}
+			.site-header .brand .tagline {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.site-nav {
+				display: flex;
+				align-items: center;
+				gap: 30px;
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+			.site-nav a.active {
+				color: #52e0f5;
+			}
+			.site-nav .search-chip {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 7px 14px;
+				border: 1px solid rgba(255, 255, 255, 0.14);
+				border-radius: 999px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+			}
+			.site-nav .search-chip kbd {
+				color: #4a5361;
+				font: inherit;
+			}
+
+			/* ヒーロー */
+			.hero {
+				display: flex;
+				align-items: flex-end;
+				justify-content: space-between;
+				gap: 24px;
+				padding: 64px 48px 34px;
+				flex-wrap: wrap;
+			}
+			.hero-copy {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+			.hero-copy .label {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #52e0f5;
+			}
+			.hero-copy h1 {
+				margin: 0;
+				font-size: 60px;
+				font-weight: 900;
+				line-height: 1;
+				letter-spacing: 0.01em;
+				text-wrap: pretty;
+			}
+			.hero-copy p {
+				margin: 0;
+				font-size: 14px;
+				line-height: 1.9;
+				color: #7d8794;
+			}
+			.hero-stats {
+				display: flex;
+				gap: 34px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.12em;
+				padding-bottom: 8px;
+			}
+			.hero-stats strong {
+				color: #dfe6ee;
+				font-weight: 500;
+			}
+
+			/* 年・月区切りの時系列リスト */
+			.archive-list {
+				padding: 0 48px 70px;
+				display: flex;
+				flex-direction: column;
+				gap: 44px;
+			}
+			.month-group {
+				display: flex;
+				flex-direction: column;
+			}
+			.month-heading {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+				padding-bottom: 14px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+				margin-bottom: 4px;
+			}
+			.month-heading .year {
+				font: 700 22px "Space Grotesk", sans-serif;
+				color: #eef2f6;
+			}
+			.month-heading .month {
+				font: 400 13px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.1em;
+			}
+			.month-heading .count {
+				margin-left: auto;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+			}
+
+			.problem-row {
+				display: flex;
+				align-items: center;
+				gap: 24px;
+				padding: 16px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.06);
+				transition: padding-left 0.2s;
+			}
+			.problem-row:hover {
+				padding-left: 10px;
+			}
+			.problem-row .id {
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #4a5361;
+				width: 44px;
+				flex-shrink: 0;
+			}
+			.problem-row .title {
+				font-size: 15px;
+				color: #eef2f6;
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+			.problem-row:hover .title {
+				color: #52e0f5;
+			}
+			.problem-row .pill {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 999px;
+				padding: 4px 10px;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+			.problem-row .dots {
+				display: flex;
+				gap: 3px;
+				flex-shrink: 0;
+			}
+			.problem-row .dots span {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: #2a3340;
+			}
+			.problem-row .dots span.on {
+				background: #52e0f5;
+			}
+			.problem-row .date {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				width: 78px;
+				text-align: right;
+				flex-shrink: 0;
+			}
+
+			.empty-note {
+				padding: 0 48px 70px;
+				color: #7d8794;
+				font-size: 14px;
+			}
+
+			@media (max-width: 720px) {
+				.site-header {
+					padding: 16px 24px;
+				}
+				.site-nav {
+					gap: 16px;
+					font-size: 12px;
+				}
+				.site-nav .search-chip span:not(.sr-only) {
+					display: none;
+				}
+				.hero {
+					padding: 40px 24px 24px;
+					align-items: flex-start;
+				}
+				.hero-copy h1 {
+					font-size: 30px;
+					line-height: 1.2;
+				}
+				.hero-stats {
+					gap: 18px;
+					padding-bottom: 0;
+				}
+				.archive-list {
+					padding: 0 24px 96px;
+					gap: 32px;
+				}
+				.empty-note {
+					padding: 0 24px 96px;
+				}
+				.problem-row {
+					flex-wrap: wrap;
+					gap: 8px 14px;
+					padding: 14px 0;
+				}
+				.problem-row .id {
+					width: auto;
+				}
+				.problem-row .title {
+					flex-basis: 100%;
+					order: 1;
+				}
+				.problem-row .date {
+					width: auto;
+					text-align: left;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page">
+			<header class="site-header">
+				<div class="brand">
+					<span class="logo">Diary</span>
+					<span class="tagline">SELF-MADE MATHEMATICS</span>
+				</div>
+				<nav class="site-nav">
+					<a href="/fields/">分野</a>
+					<a href="/">新着</a>
+					<a href="/archive/" class="active">アーカイブ</a>
+					<span class="search-chip" data-search-open
+						>検索<kbd>⌘K</kbd></span
+					>
+				</nav>
+			</header>
+
+			<SearchModal />
+
+			<section class="hero">
+				<div class="hero-copy">
+					<span class="label">ARCHIVE</span>
+					<h1>全問題アーカイブ</h1>
+					<p>公開日の新しい順に、すべての問題を一覧できます。</p>
+				</div>
+				<div class="hero-stats">
+					<span>PROBLEMS <strong>{String(stats.problemCount).padStart(4, "0")}</strong></span>
+				</div>
+			</section>
+
+			{
+				groups.length === 0 ? (
+					<p class="empty-note">まだ公開された問題がありません。</p>
+				) : (
+					<div class="archive-list">
+						{groups.map((g) => (
+							<div class="month-group">
+								<div class="month-heading">
+									{g.year ? (
+										<>
+											<span class="year">{g.year}</span>
+											<span class="month">{g.month} 月</span>
+										</>
+									) : (
+										<span class="year">日付未設定</span>
+									)}
+									<span class="count">{g.items.length} 問</span>
+								</div>
+								{g.items.map((p) => (
+									<a href={`/problems/${p.id}/`} class="problem-row">
+										<span class="id">{p.id}</span>
+										<span class="title">{p.title}</span>
+										<span class="pill">
+											{p.field.major} / {p.field.minor}
+										</span>
+										<span class="dots">
+											{difficultyDots(p.difficulty).map((on) => (
+												<span class:list={[{ on }]} />
+											))}
+										</span>
+										<span class="date">{formatDate(p.created)}</span>
+									</a>
+								))}
+							</div>
+						))}
+					</div>
+				)
+			}
+		</div>
+
+		<BottomTabNav />
+	</body>
+</html>
