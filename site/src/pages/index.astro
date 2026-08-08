@@ -12,6 +12,7 @@
 //   差し替える（#68 で軽量版に差し替え予定。当面はこの静的ヒーローで可）。
 import { computeSiteStats } from "../lib/site-data";
 import LoadingCurtain from "../components/LoadingCurtain.astro";
+import SearchModal from "../components/SearchModal.astro";
 
 const stats = computeSiteStats();
 
@@ -650,9 +651,11 @@ const issueHref =
 				<a href="/fields/">分野</a>
 				<a href="#new">新着</a>
 				<a href="/about/">About</a>
-				<span class="kbd">検索<span>⌘K</span></span>
+				<span class="kbd" data-search-open>検索<span>⌘K</span></span>
 			</div>
 		</nav>
+
+		<SearchModal />
 
 		<div id="cur" aria-hidden="true"></div>
 		<div id="curdot" aria-hidden="true"></div>
