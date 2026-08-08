@@ -1,0 +1,257 @@
+---
+// site/src/pages/save/index.astro
+//
+// issue #69: 保存(☆)タブのページ。localStorage(lib/save-store.ts) に
+// 保存された問題 ID を、既存の検索インデックス（/search-index.json、#61）と
+// 突き合わせて一覧表示する。新しいデータソースは増やさない。
+//
+// localStorage が使えない環境では一覧は「保存機能が使えません」という
+// 案内のみを表示する（他ページ・他機能に影響しない。site/CLAUDE.md 禁止事項
+// 「localStorage 等への依存を前提とした必須機能の実装」を避けるため、
+// この機能自体が任意のブックマークという位置づけ）。
+import BottomTabNav from "../../components/BottomTabNav.astro";
+import SearchModal from "../../components/SearchModal.astro";
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>保存した問題 — Diary</title>
+		<meta name="description" content="保存した問題の一覧です（この端末のブラウザにのみ保存されます）。" />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&display=swap"
+		/>
+		<style>
+			:root {
+				color-scheme: dark;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				background: #05060a;
+				color: #eef2f6;
+				font-family: "Noto Sans JP", system-ui, sans-serif;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			.page {
+				max-width: 900px;
+				margin: 0 auto;
+				padding-bottom: 80px;
+			}
+			.site-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 22px 48px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+			}
+			.brand {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+			.brand strong {
+				font: 700 19px "Space Grotesk", sans-serif;
+			}
+			.brand span {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.site-nav {
+				display: flex;
+				align-items: center;
+				gap: 30px;
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+			.site-nav .search-chip {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 7px 14px;
+				border: 1px solid rgba(255, 255, 255, 0.14);
+				border-radius: 999px;
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				cursor: pointer;
+			}
+			.hero {
+				padding: 56px 48px 28px;
+			}
+			.hero .label {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #52e0f5;
+			}
+			.hero h1 {
+				margin: 12px 0 0;
+				font-size: 44px;
+				font-weight: 900;
+				line-height: 1.2;
+			}
+			.hero p {
+				margin: 14px 0 0;
+				font-size: 14px;
+				line-height: 1.9;
+				color: #7d8794;
+				max-width: 560px;
+			}
+			.save-list {
+				padding: 0 48px;
+				display: flex;
+				flex-direction: column;
+			}
+			.save-row {
+				display: flex;
+				align-items: center;
+				gap: 20px;
+				padding: 20px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.save-list a.save-row:last-child {
+				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.save-row:hover {
+				background: rgba(82, 224, 245, 0.04);
+			}
+			.save-row .id {
+				font: 500 13px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				flex-shrink: 0;
+			}
+			.save-row .title {
+				flex: 1;
+				font-size: 16px;
+				font-weight: 500;
+			}
+			.save-row .meta {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				flex-shrink: 0;
+			}
+			.empty-state,
+			.unavailable-state {
+				padding: 40px 48px 0;
+				color: #7d8794;
+				font-size: 14px;
+				line-height: 1.9;
+			}
+			@media (max-width: 720px) {
+				.site-header {
+					padding: 16px 24px;
+				}
+				.hero {
+					padding: 40px 24px 20px;
+				}
+				.hero h1 {
+					font-size: 28px;
+				}
+				.save-list,
+				.empty-state,
+				.unavailable-state {
+					padding-left: 24px;
+					padding-right: 24px;
+				}
+				.page {
+					padding-bottom: 96px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page">
+			<header class="site-header">
+				<a class="brand" href="/">
+					<strong>Diary</strong>
+					<span>SELF-MADE MATHEMATICS</span>
+				</a>
+				<nav class="site-nav">
+					<a href="/fields/">分野</a>
+					<a href="/about/">About</a>
+					<span class="search-chip" data-search-open>検索⌘K</span>
+				</nav>
+			</header>
+
+			<SearchModal />
+
+			<section class="hero">
+				<span class="label">SAVED</span>
+				<h1>保存した問題</h1>
+				<p>この端末のブラウザ内(localStorage)にのみ保存されます。他の端末とは共有されません。</p>
+			</section>
+
+			<div id="save-list" class="save-list"></div>
+			<p id="save-empty" class="empty-state" hidden>まだ保存した問題がありません。問題ページの ☆ ボタンから保存できます。</p>
+			<p id="save-unavailable" class="unavailable-state" hidden>
+				この端末・ブラウザでは保存機能を利用できません（localStorage が無効になっています）。
+			</p>
+		</div>
+
+		<BottomTabNav active="save" />
+
+		<script>
+			import { isStorageAvailable, listSaved } from "../../lib/save-store";
+
+			async function render() {
+				const listEl = document.getElementById("save-list");
+				const emptyEl = document.getElementById("save-empty");
+				const unavailableEl = document.getElementById("save-unavailable");
+				if (!listEl || !emptyEl || !unavailableEl) return;
+
+				if (!isStorageAvailable()) {
+					unavailableEl.hidden = false;
+					return;
+				}
+
+				const ids = listSaved();
+				if (ids.length === 0) {
+					emptyEl.hidden = false;
+					return;
+				}
+
+				try {
+					const res = await fetch("/search-index.json");
+					if (!res.ok) throw new Error(String(res.status));
+					const index: { id: string; title: string; field: string; sub: string }[] = await res.json();
+					const byId = new Map(index.map((e) => [e.id, e]));
+					const entries = ids.map((id) => byId.get(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
+					if (entries.length === 0) {
+						emptyEl.hidden = false;
+						return;
+					}
+					for (const entry of entries) {
+						const row = document.createElement("a");
+						row.className = "save-row";
+						row.href = `/problems/${entry.id}/`;
+						const no = document.createElement("span");
+						no.className = "id";
+						no.textContent = entry.id;
+						const title = document.createElement("span");
+						title.className = "title";
+						title.textContent = entry.title;
+						const meta = document.createElement("span");
+						meta.className = "meta";
+						meta.textContent = [entry.field, entry.sub].filter(Boolean).join(" / ");
+						row.append(no, title, meta);
+						listEl.appendChild(row);
+					}
+				} catch {
+					emptyEl.hidden = false;
+				}
+			}
+
+			render();
+		</script>
+	</body>
+</html>

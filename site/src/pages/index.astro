@@ -13,6 +13,7 @@
 import { computeSiteStats } from "../lib/site-data";
 import LoadingCurtain from "../components/LoadingCurtain.astro";
 import SearchModal from "../components/SearchModal.astro";
+import BottomTabNav from "../components/BottomTabNav.astro";
 
 const stats = computeSiteStats();
 
@@ -126,6 +127,9 @@ const issueHref =
 				gap: 32px;
 				font-size: 13px;
 				color: #aeb6c2;
+			}
+			.site-nav .links a {
+				white-space: nowrap;
 			}
 			.site-nav .kbd {
 				display: flex;
@@ -379,44 +383,70 @@ const issueHref =
 				color: #52e0f5;
 			}
 
-			/* ---------- モバイル用の静的ヒーロー ---------- */
+			/* ---------- モバイル用の軽量ヒーロー(design/03_mobile.dc.html M トップ) ----------
+			   スクロール駆動ではなく、常に Diary の文字形へ収束・微振動するだけの
+			   軽量パーティクル演出（高さ 376px）。particles/ の共通エンジン（#62）を
+			   使い、ページ側は「Diary の文字形を作って毎フレーム target として返す」
+			   だけを行う（トップのスクロール演出とロジックを共有しない、独立した
+			   軽量版）。 */
 			#mobile-hero {
 				display: none;
-				padding: 140px 24px 90px;
-				text-align: center;
+				flex-direction: column;
+			}
+			#mobile-hero-stage {
+				position: relative;
+				height: 376px;
+				overflow: hidden;
+			}
+			#mobile-hero-fx {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				display: block;
+			}
+			#mobile-hero-caption {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 26px;
+				display: flex;
 				flex-direction: column;
 				align-items: center;
-				gap: 18px;
+				gap: 12px;
+				padding: 0 24px;
 			}
-			#mobile-hero .eyebrow {
-				font: 500 11px "IBM Plex Mono", monospace;
-				letter-spacing: 0.28em;
+			#mobile-hero-caption .eyebrow {
+				font: 500 9px "IBM Plex Mono", monospace;
+				letter-spacing: 0.24em;
 				color: #52e0f5;
+				text-align: center;
 			}
-			#mobile-hero h1 {
+			#mobile-hero-caption p {
 				margin: 0;
-				font-size: 34px;
-				font-weight: 900;
-				line-height: 1.3;
-				text-wrap: pretty;
-			}
-			#mobile-hero p {
-				margin: 0;
-				font-size: 15px;
-				line-height: 1.9;
+				font-size: 14px;
+				font-weight: 500;
 				color: #c3ccd8;
+				text-align: center;
+				line-height: 1.8;
 			}
 			#mobile-hero .stats {
 				display: flex;
-				gap: 24px;
-				margin-top: 8px;
-				font: 400 12px "IBM Plex Mono", monospace;
+				justify-content: space-between;
+				gap: 12px;
+				padding: 14px 24px;
+				border-top: 1px solid rgba(255, 255, 255, 0.08);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				font: 400 10px "IBM Plex Mono", monospace;
 				color: #5c6572;
 				letter-spacing: 0.1em;
 			}
 			#mobile-hero .stats strong {
 				color: #dfe6ee;
 				font-weight: 400;
+			}
+			#mobile-hero .stats .goal strong {
+				color: #52e0f5;
 			}
 
 			/* ---------- スクロール後のセクション ---------- */
@@ -573,6 +603,9 @@ const issueHref =
 				.site-nav {
 					padding: 18px 24px;
 				}
+				.site-nav .brand span {
+					display: none;
+				}
 				.site-nav .links {
 					gap: 16px;
 					font-size: 12px;
@@ -609,6 +642,7 @@ const issueHref =
 				.site-footer {
 					padding: 20px 24px;
 					flex-direction: column;
+					padding-bottom: 90px;
 				}
 			}
 
@@ -707,13 +741,17 @@ const issueHref =
 		</div>
 
 		<div id="mobile-hero">
-			<div class="eyebrow">ORIGINAL ENTRANCE-EXAM MATHEMATICS</div>
-			<h1>自作の入試数学、<br />1000問へ。</h1>
-			<p>解く価値のある一問を。すべての問題は完全自作。<br />ブラウザで読んで、PDF で解く。</p>
+			<div id="mobile-hero-stage">
+				<canvas id="mobile-hero-fx" aria-hidden="true"></canvas>
+				<div id="mobile-hero-caption">
+					<div class="eyebrow">ORIGINAL ENTRANCE-EXAM MATH</div>
+					<p>自作の入試数学、1000問へ。<br />解く価値のある一問を。</p>
+				</div>
+			</div>
 			<div class="stats">
 				<span>PROBLEMS <strong>{problemsPadded}</strong></span>
 				<span>FIELDS <strong>{fieldsPadded}</strong></span>
-				<span>GOAL <strong>1000+</strong></span>
+				<span class="goal">GOAL <strong>1000+</strong></span>
 			</div>
 		</div>
 
@@ -729,7 +767,7 @@ const issueHref =
 							<a href="/fields/" class="field-row">
 								<span class="no">{f.no}</span>
 								<span class="major">{f.major}</span>
-								<span class="count">{String(f.count).padStart(3, "0")} 問</span>
+								<span class="count">{f.count} 問</span>
 							</a>
 						))
 					}
@@ -768,6 +806,8 @@ const issueHref =
 				<a href={issueHref} target="_blank" rel="noopener noreferrer">誤植報告 → GITHUB ISSUE</a>
 			</footer>
 		</div>
+
+		<BottomTabNav active="home" />
 
 		<script>
 			// トップページのスクロール駆動演出（design/01_top_scroll.dc.html 相当）。
@@ -957,6 +997,50 @@ const issueHref =
 
 				window.addEventListener("resize", () => {
 					ensureSets();
+				});
+			}
+
+			// ---------- モバイル軽量ヒーロー(design/03_mobile.dc.html M トップ) ----------
+			// スクロール駆動ではなく、常に「Diary」の文字形へ向けて収束・微振動するだけ。
+			// #62 の共通エンジンをそのまま使い、target を常に textShape("Diary") にする
+			// だけで実装できる（ParticleEngine が追従・微振動を担当するため）。
+			// prefers-reduced-motion: reduce のときは ParticleEngine が自動的に
+			// アニメーションループを開始せず、静止形を 1 回描画するだけになる。
+			const mobileHeroCanvas = document.getElementById("mobile-hero-fx") as HTMLCanvasElement | null;
+			if (mobileHeroCanvas && isMobile) {
+				const mEngine = new ParticleEngine(mobileHeroCanvas, {
+					followLerp: 0.06,
+					wobbleAmp: 0.35,
+				});
+
+				let mDiary: ReturnType<typeof textShape> = [];
+				let mBuiltKey = "";
+
+				function ensureMobileDiary() {
+					const w = mobileHeroCanvas!.clientWidth || window.innerWidth;
+					const h = mobileHeroCanvas!.clientHeight || 376;
+					const key = `${w}x${h}`;
+					if (key !== mBuiltKey) {
+						mDiary = textShape("Diary", {
+							width: w,
+							height: h,
+							fontPx: Math.min(w * 0.34, 130),
+							centerY: h * 0.42,
+							gap: 4,
+						});
+						mBuiltKey = key;
+						mEngine.setParticleCount(mDiary.length);
+					}
+				}
+
+				ensureMobileDiary();
+				mEngine.start((i) => {
+					ensureMobileDiary();
+					return mDiary[i];
+				});
+
+				window.addEventListener("resize", () => {
+					ensureMobileDiary();
 				});
 			}
 		</script>

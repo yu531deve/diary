@@ -597,9 +597,18 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			@media (max-width: 480px) {
 				.answer-body {
 					padding: 22px 18px 26px;
+					/* design/03_mobile.dc.html M解答: モバイルはブラー 8px（デスクトップは 9px） */
+					filter: blur(8px);
+				}
+				.reveal-checkbox:checked ~ .solution-grid .answer-panel .answer-body {
+					filter: blur(0);
 				}
 				.step-panel .step-body {
 					padding: 0 18px 20px;
+				}
+				.reveal-btn {
+					padding: 13px 28px;
+					font-size: 13px;
 				}
 				.fallback-embed {
 					height: 60vh;

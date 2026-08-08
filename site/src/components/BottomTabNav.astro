@@ -1,0 +1,90 @@
+---
+// site/src/components/BottomTabNav.astro
+//
+// issue #69: モバイル下部タブナビ（design/03_mobile.dc.html 共通要素）。
+// ホーム / 分野 / 検索 / 保存 の 4 タブ。モバイル幅（<=860px、他ページの
+// ブレークポイントに合わせる）のみ表示し、デスクトップでは display:none。
+//
+// - 検索タブは新規モーダルを作らず、既存の SearchModal（#70）を
+//   `data-search-open` トリガーとして開く。ページ側で <SearchModal /> を
+//   設置していることが前提（未設置ページでは押しても何も起きないだけで
+//   他機能は壊れない）。
+// - 保存タブは静的リンク /save/。保存機能自体は localStorage 任意機能
+//   （lib/save-store.ts）で、ここでは単なるナビゲーションリンク。
+// - 44px 以上のタップ領域を確保する（各タブ padding 込みで高さ 58px 以上）。
+export interface Props {
+  active?: "home" | "fields" | "save" | null;
+}
+
+const { active = null } = Astro.props;
+---
+
+<nav class="bottom-tab-nav" aria-label="モバイルナビゲーション">
+	<a href="/" class={`tab${active === "home" ? " is-active" : ""}`} aria-current={active === "home" ? "page" : undefined}>
+		<span class="icon" aria-hidden="true">◆</span>
+		<span class="label">ホーム</span>
+	</a>
+	<a href="/fields/" class={`tab${active === "fields" ? " is-active" : ""}`} aria-current={active === "fields" ? "page" : undefined}>
+		<span class="icon" aria-hidden="true">≡</span>
+		<span class="label">分野</span>
+	</a>
+	<button type="button" class="tab" data-search-open aria-haspopup="dialog">
+		<span class="icon" aria-hidden="true">⌕</span>
+		<span class="label">検索</span>
+	</button>
+	<a href="/save/" class={`tab${active === "save" ? " is-active" : ""}`} aria-current={active === "save" ? "page" : undefined}>
+		<span class="icon" aria-hidden="true">☆</span>
+		<span class="label">保存</span>
+	</a>
+</nav>
+
+<style>
+	.bottom-tab-nav {
+		display: none;
+	}
+
+	@media (max-width: 860px) {
+		.bottom-tab-nav {
+			position: fixed;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 200;
+			display: flex;
+			background: rgba(5, 6, 10, 0.94);
+			border-top: 1px solid rgba(255, 255, 255, 0.1);
+			-webkit-backdrop-filter: blur(12px);
+			backdrop-filter: blur(12px);
+			padding-bottom: env(safe-area-inset-bottom, 0);
+		}
+		.bottom-tab-nav .tab {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			padding: 12px 0 24px;
+			min-height: 44px;
+			color: #5c6572;
+			background: none;
+			border: none;
+			font-family: inherit;
+			cursor: pointer;
+			-webkit-tap-highlight-color: transparent;
+		}
+		.bottom-tab-nav .tab .icon {
+			font: 400 15px "IBM Plex Mono", monospace;
+			line-height: 1;
+		}
+		.bottom-tab-nav .tab .label {
+			font-size: 10px;
+		}
+		.bottom-tab-nav .tab.is-active {
+			color: #52e0f5;
+		}
+		.bottom-tab-nav .tab.is-active .label {
+			font-weight: 500;
+		}
+	}
+</style>
