@@ -1,0 +1,388 @@
+---
+// site/src/pages/dev/beta-gamma/index.astro
+//
+// issue #93 のプロトタイプ。既存の面積アニメーション（#62 パーティクルエンジン /
+// トップページの「放物線と直線が囲む面積」演出）を土台に、β関数・Γ関数の
+// 被積分関数とその面積を可視化する。
+//
+// これはプロトタイプであり、配置先（トップのバリエーション / 分野ページの装飾 /
+// 問題ページなど）は未定。本番ページには一切組み込まない。
+---
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>β・Γ関数 面積アニメーション プロトタイプ（dev）</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      margin: 0;
+      background: #05060a;
+      color: #eef2f6;
+      font-family: "IBM Plex Mono", "Hiragino Kaku Gothic ProN", monospace, sans-serif;
+    }
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    header h1 {
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      margin: 0 0 6px;
+      font-weight: 600;
+      color: #eef2f6;
+    }
+    header p {
+      margin: 0;
+      font-size: 12px;
+      color: #7d8794;
+      line-height: 1.6;
+    }
+    header p.warn {
+      color: #f5b452;
+      margin-top: 6px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 0;
+    }
+    @media (max-width: 780px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .stage {
+      position: relative;
+      width: 100%;
+      height: min(70vh, 640px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .panel {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+    }
+    .mode-switch button {
+      flex: 1;
+      background: #0a0c12;
+      color: #dfe6ee;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .mode-switch button[aria-pressed="true"] {
+      background: #52e0f5;
+      color: #06232a;
+      border-color: #52e0f5;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .field label {
+      font-size: 12px;
+      color: #aeb6c2;
+      display: flex;
+      justify-content: space-between;
+    }
+    .field label output {
+      color: #52e0f5;
+      font-weight: 600;
+    }
+    .field input[type="range"] {
+      width: 100%;
+      accent-color: #52e0f5;
+    }
+    .values {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 14px;
+      font-size: 12px;
+      line-height: 1.9;
+      color: #cdd5df;
+    }
+    .values strong {
+      color: #52e0f5;
+    }
+    .values .formula {
+      color: #7d8794;
+      font-size: 11px;
+    }
+    #status {
+      position: absolute;
+      left: 16px;
+      bottom: 12px;
+      font-size: 10px;
+      color: #5c6572;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>dev: β関数・Γ関数 面積アニメーション プロトタイプ（issue #93）</h1>
+    <p>
+      既存パーティクルエンジン（site/src/lib/particles/）とトップ演出の面積塗りを流用。
+      パラメータを動かすと被積分関数の形と面積が変化する様子を確認できる。
+    </p>
+    <p class="warn">これはプロトタイプであり、配置先（トップ / 分野ページ / 問題ページ等）は未定。</p>
+  </header>
+  <div class="layout">
+    <div class="stage">
+      <canvas id="fx"></canvas>
+      <div id="status">loading…</div>
+    </div>
+    <div class="panel">
+      <div class="mode-switch">
+        <button type="button" data-mode="beta" aria-pressed="true">β関数 B(p,q)</button>
+        <button type="button" data-mode="gamma" aria-pressed="false">Γ関数 Γ(s)</button>
+      </div>
+
+      <div id="beta-fields">
+        <div class="field">
+          <label for="p">p <output id="p-out">2.00</output></label>
+          <input type="range" id="p" min="0.5" max="6" step="0.05" value="2" />
+        </div>
+        <div class="field">
+          <label for="q">q <output id="q-out">3.00</output></label>
+          <input type="range" id="q" min="0.5" max="6" step="0.05" value="3" />
+        </div>
+      </div>
+
+      <div id="gamma-fields" style="display:none">
+        <div class="field">
+          <label for="s">s <output id="s-out">3.50</output></label>
+          <input type="range" id="s" min="0.5" max="8" step="0.05" value="3.5" />
+        </div>
+      </div>
+
+      <div class="values" id="values">計算中…</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      ParticleEngine,
+      randomScatter,
+    } from "../../../lib/particles/index.ts";
+    import { gamma, beta, betaIntegrand, gammaIntegrand, verifyMathviz } from "../../../lib/mathviz/gamma.ts";
+
+    // 起動時に一度だけ数値検証をコンソールに出す（PR で数学的正しさを確認した根拠）。
+    console.table(verifyMathviz());
+
+    const canvas = document.getElementById("fx");
+    const statusEl = document.getElementById("status");
+    const valuesEl = document.getElementById("values");
+
+    const modeButtons = document.querySelectorAll(".mode-switch button");
+    const betaFields = document.getElementById("beta-fields");
+    const gammaFields = document.getElementById("gamma-fields");
+
+    const pInput = document.getElementById("p");
+    const qInput = document.getElementById("q");
+    const sInput = document.getElementById("s");
+    const pOut = document.getElementById("p-out");
+    const qOut = document.getElementById("q-out");
+    const sOut = document.getElementById("s-out");
+
+    let mode = "beta"; // "beta" | "gamma"
+
+    const PARTICLE_COUNT = 1600;
+
+    const engine = new ParticleEngine(canvas, {
+      colors: { accentRatio: 0.22 },
+    });
+    engine.setParticleCount(PARTICLE_COUNT, () => ({
+      x: Math.random() * (canvas.clientWidth || window.innerWidth),
+      y: Math.random() * (canvas.clientHeight || window.innerHeight),
+    }));
+
+    /** 現在のモードの被積分関数と描画ドメインを返す。 */
+    function currentIntegrand() {
+      if (mode === "beta") {
+        const p = parseFloat(pInput.value);
+        const q = parseFloat(qInput.value);
+        return {
+          domain: [0, 1],
+          fn: (x) => betaIntegrand(p, q, x),
+          label: `f(x) = x^(p-1) (1-x)^(q-1)`,
+        };
+      }
+      const s = parseFloat(sInput.value);
+      // Γ(s) の裾は s に応じて伸びる。s-1 付近にピークを持つので余裕を見て打ち切る。
+      const xmax = Math.max(10, s * 3 + 6);
+      return {
+        domain: [0, xmax],
+        fn: (x) => gammaIntegrand(s, x),
+        label: `f(x) = x^(s-1) e^(-x)`,
+      };
+    }
+
+    /** 被積分関数の最大値を粗いグリッド探索で求める（矩形サンプリングの上限に使う）。 */
+    function findMax(fn, domain, samples = 400) {
+      const [a, b] = domain;
+      let max = 0;
+      for (let i = 0; i <= samples; i++) {
+        const x = a + ((b - a) * i) / samples;
+        const y = fn(x);
+        if (Number.isFinite(y) && y > max) max = y;
+      }
+      return max || 1;
+    }
+
+    /**
+     * 曲線下の領域に一様分布する点列を棄却サンプリングで作る（面積の可視化）。
+     * 画面座標へは呼び出し側の sx/sy で変換する。
+     */
+    function sampleUnderCurve(fn, domain, count, fMax) {
+      const [a, b] = domain;
+      const pts = [];
+      let guard = 0;
+      while (pts.length < count && guard < count * 200) {
+        guard++;
+        const x = a + Math.random() * (b - a);
+        const y = Math.random() * fMax;
+        if (y <= fn(x)) pts.push({ x, y });
+      }
+      // 収束しなかった分はドメイン内にランダム充填（フェイルセーフ）。
+      while (pts.length < count) {
+        pts.push({ x: a + Math.random() * (b - a), y: 0 });
+      }
+      return pts;
+    }
+
+    let sx = (x) => x;
+    let sy = (y) => y;
+    let targets = [];
+    let curveInfo = null;
+
+    const MARGIN = { top: 40, right: 30, bottom: 46, left: 46 };
+
+    function rebuild() {
+      const w = canvas.clientWidth || window.innerWidth;
+      const h = canvas.clientHeight || window.innerHeight;
+      const { domain, fn, label } = currentIntegrand();
+      const fMax = findMax(fn, domain);
+      const plotW = w - MARGIN.left - MARGIN.right;
+      const plotH = h - MARGIN.top - MARGIN.bottom;
+
+      sx = (x) => MARGIN.left + ((x - domain[0]) / (domain[1] - domain[0])) * plotW;
+      // y=0 を下端、fMax*1.15 を上端にとる（少し余白を持たせる）。
+      sy = (y) => MARGIN.top + plotH - (y / (fMax * 1.15)) * plotH;
+
+      const domainPts = sampleUnderCurve(fn, domain, PARTICLE_COUNT, fMax);
+      targets = domainPts.map((pt) => ({ x: sx(pt.x), y: sy(pt.y) }));
+      curveInfo = { domain, fn, fMax, plotW, plotH };
+
+      updateValues();
+    }
+
+    function updateValues() {
+      if (mode === "beta") {
+        const p = parseFloat(pInput.value);
+        const q = parseFloat(qInput.value);
+        const b = beta(p, q);
+        valuesEl.innerHTML = `
+          B(p,q) = <strong>${b.toFixed(6)}</strong><br />
+          <span class="formula">= Γ(p)Γ(q) / Γ(p+q)</span><br />
+          <span class="formula">Γ(${p.toFixed(2)}) = ${gamma(p).toFixed(6)}, Γ(${q.toFixed(2)}) = ${gamma(q).toFixed(6)}, Γ(${(p + q).toFixed(2)}) = ${gamma(p + q).toFixed(6)}</span>
+        `;
+      } else {
+        const s = parseFloat(sInput.value);
+        valuesEl.innerHTML = `
+          Γ(s) = <strong>${gamma(s).toFixed(6)}</strong><br />
+          <span class="formula">s が正整数なら Γ(s) = (s-1)!</span>
+        `;
+      }
+    }
+
+    function drawAxesAndCurve(frame) {
+      if (!curveInfo) return;
+      const { domain, fn } = curveInfo;
+      const ctx = frame.ctx;
+      const w = frame.width;
+      const h = frame.height;
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.18)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(MARGIN.left, MARGIN.top);
+      ctx.lineTo(MARGIN.left, h - MARGIN.bottom);
+      ctx.lineTo(w - MARGIN.right, h - MARGIN.bottom);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(82,224,245,0.9)";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      const steps = 240;
+      for (let i = 0; i <= steps; i++) {
+        const x = domain[0] + ((domain[1] - domain[0]) * i) / steps;
+        const y = fn(x);
+        const px = sx(x);
+        const py = sy(Number.isFinite(y) ? y : 0);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function setActiveMode(next) {
+      mode = next;
+      modeButtons.forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.mode === next));
+      });
+      betaFields.style.display = next === "beta" ? "" : "none";
+      gammaFields.style.display = next === "gamma" ? "" : "none";
+      rebuild();
+    }
+
+    modeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => setActiveMode(btn.dataset.mode));
+    });
+
+    [pInput, qInput, sInput].forEach((input) => {
+      input.addEventListener("input", () => {
+        pOut.textContent = parseFloat(pInput.value).toFixed(2);
+        qOut.textContent = parseFloat(qInput.value).toFixed(2);
+        sOut.textContent = parseFloat(sInput.value).toFixed(2);
+        rebuild();
+      });
+    });
+    pOut.textContent = parseFloat(pInput.value).toFixed(2);
+    qOut.textContent = parseFloat(qInput.value).toFixed(2);
+    sOut.textContent = parseFloat(sInput.value).toFixed(2);
+
+    rebuild();
+
+    statusEl.textContent = `particles: ${PARTICLE_COUNT} / reducedMotion: ${engine.reducedMotion}`;
+
+    engine.start(
+      (i) => targets[i] ?? { x: 0, y: 0 },
+      (frame) => drawAxesAndCurve(frame),
+    );
+
+    window.addEventListener("resize", () => rebuild());
+  </script>
+</body>
+</html>
