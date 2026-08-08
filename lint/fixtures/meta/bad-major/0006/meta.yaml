@@ -3,7 +3,7 @@ title: "field.major が辞書に無い問題"
 status: draft
 field:
   major: "存在しない分野"
-  minor: "定積分"
+  minor: "一変数の微分積分"
 tags: []
 difficulty: 3
 created: 2026-08-04

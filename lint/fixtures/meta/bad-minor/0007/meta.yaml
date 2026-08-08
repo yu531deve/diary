@@ -2,7 +2,7 @@ id: "0007"
 title: "field.minor が major 配下に無い問題"
 status: draft
 field:
-  major: "微分積分"
+  major: "微分積分学"
   minor: "存在しない中分野"
 tags: []
 difficulty: 3
