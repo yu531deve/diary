@@ -5,20 +5,41 @@
 // 「解く前にうっかり答えが見えてしまう」のを防ぐ段階開示は
 // design/README.md 「C. 解答ページ」節に準拠する:
 //   STEP1 ヒント / STEP2 方針 = 折りたたみパネル
-//   STEP3 解答           = blur(9px) + user-select:none + オーバーレイ
+//   STEP3 解答           = 未開示時は DOM から除去（hidden 属性）+ オーバーレイ
 // 開示状態は保存しない（sessionStorage 等に依存しない。site/CLAUDE.md 禁止）。
 //
-// 実装方式（JS 無し・CSS のみ）:
-//   - STEP1/STEP2 のアコーディオンはネイティブ <details>/<summary> を使う。
-//     開閉のアニメーションは grid-template-rows の 0fr↔1fr トリック
-//     （CSS だけで実現でき、JS もポリフィルも不要）。
-//   - STEP3 のブラー解除はチェックボックスハック（隠し <input type=checkbox> +
-//     <label> ボタン + ~ 兄弟結合子）で実装する。ボタンをクリックすると
-//     チェック状態が変わり、CSS だけで blur(9px)→blur(0) の
-//     transition・オーバーレイの opacity・ANSWER カードの色を同時に切り替える。
-//   - つまり JS を一切使わない。「JS 無効時の noscript 代替」を issue は
-//     要求しているが、この実装は最初から JS に依存しないため noscript は
-//     不要（JS の有無で見た目・挙動が変わらない）。PR 本文にこの判断を明記する。
+// 実装方式（#149 で JS 駆動に変更）:
+//   - STEP1/STEP2 のアコーディオンは引き続きネイティブ <details>/<summary>
+//     （grid-template-rows の 0fr↔1fr トリック、JS 不要）。
+//   - STEP3 は当初チェックボックスハック（隠し <input type=checkbox> + <label> +
+//     ~ 兄弟結合子）+ filter: blur() で実装していたが、#124 の a11y 監査（#149）で
+//     「blur は視覚効果に過ぎず、未開示状態でも .answer-body の答え本文が
+//     DOM 上にそのまま存在し、スクリーンリーダー・リーダーモード・テキスト選択で
+//     読めてしまう」不具合が発覚した。
+//     同じページの ANSWER カード（462 行目付近のコメント参照、#67 起因）は
+//     既に「未開示状態で答えの実体を DOM 上に一切出さない」方式
+//     （revealed 側を hidden にしておき、開示時だけ表示に切り替える）で
+//     対応済みだったため、.answer-body もそれに合わせる。
+//     具体的には .answer-body は初期状態で `hidden` 属性付き・空の div とし、
+//     答え本文（HTML）はサーバー側で base64 エンコードした上で
+//     <script type="application/octet-stream"> に埋め込む（この type は
+//     ブラウザに実行されず、内容はアクセシビリティツリーにも露出しない）。
+//     ANSWER カードは display:none による既存方式のままで統一を保っている。
+//     hidden 属性だけでも読み上げ・選択・視覚表示は防げるが、それだけだと
+//     ビルド成果物の HTML ソースには答えの文章がそのまま残ってしまうため
+//     （#149 の受け入れ条件は「ビルド後の index.html を grep して答え本文が
+//     含まれないこと」を明示的に求めている）、base64 化までを一手ずつ行う。
+//     「解答を表示する」ボタン（<button aria-expanded aria-controls>）
+//     クリック時に最小限の JS でデコードして .answer-body に挿入し、
+//     hidden を外す。
+//   - site/CLAUDE.md は「検索と解答表示トグル以外で重い JS を入れない」と
+//     定めており、解答表示トグルへの JS 使用はそもそも許容されている。
+//     追加した JS は開示ボタンのクリックハンドラ 1 つのみで、ロジックは
+//     base64 デコード・hidden 属性のトグル・aria-expanded の同期・
+//     ANSWER カードの placeholder/revealed 切り替えだけの数十行に留めている。
+//   - JS が無効な環境では base64 データをデコードする手段が無いため、答えは
+//     「常に非表示」側に倒れる（要求どおり、露出はしない）。<noscript> で
+//     その旨を明示するメッセージを表示する。
 //
 // STEP1/STEP2 の原稿:
 //   content/{id}/ には現時点で hint.tex・policy.tex の規約が無く
@@ -92,6 +113,15 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 const bodyHtml = solutionHtml.isFallback ? "" : markFinalAnswerEquations(solutionHtml.bodyHtml);
 // ANSWER カードから本文の答えブロックへ飛ぶためのアンカー ID。
 const answerAnchorId = `answer-body-${meta.id}`;
+// #149: 答え本文を未開示状態の HTML に「答えとして読める形」で出さないため、
+// <script type="application/octet-stream"> に base64 エンコードして埋め込み、
+// 開示ボタンクリック時にのみ JS でデコードして .answer-body に挿入する。
+// hidden 属性だけでも読み上げ・選択・視覚表示は防げるが、それだけだと
+// ページのソース上には答えの文章がそのまま残ってしまう。base64 化することで
+// view-source やビルド成果物の grep でも答えの文面が直接読めない状態にする。
+const bodyHtmlEncoded = solutionHtml.isFallback
+  ? ""
+  : Buffer.from(bodyHtml, "utf-8").toString("base64");
 
 // 関連問題: 同じ大分野（field.major）から、id 昇順で自分以外を最大 2 件。
 const related = allProblems
@@ -282,7 +312,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			.answer-panel .step-head .step-toggle::before {
 				content: "未表示";
 			}
-			.reveal-checkbox:checked ~ .solution-grid .answer-panel .step-head .step-toggle::before {
+			.answer-panel.is-revealed .step-head .step-toggle::before {
 				content: "表示中";
 			}
 			.answer-reveal-wrap {
@@ -294,12 +324,17 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				flex-direction: column;
 				gap: 22px;
 				filter: blur(9px);
-				user-select: none;
 				transition: filter 0.6s ease;
 			}
-			.reveal-checkbox:checked ~ .solution-grid .answer-panel .answer-body {
+			/* hidden 属性が付いている間は答え本文を DOM 上に見せない
+			   （#149）。author スタイルは UA スタイルの [hidden]{display:none}
+			   より優先されてしまうため、.answer-body 側の display:flex を
+			   明示的に上書きする必要がある。 */
+			.answer-body[hidden] {
+				display: none;
+			}
+			.answer-body.is-revealed {
 				filter: blur(0);
-				user-select: text;
 			}
 			.answer-body :global(p),
 			.answer-body :global(.ltx_p) {
@@ -402,7 +437,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				pointer-events: auto;
 				transition: opacity 0.5s;
 			}
-			.reveal-checkbox:checked ~ .solution-grid .answer-panel .answer-overlay {
+			.answer-panel.is-revealed .answer-overlay {
 				opacity: 0;
 				pointer-events: none;
 			}
@@ -420,19 +455,16 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				border-radius: 2px;
 				cursor: pointer;
 				border: none;
+				font-family: inherit;
 				display: inline-block;
 			}
 			.reveal-btn:hover {
 				background: #7ce8f8;
 			}
-			/* チェックボックス本体は非表示（ラベルクリックで操作する） */
-			.reveal-checkbox {
-				position: absolute;
-				width: 1px;
-				height: 1px;
-				overflow: hidden;
-				clip: rect(0 0 0 0);
-				white-space: nowrap;
+			.js-required-notice {
+				margin: 0;
+				font-size: 12px;
+				color: #5c6572;
 			}
 
 			/* 右カラム */
@@ -476,12 +508,12 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			.answer-card .card-value.revealed:hover {
 				color: #7ce8f8;
 			}
-			/* 開示後（STEP3 のチェックボックスと連動。別カラムでも
-			   ~ 兄弟結合子で .solution-grid 経由の子孫セレクタとして繋がる） */
-			.reveal-checkbox:checked ~ .solution-grid .col-side .answer-card .card-value.placeholder {
+			/* 開示後（STEP3 の開示ボタンの JS と連動。#149 でチェックボックス
+			   ハックから <body>.is-revealed クラスの JS トグルに変更） */
+			body.is-revealed .col-side .answer-card .card-value.placeholder {
 				display: none;
 			}
-			.reveal-checkbox:checked ~ .solution-grid .col-side .answer-card .card-value.revealed {
+			body.is-revealed .col-side .answer-card .card-value.revealed {
 				display: block;
 			}
 
@@ -600,7 +632,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 					/* design/03_mobile.dc.html M解答: モバイルはブラー 8px（デスクトップは 9px） */
 					filter: blur(8px);
 				}
-				.reveal-checkbox:checked ~ .solution-grid .answer-panel .answer-body {
+				.answer-body.is-revealed {
 					filter: blur(0);
 				}
 				.step-panel .step-body {
@@ -624,9 +656,6 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			</a>
 			<a class="back-link" href={problemHref}>← 問題に戻る</a>
 		</header>
-
-		{/* STEP3 のブラー解除を制御するチェックボックス（CSS のみ・状態は保存しない） */}
-		<input type="checkbox" id="answer-reveal" class="reveal-checkbox" />
 
 		<div class="solution-grid">
 			<div class="col-main">
@@ -695,10 +724,33 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 									<span class="step-toggle mono" />
 								</div>
 								<div class="answer-reveal-wrap">
-									<div class="answer-body" id={answerAnchorId} set:html={bodyHtml} />
+									{/* #149: 未開示状態では答え本文を平文で DOM に出さない。
+									    hidden 属性の div は空のままにしておき、答え本文は
+									    <script type="application/octet-stream"> に base64 化して
+									    埋め込む（この type はブラウザに実行されず、内容は
+									    アクセシビリティツリーにも露出しない）。開示ボタンが
+									    押されたときだけ JS でデコードして .answer-body に挿入する。 */}
+									<div class="answer-body" id={answerAnchorId} hidden />
+									<script
+										type="application/octet-stream"
+										class="answer-body-data"
+										set:text={bodyHtmlEncoded}
+									/>
 									<div class="answer-overlay">
 										<p>解き終わりましたか？</p>
-										<label class="reveal-btn" for="answer-reveal">解答を表示する</label>
+										<button
+											type="button"
+											class="reveal-btn js-answer-reveal-btn"
+											aria-expanded="false"
+											aria-controls={answerAnchorId}
+										>
+											解答を表示する
+										</button>
+										<noscript>
+											<p class="js-required-notice">
+												解答の表示には JavaScript が必要です。
+											</p>
+										</noscript>
 									</div>
 								</div>
 							</div>
@@ -752,5 +804,47 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				</a>
 			</div>
 		</div>
+
+		{/* #149: STEP3 の開示ボタン用の最小限の JS。site/CLAUDE.md が許容する
+		    「解答表示トグル」の JS であり、追加のライブラリ・状態保存は無い。
+		    base64 化された答え本文のデコード・挿入、hidden 属性のトグル、
+		    aria-expanded の同期、ANSWER カードの placeholder/revealed 切り替えのみを行う。
+		    JS が無効な環境では答え本文は base64 のまま script 要素に留まり、
+		    .answer-body には何も挿入されない ＝ 常に非表示のまま（要求どおり
+		    「表示できない」側に倒れる）。 */}
+		<script>
+			function decodeBase64Utf8(base64: string): string {
+				const binary = atob(base64);
+				const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+				return new TextDecoder().decode(bytes);
+			}
+
+			document.querySelectorAll(".js-answer-reveal-btn").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					const wrap = btn.closest(".answer-reveal-wrap");
+					const panel = btn.closest(".answer-panel");
+					const body = wrap?.querySelector(".answer-body");
+					const dataEl = wrap?.querySelector(".answer-body-data");
+					if (!(body instanceof HTMLElement)) return;
+
+					if (!body.dataset.revealed && dataEl?.textContent) {
+						body.innerHTML = decodeBase64Utf8(dataEl.textContent.trim());
+						body.dataset.revealed = "true";
+						// デコード後は不要になった data アイランドを DOM から除去する。
+						dataEl.remove();
+					}
+
+					body.hidden = false;
+					// hidden を外した直後に is-revealed を付けることで
+					// blur(9px) → blur(0) の transition を発火させる。
+					requestAnimationFrame(() => {
+						body.classList.add("is-revealed");
+					});
+					panel?.classList.add("is-revealed");
+					btn.setAttribute("aria-expanded", "true");
+					document.body.classList.add("is-revealed");
+				});
+			});
+		</script>
 	</body>
 </html>
