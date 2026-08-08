@@ -229,3 +229,105 @@ export function hasSolutionPdf(id: string): boolean {
   assertDistExists();
   return fs.existsSync(path.join(DIST_PDF_DIR, id, "solution.pdf"));
 }
+
+/**
+ * dist/html/{id}/{hint,policy}.html を読む、解答ページの STEP1/STEP2
+ * 用の任意ファイル（#67）。
+ *
+ * content/{id}/ には現時点で hint.tex・policy.tex の原稿規約が存在せず
+ * （content/CLAUDE.md 参照）、scripts/build-html.js も problem/solution
+ * の 2 種類しかビルドしない。つまり今は常に存在しない。
+ * そのため readProblemHtml/readSolutionHtml と異なり「無ければ例外」では
+ * なく null を返す ―― 将来 hint.tex・policy.tex の原稿規約が追加された
+ * 際に、このページ側の変更なしで自動的に STEP1/STEP2 が出せるようにする
+ * ための最小限のフック。原稿が無い問題（現状すべて）は該当 STEP を
+ * 出さない、という #67 の要件はこの null 分岐で自然に満たされる。
+ */
+function readOptionalStepHtml(id: string, mode: "hint" | "policy"): ProblemHtml | null {
+  if (!fs.existsSync(DIST_HTML_DIR)) return null;
+  const htmlPath = path.join(DIST_HTML_DIR, id, `${mode}.html`);
+  if (!fs.existsSync(htmlPath)) return null;
+  const html = fs.readFileSync(htmlPath, "utf-8");
+
+  const isFallback = /<meta\s+name="diary-fallback"/i.test(html);
+  if (isFallback) return null; // STEP1/2 はフォールバック表示に対応しない
+
+  const articleMatch = html.match(
+    /<article[^>]*class="[^"]*ltx_document[^"]*"[^>]*>[\s\S]*?<\/article>/i
+  );
+  const bodyHtml = articleMatch ? articleMatch[0] : "";
+  if (!bodyHtml) return null;
+
+  return { isFallback: false, bodyHtml, fallbackReason: "", figureFiles: [] };
+}
+
+/** dist/html/{id}/hint.html があれば読む。無ければ null（STEP1 を出さない） */
+export function readHintHtml(id: string): ProblemHtml | null {
+  return readOptionalStepHtml(id, "hint");
+}
+
+/** dist/html/{id}/policy.html があれば読む。無ければ null（STEP2 を出さない） */
+export function readPolicyHtml(id: string): ProblemHtml | null {
+  return readOptionalStepHtml(id, "policy");
+}
+
+/**
+ * 解答本文 HTML（LaTeXML 出力）のうち、各 `<li class="ltx_item">`
+ * （enumerate の各設問）ごとに「最後の表示数式」を「答え」とみなし、
+ * `diary-final-equation` クラスを付与する。設問区切りが無い解答では
+ * 文書全体の最後の表示数式を対象にする。
+ *
+ * 原稿側に「これが答え」という印を付ける記法が無いため（content/CLAUDE.md
+ * に規定なし）、design/README.md の意図（各設問の最終結果を
+ * `border-left: 2px solid #52e0f5` で強調する）をヒューリスティックで
+ * 近似する。原稿の書き方に依存する近似であることは PR に明記する。
+ */
+export function markFinalAnswerEquations(html: string): string {
+  if (!html) return html;
+  const liRe = /<li\b[^>]*class="[^"]*ltx_item[^"]*"[^>]*>/g;
+  const liStarts: number[] = [];
+  let liMatch: RegExpExecArray | null;
+  while ((liMatch = liRe.exec(html))) liStarts.push(liMatch.index);
+
+  const chunks: string[] =
+    liStarts.length === 0
+      ? [html]
+      : [html.slice(0, liStarts[0]), ...liStarts.map((start, i) => html.slice(start, liStarts[i + 1] ?? html.length))];
+
+  const tableOpenRe = /<table\s+id="[^"]*"\s+class="ltx_equation ltx_eqn_table">/g;
+  const marked = chunks.map((chunk) => {
+    let last: RegExpExecArray | null = null;
+    let m: RegExpExecArray | null;
+    tableOpenRe.lastIndex = 0;
+    while ((m = tableOpenRe.exec(chunk))) last = m;
+    if (!last) return chunk;
+    const openTag = last[0];
+    const replaced = openTag.replace(
+      'class="ltx_equation ltx_eqn_table"',
+      'class="ltx_equation ltx_eqn_table diary-final-equation"'
+    );
+    return chunk.slice(0, last.index) + replaced + chunk.slice(last.index + openTag.length);
+  });
+
+  return marked.join("");
+}
+
+/**
+ * 解答本文 HTML から、文書全体で最後の表示数式（＝最終的な答え）の
+ * `<math>...</math>` 断片だけを取り出す。右カラムの ANSWER カード用。
+ * 見つからなければ null（カードは開示しても値を表示しない）。
+ */
+export function extractFinalAnswerMath(html: string): string | null {
+  if (!html) return null;
+  const tableRe = /<table\s+id="[^"]*"\s+class="ltx_equation ltx_eqn_table">[\s\S]*?<\/table>/g;
+  let last: RegExpExecArray | null = null;
+  let m: RegExpExecArray | null;
+  while ((m = tableRe.exec(html))) last = m;
+  if (!last) return null;
+
+  const mathRe = /<math\b[\s\S]*?<\/math>/g;
+  let lastMath: RegExpExecArray | null = null;
+  let mm: RegExpExecArray | null;
+  while ((mm = mathRe.exec(last[0]))) lastMath = mm;
+  return lastMath ? lastMath[0] : null;
+}

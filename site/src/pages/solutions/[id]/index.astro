@@ -1,27 +1,47 @@
 ---
-// 解答ページ /solutions/{id}/（#27）。
+// 解答ページ /solutions/{id}/（#27 で仮実装 → #67 で design/02-C の
+// High-fidelity デザインに刷新）。URL は不変条件のため変更しない。
 //
-// dist/html/{id}/solution.html（LaTeXML 出力）の本文を取り込んで表示する。
-// 実装方針は /problems/{id}/（#26）とほぼ同じだが、以下の「ワンクリック
-// ガード」が要件（docs/requirements.md §6、site/CLAUDE.md）:
-//   「問題を解く前にうっかり解答が見える」ことを防ぐため、初期状態では
-//   解答本文を隠し、1 クリックの操作を挟んでから表示する。
+// 「解く前にうっかり答えが見えてしまう」のを防ぐ段階開示は
+// design/README.md 「C. 解答ページ」節に準拠する:
+//   STEP1 ヒント / STEP2 方針 = 折りたたみパネル
+//   STEP3 解答           = blur(9px) + user-select:none + オーバーレイ
+// 開示状態は保存しない（sessionStorage 等に依存しない。site/CLAUDE.md 禁止）。
 //
-// ガード方式として <details>/<summary> を採用する（JS のトグルボタン +
-// display:none ではなく）。理由:
-//   - ブラウザネイティブの開閉機構なので、JS が無効な環境でも
-//     クリックで開閉できる（site/CLAUDE.md の「クライアント JS は
-//     最小限」方針とも合致し、JS 実装・保守コストがゼロ）。
-//   - スクリーンリーダー等の支援技術に対して開閉状態
-//     （aria-expanded 相当）が標準で伝わり、独自 ARIA 実装が不要。
-//   - 「1 クリックで開く」という受け入れ条件をそのまま満たす
-//     （<summary> クリック = 開閉のトグル）。
-// フォールバック（PDF 埋め込み表示）時も同様に <details> の中に埋め込み、
-// 解答 PDF が誤って初期表示されないようにする。
+// 実装方式（JS 無し・CSS のみ）:
+//   - STEP1/STEP2 のアコーディオンはネイティブ <details>/<summary> を使う。
+//     開閉のアニメーションは grid-template-rows の 0fr↔1fr トリック
+//     （CSS だけで実現でき、JS もポリフィルも不要）。
+//   - STEP3 のブラー解除はチェックボックスハック（隠し <input type=checkbox> +
+//     <label> ボタン + ~ 兄弟結合子）で実装する。ボタンをクリックすると
+//     チェック状態が変わり、CSS だけで blur(9px)→blur(0) の
+//     transition・オーバーレイの opacity・ANSWER カードの色を同時に切り替える。
+//   - つまり JS を一切使わない。「JS 無効時の noscript 代替」を issue は
+//     要求しているが、この実装は最初から JS に依存しないため noscript は
+//     不要（JS の有無で見た目・挙動が変わらない）。PR 本文にこの判断を明記する。
+//
+// STEP1/STEP2 の原稿:
+//   content/{id}/ には現時点で hint.tex・policy.tex の規約が無く
+//   （content/CLAUDE.md 参照）、scripts/build-html.js も problem/solution
+//   の 2 種類しかビルドしない。dist-content.ts の readHintHtml/readPolicyHtml
+//   は「無ければ null」を返す設計にしてあるため、原稿が無い問題（現状すべて、
+//   0001 含む）では自動的に STEP1/STEP2 が出ない。将来 hint.tex/policy.tex
+//   の規約が追加された場合もこのページの変更なしで対応できる。
+//
+// 「答え」の視覚強調（border-left 2px #52e0f5）:
+//   LaTeXML 出力には「これが答えである」という印が無いため、
+//   markFinalAnswerEquations() が各設問（<li class="ltx_item">）内の
+//   最後の表示数式をヒューリスティックに「答え」とみなしてクラスを付与する
+//   （dist-content.ts 参照）。原稿の書き方に依存する近似である。
+//   右カラムの ANSWER カードは文書全体で最後の表示数式を表示する。
 import {
   listPublishedProblems,
   readSolutionHtml,
+  readHintHtml,
+  readPolicyHtml,
   hasSolutionPdf,
+  markFinalAnswerEquations,
+  extractFinalAnswerMath,
   DistNotFoundError,
   type ProblemMeta,
 } from "../../../lib/dist-content";
@@ -30,12 +50,12 @@ export async function getStaticPaths() {
   const problems = listPublishedProblems();
   return problems.map((meta) => ({
     params: { id: meta.id },
-    props: { meta },
+    props: { meta, allProblems: problems },
   }));
 }
 
-type Props = { meta: ProblemMeta };
-const { meta } = Astro.props;
+type Props = { meta: ProblemMeta; allProblems: ProblemMeta[] };
+const { meta, allProblems } = Astro.props;
 
 let solutionHtml;
 try {
@@ -50,12 +70,26 @@ try {
   throw e;
 }
 
+const hintHtml = readHintHtml(meta.id);
+const policyHtml = readPolicyHtml(meta.id);
+
 const pdfAvailable = hasSolutionPdf(meta.id);
 const pdfHref = `/solutions/${meta.id}/solution.pdf`;
 const problemHref = `/problems/${meta.id}/`;
 const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeURIComponent(
   `誤植報告: ${meta.id} ${meta.title}（解答）`
 )}`;
+
+const bodyHtml = solutionHtml.isFallback ? "" : markFinalAnswerEquations(solutionHtml.bodyHtml);
+const finalAnswerMath = solutionHtml.isFallback ? null : extractFinalAnswerMath(solutionHtml.bodyHtml);
+
+// 関連問題: 同じ大分野（field.major）から、id 昇順で自分以外を最大 2 件。
+const related = allProblems
+  .filter((p) => p.id !== meta.id && p.field.major && p.field.major === meta.field.major)
+  .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+  .slice(0, 2);
+
+const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 ---
 
 <html lang="ja">
@@ -65,121 +99,483 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<title>解答 | {meta.id} {meta.title} | Diary</title>
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;700&display=swap"
+		/>
 		<style>
 			:root {
-				color-scheme: light dark;
-				font-family: system-ui, sans-serif;
+				color-scheme: dark;
 			}
 			* {
 				box-sizing: border-box;
 			}
 			body {
-				max-width: 42rem;
-				margin: 0 auto;
-				padding: 1.5rem;
-				line-height: 1.7;
+				margin: 0;
+				background: #05060a;
+				color: #dfe6ee;
+				font-family: "Noto Sans JP", system-ui, sans-serif;
+				-webkit-font-smoothing: antialiased;
 				overflow-x: hidden;
 			}
-			header.page-header h1 {
-				font-size: 1.4rem;
-				margin-bottom: 0.25rem;
-			}
-			.meta-line {
-				font-size: 0.85rem;
-				opacity: 0.75;
-				margin: 0 0 1rem;
-			}
-			.meta-line span {
-				margin-right: 0.75rem;
-				display: inline-block;
-			}
-			nav.actions {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				margin: 1.25rem 0;
-			}
-			nav.actions a {
-				display: inline-block;
-				padding: 0.5rem 0.9rem;
-				border: 1px solid currentColor;
-				border-radius: 0.4rem;
-				text-decoration: none;
+			a {
 				color: inherit;
-				font-size: 0.9rem;
+				text-decoration: none;
 			}
-			nav.actions a.primary {
-				font-weight: bold;
+			.mono {
+				font-family: "IBM Plex Mono", monospace;
 			}
-			.guard {
-				border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-				padding-top: 1.25rem;
+
+			/* ヘッダー */
+			.site-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 22px 48px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 			}
-			.guard > summary {
+			.logo {
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+			.logo strong {
+				font: 700 19px "Space Grotesk", sans-serif;
+			}
+			.logo span {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.back-link {
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+			.back-link:hover {
+				color: #52e0f5;
+			}
+
+			/* 本体グリッド */
+			.solution-grid {
+				display: grid;
+				grid-template-columns: 1fr 300px;
+				gap: 64px;
+				padding: 52px 48px 60px;
+			}
+			.col-main {
+				display: flex;
+				flex-direction: column;
+				gap: 28px;
+				max-width: 720px;
+				min-width: 0;
+			}
+			.head-block {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+			.eyebrow {
+				font: 500 11px "IBM Plex Mono", monospace;
+				letter-spacing: 0.3em;
+				color: #52e0f5;
+			}
+			.title-heading {
+				margin: 0;
+				font-size: 38px;
+				font-weight: 900;
+				line-height: 1.35;
+				letter-spacing: 0.01em;
+				text-wrap: pretty;
+			}
+			.lede {
+				margin: 0;
+				font-size: 13px;
+				color: #5c6572;
+			}
+
+			/* STEP パネル共通 */
+			.step-panel {
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				background: #080a10;
+			}
+			.step-panel > summary {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				padding: 20px 26px;
 				cursor: pointer;
-				font-weight: bold;
-				font-size: 1.05rem;
-				padding: 0.9rem 1rem;
-				border: 1px solid currentColor;
-				border-radius: 0.4rem;
 				list-style: none;
+				transition: background 0.2s;
 			}
-			.guard > summary::-webkit-details-marker {
+			.step-panel > summary::-webkit-details-marker {
 				display: none;
 			}
-			.guard > summary::before {
-				content: "▶ ";
+			.step-panel > summary:hover {
+				background: #0c0f16;
 			}
-			.guard[open] > summary::before {
-				content: "▼ ";
+			.step-panel .step-label {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.18em;
 			}
-			.solution-body {
-				margin-top: 1.25rem;
+			.step-panel .step-title {
+				font-size: 16px;
+				font-weight: 700;
 			}
-			.solution-body :global(p),
-			.solution-body :global(.ltx_p) {
-				margin: 0 0 1rem;
+			.step-panel .step-toggle {
+				margin-left: auto;
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #5c6572;
+			}
+			.step-panel .step-toggle::before {
+				content: "開く";
+			}
+			.step-panel[open] .step-toggle::before {
+				content: "閉じる";
+			}
+			/* grid-template-rows 0fr↔1fr トリックで JS 無しの開閉アニメーション */
+			.step-panel .step-body-wrap {
+				display: grid;
+				grid-template-rows: 0fr;
+				transition: grid-template-rows 0.45s ease;
+			}
+			.step-panel[open] .step-body-wrap {
+				grid-template-rows: 1fr;
+			}
+			.step-panel .step-body-inner {
+				overflow: hidden;
+			}
+			.step-panel .step-body {
+				margin: 0;
+				padding: 0 26px 24px;
+				font-size: 16px;
+				line-height: 2;
+				color: #c3ccd8;
+			}
+			.step-panel .step-body :global(math) {
+				font-family: "STIX Two Text", serif;
+			}
+
+			/* STEP3 解答 */
+			.answer-panel {
+				position: relative;
+				border: 1px solid rgba(82, 224, 245, 0.28);
+				background: #080a10;
+			}
+			.answer-panel .step-head {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				padding: 20px 26px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+			}
+			.answer-panel .step-head .step-toggle::before {
+				content: "未表示";
+			}
+			.reveal-checkbox:checked ~ .solution-grid .answer-panel .step-head .step-toggle::before {
+				content: "表示中";
+			}
+			.answer-reveal-wrap {
+				position: relative;
+			}
+			.answer-body {
+				padding: 28px 26px 32px;
+				display: flex;
+				flex-direction: column;
+				gap: 22px;
+				filter: blur(9px);
+				user-select: none;
+				transition: filter 0.6s ease;
+			}
+			.reveal-checkbox:checked ~ .solution-grid .answer-panel .answer-body {
+				filter: blur(0);
+				user-select: text;
+			}
+			.answer-body :global(p),
+			.answer-body :global(.ltx_p) {
+				margin: 0;
+				font-size: 16px;
+				line-height: 2.05;
+				color: #dfe6ee;
 				overflow-wrap: break-word;
 			}
-			.solution-body :global(ol),
-			.solution-body :global(.ltx_enumerate) {
-				padding-left: 1.4rem;
+			.answer-body :global(math),
+			.step-body :global(math) {
+				font-family: "STIX Two Text", serif;
 			}
-			.solution-body :global(img) {
-				max-width: 100%;
-				height: auto;
-				display: block;
-				margin: 1rem auto;
-			}
-			.solution-body :global(math) {
-				max-width: 100%;
-			}
-			.solution-body :global(.ltx_Math) {
+			/* インライン数式（ltx_Math）は個別に横スクロールへ逃がす。
+			   横に長い式が段落中にあってもページ全体は横に伸びない
+			   （problem ページ .problem-body :global(.ltx_Math) と同方針）。 */
+			.answer-body :global(.ltx_Math),
+			.step-body :global(.ltx_Math) {
 				display: inline-block;
 				max-width: 100%;
 				overflow-x: auto;
 				vertical-align: middle;
 			}
+			.answer-body :global(ol),
+			.answer-body :global(.ltx_enumerate) {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 22px;
+			}
+			.answer-body :global(.ltx_enumerate > .ltx_item) {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+			.answer-body :global(.ltx_tag_item) {
+				font: 400 12px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.16em;
+			}
+			.answer-body :global(.ltx_para) {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+			/* 表示数式（途中式） */
+			.answer-body :global(table.ltx_equation) {
+				display: block;
+				width: 100%;
+				max-width: 100%;
+				overflow-x: auto;
+				border-collapse: collapse;
+				background: rgba(255, 255, 255, 0.03);
+				padding: 18px 22px;
+				font-family: "STIX Two Text", serif;
+				font-style: italic;
+				font-size: 19px;
+				line-height: 2;
+			}
+			.answer-body :global(table.ltx_equation tbody),
+			.answer-body :global(table.ltx_equation tr) {
+				display: block;
+			}
+			.answer-body :global(table.ltx_equation td) {
+				display: inline-block;
+				padding: 0;
+				white-space: nowrap;
+			}
+			.answer-body :global(math) {
+				max-width: 100%;
+			}
+			.step-body :global(table.ltx_equation) {
+				display: block;
+				max-width: 100%;
+				overflow-x: auto;
+			}
+			/* 各設問の最終結果 ―― 「答え」の視覚記号（design/README.md C 節） */
+			.answer-body :global(table.diary-final-equation) {
+				background: rgba(82, 224, 245, 0.07);
+				border-left: 2px solid #52e0f5;
+				font-size: 20px;
+			}
+			.answer-body :global(hr) {
+				border: none;
+				height: 1px;
+				background: rgba(255, 255, 255, 0.08);
+			}
+			.answer-overlay {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 18px;
+				background: rgba(5, 6, 10, 0.55);
+				opacity: 1;
+				pointer-events: auto;
+				transition: opacity 0.5s;
+			}
+			.reveal-checkbox:checked ~ .solution-grid .answer-panel .answer-overlay {
+				opacity: 0;
+				pointer-events: none;
+			}
+			.answer-overlay p {
+				margin: 0;
+				font-size: 14px;
+				color: #aeb6c2;
+			}
+			.reveal-btn {
+				padding: 15px 34px;
+				background: #52e0f5;
+				color: #06232a;
+				font-weight: 700;
+				font-size: 14px;
+				border-radius: 2px;
+				cursor: pointer;
+				border: none;
+				display: inline-block;
+			}
+			.reveal-btn:hover {
+				background: #7ce8f8;
+			}
+			/* チェックボックス本体は非表示（ラベルクリックで操作する） */
+			.reveal-checkbox {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip: rect(0 0 0 0);
+				white-space: nowrap;
+			}
+
+			/* 右カラム */
+			.col-side {
+				display: flex;
+				flex-direction: column;
+				gap: 22px;
+				min-width: 0;
+			}
+			.answer-card {
+				display: flex;
+				flex-direction: column;
+				gap: 14px;
+				padding: 24px;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				background: #080a10;
+			}
+			.answer-card .card-label {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.answer-card .card-value {
+				display: block;
+				font: italic 400 30px "STIX Two Text", serif;
+				color: #2a3340;
+				transition: color 0.5s;
+				max-width: 100%;
+				overflow-x: auto;
+				overflow-y: hidden;
+			}
+			.answer-card .card-value :global(math) {
+				font-family: "STIX Two Text", serif;
+			}
+			.reveal-checkbox:checked ~ .solution-grid .col-side .answer-card .card-value {
+				color: #52e0f5;
+			}
+
+			.pdf-links {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+				background: rgba(255, 255, 255, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+			}
+			.pdf-links a {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 18px 20px;
+				background: #05060a;
+				transition: background 0.2s;
+			}
+			.pdf-links a:hover {
+				background: #0c0f16;
+			}
+			.pdf-links .pdf-badge {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				letter-spacing: 0.14em;
+			}
+			.pdf-links .pdf-name {
+				font-size: 14px;
+				font-weight: 500;
+			}
+			.pdf-links .arrow {
+				margin-left: auto;
+				color: #5c6572;
+			}
+
+			.related {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+				padding-top: 6px;
+			}
+			.related .card-label {
+				font: 400 10px "IBM Plex Mono", monospace;
+				color: #5c6572;
+				letter-spacing: 0.18em;
+			}
+			.related a {
+				font-size: 14px;
+				line-height: 1.7;
+				color: #c3ccd8;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				padding-bottom: 12px;
+			}
+			.related a:hover {
+				color: #52e0f5;
+			}
+			.related .related-empty {
+				font-size: 12px;
+				color: #4a5361;
+			}
+
+			.report-link {
+				font-size: 12px;
+				color: #5c6572;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+				padding-bottom: 6px;
+				align-self: flex-start;
+			}
+			.report-link:hover {
+				color: #aeb6c2;
+			}
+
+			/* フォールバック */
 			.fallback-notice {
-				padding: 0.75rem 1rem;
-				background: color-mix(in srgb, orange 18%, transparent);
-				border: 1px solid color-mix(in srgb, orange 45%, transparent);
-				border-radius: 0.4rem;
-				margin-bottom: 1rem;
-				font-size: 0.9rem;
+				padding: 18px 22px;
+				border: 1px solid rgba(82, 224, 245, 0.28);
+				background: rgba(82, 224, 245, 0.05);
+				margin-bottom: 8px;
+				font-size: 14px;
+				line-height: 1.8;
+				color: #aeb6c2;
+			}
+			.fallback-notice strong {
+				color: #52e0f5;
+				font-weight: 700;
 			}
 			.fallback-embed {
 				width: 100%;
 				height: 80vh;
-				border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				background: #fff;
+			}
+
+			@media (max-width: 900px) {
+				.site-header {
+					padding-left: 24px;
+					padding-right: 24px;
+				}
+				.solution-grid {
+					grid-template-columns: 1fr;
+					gap: 40px;
+					padding: 32px 24px;
+				}
+				.title-heading {
+					font-size: 28px;
+					word-break: break-word;
+				}
+				.answer-body :global(p),
+				.step-body {
+					word-break: break-word;
+				}
 			}
 			@media (max-width: 480px) {
-				body {
-					padding: 1rem;
+				.answer-body {
+					padding: 22px 18px 26px;
 				}
-				nav.actions a {
-					flex: 1 1 auto;
-					text-align: center;
+				.step-panel .step-body {
+					padding: 0 18px 20px;
 				}
 				.fallback-embed {
 					height: 60vh;
@@ -188,61 +584,139 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 		</style>
 	</head>
 	<body>
-		<p><a href={problemHref}>← 問題に戻る</a></p>
-		<header class="page-header">
-			<h1>{meta.id} {meta.title}（解答）</h1>
-			<p class="meta-line">
-				<span>分野: {meta.field.major} / {meta.field.minor}</span>
-				{meta.difficulty && <span>難易度: {meta.difficulty}</span>}
-				{meta.tags.length > 0 && <span>タグ: {meta.tags.join("、")}</span>}
-			</p>
+		<header class="site-header">
+			<a class="logo" href="/">
+				<strong>Diary</strong>
+				<span>SELF-MADE MATHEMATICS</span>
+			</a>
+			<a class="back-link" href={problemHref}>← 問題に戻る</a>
 		</header>
 
-		<nav class="actions">
-			{
-				pdfAvailable && (
-					<a class="primary" href={pdfHref} download>
-						解答 PDF をダウンロード
-					</a>
-				)
-			}
-			<a class="primary" href={problemHref}>
-				問題に戻る
-			</a>
-			<a href={issueHref} target="_blank" rel="noopener noreferrer">
-				誤植を報告する
-			</a>
-		</nav>
+		{/* STEP3 のブラー解除を制御するチェックボックス（CSS のみ・状態は保存しない） */}
+		<input type="checkbox" id="answer-reveal" class="reveal-checkbox" />
 
-		<details class="guard">
-			<summary>解答を表示する</summary>
+		<div class="solution-grid">
+			<div class="col-main">
+				<div class="head-block">
+					<span class="eyebrow mono">SOLUTION / {meta.id}</span>
+					<h1 class="title-heading">{meta.title}</h1>
+					<p class="lede">まず自分で解いてから。必要な分だけ開いてください。</p>
+				</div>
 
-			{
-				solutionHtml.isFallback ? (
-					<div class="fallback-notice">
-						この解答は HTML への自動変換に失敗したため、PDF を埋め込み表示しています。
-						{solutionHtml.fallbackReason && (
-							<>（理由: {solutionHtml.fallbackReason}）</>
-						)}
-					</div>
-				) : null
-			}
+				{
+					solutionHtml.isFallback ? (
+						<div class="fallback-notice">
+							<strong>この解答は HTML への自動変換に失敗したため、PDF を埋め込み表示しています。</strong>
+							{solutionHtml.fallbackReason && <>（理由: {solutionHtml.fallbackReason}）</>}
+						</div>
+					) : null
+				}
 
-			{
-				solutionHtml.isFallback ? (
-					pdfAvailable ? (
-						<embed
-							class="fallback-embed"
-							src={pdfHref}
-							type="application/pdf"
-						/>
+				{
+					solutionHtml.isFallback ? (
+						pdfAvailable ? (
+							<embed class="fallback-embed" src={pdfHref} type="application/pdf" />
+						) : (
+							<p>PDF も見つかりませんでした。ビルドを確認してください。</p>
+						)
 					) : (
-						<p>PDF も見つかりませんでした。ビルドを確認してください。</p>
+						<>
+							{
+								hintHtml && (
+									<details class="step-panel">
+										<summary>
+											<span class="step-label mono">STEP 1</span>
+											<span class="step-title">ヒント</span>
+											<span class="step-toggle mono" />
+										</summary>
+										<div class="step-body-wrap">
+											<div class="step-body-inner">
+												<div class="step-body" set:html={hintHtml.bodyHtml} />
+											</div>
+										</div>
+									</details>
+								)
+							}
+
+							{
+								policyHtml && (
+									<details class="step-panel">
+										<summary>
+											<span class="step-label mono">STEP 2</span>
+											<span class="step-title">方針</span>
+											<span class="step-toggle mono" />
+										</summary>
+										<div class="step-body-wrap">
+											<div class="step-body-inner">
+												<div class="step-body" set:html={policyHtml.bodyHtml} />
+											</div>
+										</div>
+									</details>
+								)
+							}
+
+							<div class="answer-panel">
+								<div class="step-head">
+									<span class="step-label mono">STEP 3</span>
+									<span class="step-title">解答</span>
+									<span class="step-toggle mono" />
+								</div>
+								<div class="answer-reveal-wrap">
+									<div class="answer-body" set:html={bodyHtml} />
+									<div class="answer-overlay">
+										<p>解き終わりましたか？</p>
+										<label class="reveal-btn" for="answer-reveal">解答を表示する</label>
+									</div>
+								</div>
+							</div>
+						</>
 					)
-				) : (
-					<div class="solution-body" set:html={solutionHtml.bodyHtml} />
-				)
-			}
-		</details>
+				}
+			</div>
+
+			<div class="col-side">
+				<div class="answer-card">
+					<span class="card-label mono">ANSWER</span>
+					{
+						finalAnswerMath ? (
+							<span class="card-value" set:html={finalAnswerMath} />
+						) : (
+							<span class="card-value">● ● ●</span>
+						)
+					}
+				</div>
+
+				<div class="pdf-links">
+					{
+						pdfAvailable && (
+							<a href={pdfHref} download>
+								<span class="pdf-badge mono">PDF</span>
+								<span class="pdf-name">解答（印刷用）</span>
+								<span class="arrow">↓</span>
+							</a>
+						)
+					}
+				</div>
+
+				<div class="related">
+					<span class="card-label mono">RELATED</span>
+					{
+						related.length > 0 ? (
+							related.map((p) => (
+								<a href={`/problems/${p.id}/`}>
+									{p.id} — {p.title}
+								</a>
+							))
+						) : (
+							<span class="related-empty">同分野の他の問題はまだありません</span>
+						)
+					}
+				</div>
+
+				<a class="report-link" href={issueHref} target="_blank" rel="noopener noreferrer">
+					誤植・不備を報告する → GitHub Issue
+				</a>
+			</div>
+		</div>
 	</body>
 </html>
