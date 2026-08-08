@@ -41,6 +41,7 @@ const initialOpenMajor = fieldIndex.reduce<string | null>((best, f) => {
 
 const fieldsForClient = fieldIndex.map((f) => ({
   major: f.major,
+  slug: f.slug,
   count: f.count,
   minors: f.minors.map((m) => ({
     name: m.name,
@@ -206,21 +207,31 @@ const fieldsForClient = fieldIndex.map((f) => ({
 				gap: 34px;
 				padding: 24px 0;
 				width: 100%;
-				background: none;
-				border: none;
-				text-align: left;
-				font-family: inherit;
-				cursor: pointer;
-				transition: padding .25s;
 			}
-			.field-row-head:hover {
+			.field-row-link {
+				display: flex;
+				align-items: center;
+				gap: 34px;
+				flex: 1 1 auto;
+				min-width: 0;
+				transition: padding-left .25s;
+			}
+			.field-row-link:hover {
 				padding-left: 22px;
 			}
-			.field-row.is-empty .field-row-head {
-				cursor: default;
+			.field-toggle {
+				display: flex;
+				align-items: center;
+				margin-left: auto;
+				flex-shrink: 0;
+				background: none;
+				border: none;
+				font-family: inherit;
+				cursor: pointer;
+				padding: 0;
 			}
-			.field-row.is-empty .field-row-head:hover {
-				padding-left: 0;
+			.field-row.is-empty .field-toggle {
+				cursor: default;
 			}
 			.field-no {
 				font: 400 12px "IBM Plex Mono", monospace;
@@ -242,7 +253,6 @@ const fieldsForClient = fieldIndex.map((f) => ({
 				color: #4a5361;
 			}
 			.field-meta {
-				margin-left: auto;
 				display: flex;
 				align-items: center;
 				gap: 26px;
@@ -331,10 +341,12 @@ const fieldsForClient = fieldIndex.map((f) => ({
 					padding: 0 24px 96px;
 				}
 				.field-row-head {
-					gap: 14px;
 					padding: 17px 0;
 				}
-				.field-row-head:hover {
+				.field-row-link {
+					gap: 14px;
+				}
+				.field-row-link:hover {
 					padding-left: 0;
 				}
 				.field-no {
@@ -403,19 +415,24 @@ const fieldsForClient = fieldIndex.map((f) => ({
 								class={`field-row${isOpen ? " is-open" : ""}${isEmpty ? " is-empty" : ""}`}
 								data-major={f.major}
 							>
-								<button
-									class="field-row-head"
-									type="button"
-									aria-expanded={isOpen ? "true" : "false"}
-									disabled={isEmpty}
-								>
-									<span class="field-no">{String(i + 1).padStart(2, "0")}</span>
-									<span class="field-name">{f.major}</span>
-									<span class="field-meta">
-										<span class="field-count">{f.count} 問</span>
-										<span class="field-sign">{isOpen ? "−" : "+"}</span>
-									</span>
-								</button>
+								<div class="field-row-head">
+									<a class="field-row-link" href={`/fields/${f.slug}/`}>
+										<span class="field-no">{String(i + 1).padStart(2, "0")}</span>
+										<span class="field-name">{f.major}</span>
+									</a>
+									<button
+										class="field-toggle"
+										type="button"
+										aria-expanded={isOpen ? "true" : "false"}
+										aria-label="中分野の一覧を開閉"
+										disabled={isEmpty}
+									>
+										<span class="field-meta">
+											<span class="field-count">{f.count} 問</span>
+											<span class="field-sign">{isOpen ? "−" : "+"}</span>
+										</span>
+									</button>
+								</div>
 								<div class="field-panel">
 									<div class="field-subs">
 										{f.minors.map((m) =>
@@ -452,7 +469,7 @@ const fieldsForClient = fieldIndex.map((f) => ({
 					list.querySelectorAll<HTMLElement>(".field-row:not(.is-empty)"),
 				);
 				for (const row of rows) {
-					const head = row.querySelector<HTMLButtonElement>(".field-row-head");
+					const head = row.querySelector<HTMLButtonElement>(".field-toggle");
 					const sign = row.querySelector<HTMLElement>(".field-sign");
 					if (!head || !sign) continue;
 					head.addEventListener("click", () => {
@@ -460,7 +477,7 @@ const fieldsForClient = fieldIndex.map((f) => ({
 						for (const other of rows) {
 							if (other === row) continue;
 							other.classList.remove("is-open");
-							other.querySelector(".field-row-head")?.setAttribute(
+							other.querySelector(".field-toggle")?.setAttribute(
 								"aria-expanded",
 								"false",
 							);
