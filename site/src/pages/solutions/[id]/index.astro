@@ -811,13 +811,39 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 		    aria-expanded の同期、ANSWER カードの placeholder/revealed 切り替えのみを行う。
 		    JS が無効な環境では答え本文は base64 のまま script 要素に留まり、
 		    .answer-body には何も挿入されない ＝ 常に非表示のまま（要求どおり
-		    「表示できない」側に倒れる）。 */}
+		    「表示できない」側に倒れる）。
+		    #152: 併せて、横スクロールする数式に tabindex を振る（下記参照）。 */}
 		<script>
+			// issue #152: 横スクロールする数式にキーボードフォーカスを通す。
+			// 実際にスクロールが発生している要素にだけ tabindex を振る
+			// （全数式に振るとタブ移動が過剰になるため）。
+			import { markScrollableMath } from "../../../lib/scrollable-math";
+
 			function decodeBase64Utf8(base64: string): string {
 				const binary = atob(base64);
 				const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
 				return new TextDecoder().decode(bytes);
 			}
+
+			// ヒント・方針（STEP1/2）は <details> なので開いたときに測り直す。
+			const applyStepScrollableMath = () => {
+				markScrollableMath(document, ".step-body .ltx_Math, .step-body table.ltx_equation");
+			};
+			applyStepScrollableMath();
+			window.addEventListener("resize", applyStepScrollableMath);
+			for (const panel of document.querySelectorAll(".step-panel")) {
+				panel.addEventListener("toggle", applyStepScrollableMath);
+			}
+
+			// 解答（answer-body）は未開示のあいだ DOM 上に何も挿入されない
+			// （#149）ため、数式そのものが存在せずタブ順に入らない。開示ボタンの
+			// クリックで innerHTML への注入が完了した「後」にだけ数式を計測して
+			// tabindex を付与する。resize でも同様に、既に開示済みの場合のみ
+			// 再計算する。
+			const applyAnswerScrollableMath = () => {
+				markScrollableMath(document, ".answer-body.is-revealed .ltx_Math, .answer-body.is-revealed table.ltx_equation");
+			};
+			window.addEventListener("resize", applyAnswerScrollableMath);
 
 			document.querySelectorAll(".js-answer-reveal-btn").forEach((btn) => {
 				btn.addEventListener("click", () => {
@@ -839,6 +865,9 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 					// blur(9px) → blur(0) の transition を発火させる。
 					requestAnimationFrame(() => {
 						body.classList.add("is-revealed");
+						// is-revealed が付いてレイアウトが確定した後に測る
+						// （hidden 解除直後だと幅がまだ 0 のことがあるため）。
+						applyAnswerScrollableMath();
 					});
 					panel?.classList.add("is-revealed");
 					btn.setAttribute("aria-expanded", "true");
