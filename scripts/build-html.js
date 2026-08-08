@@ -160,6 +160,12 @@ function convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbac
         `--path=${BINDINGS_DIR}`,
         "--format=html5",
         "--pmml", // MathML (Presentation) を出力に含める
+        // #150: alttext が生 LaTeX のまま露出し、semantics/annotation も
+        // 無かった問題への対応。--mathtex により各 <math> を
+        // <semantics>...<annotation encoding="application/x-tex">元のTeX</annotation></semantics>
+        // でラップする（LaTeXML 標準機能。見た目の Presentation MathML 部分は
+        // 変更されないため、数式表示への影響はない）。
+        "--mathtex",
         "--nodefaultresources",
         `--timeout=${LATEXMLC_TIMEOUT_SEC}`,
         `--dest=${outPath}`,
