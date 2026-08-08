@@ -13,7 +13,9 @@
 // - 「01 作問方針」の文面のみ仮文面。Yu の原稿に差し替え予定（PR 本文に明記）。
 // - このページはヘッダー等の共有コンポーネントを新設せず、/fields/ と同じ方針で
 //   ページ内に閉じた実装にしている（#67 と並行作業中のため）。
+//   ただし ⌘K 検索モーダル（#70）のみ共有コンポーネントとして差し込む。
 import { computeSiteStats } from "../../lib/site-data";
+import SearchModal from "../../components/SearchModal.astro";
 
 const stats = computeSiteStats();
 const problemsPadded = String(stats.problemCount).padStart(4, "0");
@@ -404,9 +406,11 @@ const typoIssueHref =
 					<a href="/fields/">分野</a>
 					<a href="/#new">新着</a>
 					<a href="/about/" class="active">About</a>
-					<span class="search-chip">検索<kbd>⌘K</kbd></span>
+					<span class="search-chip" data-search-open>検索<kbd>⌘K</kbd></span>
 				</nav>
 			</header>
+
+			<SearchModal />
 
 			<section class="hero">
 				<span class="label">ABOUT</span>

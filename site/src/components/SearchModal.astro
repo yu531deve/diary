@@ -1,0 +1,534 @@
+---
+// site/src/components/SearchModal.astro
+//
+// issue #70: ⌘K 検索モーダル（design/README.md D. ⌘K 検索・絞り込み /
+// design/02_desktop_screens.dc.html の検索画面相当）。
+//
+// - データは #61 が生成する /search-index.json（id/title/field/sub/tags/difficulty
+//   のみ。地の文・数式は含まない。数式検索は仕様外）を初回オープン時に fetch する。
+// - 検索対象は `id + title + field + sub + tags` の連結文字列に対する部分一致。
+//   フィルタチップは分野（field）の完全一致（design 通り ALL は無効化）。
+// - 1000 問規模を想定し、DOM に描画する結果は上位 MAX_RESULTS 件のみに絞る
+//   （仮想化はしない。件数はフッターに全マッチ数を出すので取りこぼしが
+//   分かるようにしてある。#70 補足事項の指示どおり理由をここと PR に明記）。
+// - ライブラリ追加はしない（素の DOM API のみ）。
+// - JS 無効時はこのモーダルは開けない（トリガーはただの装飾テキストのまま）。
+//   モーダル自体は `hidden` 属性で最初から非表示にしてあるので、JS が
+//   動かない環境では常に非表示のままになる。
+//
+// 各ページ側の組み込みは「<SearchModal /> を置く」+「起動用トリガー要素に
+// `data-search-open` を付ける」の 2 点のみ（index.astro / fields/index.astro /
+// about/index.astro）。
+
+const MAX_RESULTS = 50;
+---
+
+<div id="search-modal-root" class="search-modal-root" hidden>
+	<div class="search-modal-overlay" data-search-close tabindex="-1"></div>
+	<div
+		class="search-modal"
+		role="dialog"
+		aria-modal="true"
+		aria-label="問題を検索"
+	>
+		<div class="search-modal-inputrow">
+			<span class="slash" aria-hidden="true">/</span>
+			<input
+				id="search-modal-input"
+				type="text"
+				placeholder="タイトル・分野・タグで検索"
+				autocomplete="off"
+				spellcheck="false"
+				aria-label="検索クエリ"
+			/>
+			<button type="button" class="esc-key" data-search-close>ESC</button>
+		</div>
+		<div class="search-modal-filterrow">
+			<span class="filter-label">FILTER</span>
+			<div class="search-modal-filters" id="search-modal-filters"></div>
+		</div>
+		<div class="search-modal-results" id="search-modal-results"></div>
+		<div class="search-modal-footer">
+			<span>↑↓ 移動 · ↵ 開く</span>
+			<span id="search-modal-count">00 RESULTS</span>
+		</div>
+	</div>
+</div>
+
+<style>
+	.search-modal-root {
+		position: fixed;
+		inset: 0;
+		z-index: 500;
+	}
+	.search-modal-root[hidden] {
+		display: none;
+	}
+	.search-modal-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(2, 3, 6, 0.72);
+	}
+	.search-modal {
+		position: relative;
+		width: 820px;
+		max-width: calc(100vw - 32px);
+		max-height: calc(100vh - 74px - 32px);
+		margin: 74px auto 0;
+		display: flex;
+		flex-direction: column;
+		background: #080a10;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7);
+		color: #eef2f6;
+		font-family: "Noto Sans JP", system-ui, sans-serif;
+	}
+	.search-modal-inputrow {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 22px 26px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		flex-shrink: 0;
+	}
+	.search-modal-inputrow .slash {
+		font: 500 19px "IBM Plex Mono", monospace;
+		color: #52e0f5;
+	}
+	.search-modal-inputrow input {
+		flex: 1;
+		background: transparent;
+		border: none;
+		outline: none;
+		color: #eef2f6;
+		font-size: 19px;
+		font-family: "Noto Sans JP", system-ui, sans-serif;
+	}
+	.search-modal-inputrow input::placeholder {
+		color: #4a5361;
+	}
+	.esc-key {
+		flex-shrink: 0;
+		padding: 5px 10px;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 3px;
+		background: rgba(255, 255, 255, 0.03);
+		color: #7d8794;
+		font: 400 11px "IBM Plex Mono", monospace;
+		letter-spacing: 0.06em;
+		cursor: pointer;
+	}
+	.esc-key:hover {
+		color: #eef2f6;
+		border-color: rgba(255, 255, 255, 0.32);
+	}
+	.search-modal-filterrow {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 14px 26px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		flex-shrink: 0;
+		flex-wrap: wrap;
+	}
+	.filter-label {
+		font: 500 11px "IBM Plex Mono", monospace;
+		letter-spacing: 0.24em;
+		color: #5c6572;
+		flex-shrink: 0;
+	}
+	.search-modal-filters {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+	/*
+	 * 以下の一部セレクタは :global() を付けている。結果行・フィルタチップ・
+	 * 空状態表示は 1000 件規模でも軽く保つため document.createElement で
+	 * JS から直接組み立てており、Astro テンプレート由来のスコープ用
+	 * data-astro-cid 属性が付かない。付けないとここのスタイルが一切
+	 * 当たらない（リンクの下線・青文字がそのまま出る等）ので :global() で
+	 * 明示的にグローバル扱いにしている。対象はこのモーダル配下でしか
+	 * 使わないクラス名なので衝突リスクは無視できる。
+	 */
+	.search-modal-filters :global(button) {
+		padding: 6px 14px;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 999px;
+		background: transparent;
+		color: #aeb6c2;
+		font-size: 12px;
+		font-family: inherit;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.search-modal-filters :global(button:hover) {
+		border-color: rgba(82, 224, 245, 0.5);
+		color: #eef2f6;
+	}
+	.search-modal-filters :global(button.active) {
+		background: #52e0f5;
+		border-color: #52e0f5;
+		color: #06232a;
+		font-weight: 700;
+	}
+	.search-modal-results {
+		overflow-y: auto;
+		flex: 1;
+		min-height: 120px;
+	}
+	.search-modal-results :global(.search-result-row) {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 16px 26px;
+		text-decoration: none;
+		color: inherit;
+		cursor: pointer;
+	}
+	.search-modal-results :global(.search-result-row:hover),
+	.search-modal-results :global(.search-result-row.is-active) {
+		background: rgba(82, 224, 245, 0.05);
+	}
+	.search-modal-results :global(.search-result-row .no) {
+		flex-shrink: 0;
+		width: 52px;
+		font: 500 13px "IBM Plex Mono", monospace;
+		color: #52e0f5;
+	}
+	.search-modal-results :global(.search-result-row .body) {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.search-modal-results :global(.search-result-row .title) {
+		font-size: 16px;
+		font-weight: 500;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.search-modal-results :global(.search-result-row .meta) {
+		font: 400 11px "IBM Plex Mono", monospace;
+		color: #7d8794;
+		letter-spacing: 0.04em;
+	}
+	.search-modal-results :global(.search-result-row .stars) {
+		flex-shrink: 0;
+		font: 400 13px "IBM Plex Mono", monospace;
+		color: #52e0f5;
+		letter-spacing: 0.06em;
+	}
+	.search-modal-results :global(.search-modal-empty),
+	.search-modal-results :global(.search-modal-loading) {
+		padding: 40px 26px;
+		text-align: center;
+		color: #7d8794;
+		font-size: 14px;
+	}
+	.search-modal-footer {
+		display: flex;
+		justify-content: space-between;
+		padding: 14px 26px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		font: 400 11px "IBM Plex Mono", monospace;
+		color: #5c6572;
+		letter-spacing: 0.06em;
+		flex-shrink: 0;
+	}
+
+	@media (max-width: 640px) {
+		.search-modal {
+			width: 100%;
+			max-width: 100%;
+			margin: 0;
+			max-height: 100vh;
+			height: 100vh;
+		}
+		.search-modal-inputrow,
+		.search-modal-filterrow,
+		.search-modal-footer {
+			padding-left: 18px;
+			padding-right: 18px;
+		}
+		.search-modal-results :global(.search-result-row) {
+			padding: 14px 18px;
+		}
+		.search-modal-results :global(.search-result-row .no) {
+			width: 40px;
+		}
+	}
+</style>
+
+<script define:vars={{ MAX_RESULTS }}>
+	(function () {
+		const root = document.getElementById("search-modal-root");
+		const overlay = root?.querySelector("[data-search-close]");
+		const input = document.getElementById("search-modal-input");
+		const filtersEl = document.getElementById("search-modal-filters");
+		const resultsEl = document.getElementById("search-modal-results");
+		const countEl = document.getElementById("search-modal-count");
+		if (!root || !input || !filtersEl || !resultsEl || !countEl) return;
+
+		/** @type {{id:string,title:string,field:string,sub:string,tags:string[],difficulty:string}[] | null} */
+		let index = null;
+		let indexPromise = null;
+		let filter = "ALL";
+		let query = "";
+		let activeIndex = 0;
+		/** @type {{id:string,title:string,field:string,sub:string,tags:string[],difficulty:string}[]} */
+		let visible = [];
+		let lastFocused = null;
+
+		function loadIndex() {
+			if (indexPromise) return indexPromise;
+			resultsEl.innerHTML = '<div class="search-modal-loading">読み込み中…</div>';
+			indexPromise = fetch("/search-index.json")
+				.then((res) => {
+					if (!res.ok) throw new Error(String(res.status));
+					return res.json();
+				})
+				.then((data) => {
+					index = Array.isArray(data) ? data : [];
+					buildFilters();
+					render();
+				})
+				.catch(() => {
+					index = [];
+					resultsEl.innerHTML =
+						'<div class="search-modal-empty">検索データを読み込めませんでした。</div>';
+				});
+			return indexPromise;
+		}
+
+		function buildFilters() {
+			if (!index) return;
+			const majors = [];
+			for (const entry of index) {
+				if (entry.field && !majors.includes(entry.field)) majors.push(entry.field);
+			}
+			filtersEl.innerHTML = "";
+			const allBtn = document.createElement("button");
+			allBtn.type = "button";
+			allBtn.textContent = "ALL";
+			allBtn.className = filter === "ALL" ? "active" : "";
+			allBtn.addEventListener("click", () => setFilter("ALL"));
+			filtersEl.appendChild(allBtn);
+			for (const major of majors) {
+				const btn = document.createElement("button");
+				btn.type = "button";
+				btn.textContent = major;
+				btn.className = filter === major ? "active" : "";
+				btn.addEventListener("click", () => setFilter(major));
+				filtersEl.appendChild(btn);
+			}
+		}
+
+		function setFilter(next) {
+			filter = next;
+			for (const btn of filtersEl.querySelectorAll("button")) {
+				btn.classList.toggle("active", btn.textContent === next);
+			}
+			activeIndex = 0;
+			render();
+		}
+
+		function haystack(entry) {
+			return [entry.id, entry.title, entry.field, entry.sub, ...(entry.tags || [])]
+				.join(" ")
+				.toLowerCase();
+		}
+
+		function starRating(difficulty) {
+			const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
+			return "★".repeat(n) + "☆".repeat(5 - n);
+		}
+
+		function matched() {
+			if (!index) return [];
+			const q = query.trim().toLowerCase();
+			return index.filter((entry) => {
+				if (filter !== "ALL" && entry.field !== filter) return false;
+				if (!q) return true;
+				return haystack(entry).includes(q);
+			});
+		}
+
+		function render() {
+			const all = matched();
+			countEl.textContent = `${String(all.length).padStart(2, "0")} RESULTS`;
+			visible = all.slice(0, MAX_RESULTS);
+			if (activeIndex >= visible.length) activeIndex = Math.max(0, visible.length - 1);
+
+			if (visible.length === 0) {
+				resultsEl.innerHTML =
+					'<div class="search-modal-empty">該当する問題が見つかりません。</div>';
+				return;
+			}
+
+			resultsEl.innerHTML = "";
+			visible.forEach((entry, i) => {
+				const row = document.createElement("a");
+				row.href = `/problems/${entry.id}/`;
+				row.className = "search-result-row" + (i === activeIndex ? " is-active" : "");
+				row.dataset.index = String(i);
+
+				const no = document.createElement("span");
+				no.className = "no";
+				no.textContent = entry.id;
+
+				const body = document.createElement("span");
+				body.className = "body";
+				const title = document.createElement("span");
+				title.className = "title";
+				title.textContent = entry.title;
+				const meta = document.createElement("span");
+				meta.className = "meta";
+				meta.textContent = [entry.field, entry.sub].filter(Boolean).join(" / ");
+				body.appendChild(title);
+				body.appendChild(meta);
+
+				const stars = document.createElement("span");
+				stars.className = "stars";
+				stars.textContent = starRating(entry.difficulty);
+
+				row.appendChild(no);
+				row.appendChild(body);
+				row.appendChild(stars);
+				row.addEventListener("mouseenter", () => {
+					activeIndex = i;
+					updateActiveRow();
+				});
+				resultsEl.appendChild(row);
+			});
+
+			if (all.length > MAX_RESULTS) {
+				const note = document.createElement("div");
+				note.className = "search-modal-empty";
+				note.textContent = `他 ${all.length - MAX_RESULTS} 件（上位 ${MAX_RESULTS} 件のみ表示）`;
+				resultsEl.appendChild(note);
+			}
+		}
+
+		function updateActiveRow() {
+			const rows = resultsEl.querySelectorAll(".search-result-row");
+			rows.forEach((row) => {
+				const i = Number(row.dataset.index);
+				row.classList.toggle("is-active", i === activeIndex);
+			});
+			const activeRow = rows[activeIndex];
+			if (activeRow) activeRow.scrollIntoView({ block: "nearest" });
+		}
+
+		function open() {
+			if (!root.hidden) return;
+			lastFocused = document.activeElement;
+			root.hidden = false;
+			document.body.style.overflow = "hidden";
+			loadIndex();
+			window.setTimeout(() => input.focus(), 0);
+		}
+
+		function close() {
+			if (root.hidden) return;
+			root.hidden = true;
+			document.body.style.overflow = "";
+			// hidden 属性を立てるだけでは input のフォーカスは自動で外れない
+			// （非表示要素でも document.activeElement に残り続け、閉じた直後の
+			// "/" が検索欄への入力として吸われてモーダルが開かなくなる）ため、
+			// 明示的に blur してから元の要素へフォーカスを戻す。
+			if (document.activeElement instanceof HTMLElement) {
+				document.activeElement.blur();
+			}
+			if (lastFocused instanceof HTMLElement) {
+				lastFocused.focus();
+			}
+		}
+
+		function toggle() {
+			if (root.hidden) open();
+			else close();
+		}
+
+		input.addEventListener("input", () => {
+			query = input.value;
+			activeIndex = 0;
+			if (index) render();
+		});
+
+		overlay?.addEventListener("click", close);
+		root.querySelectorAll("[data-search-close]").forEach((el) => {
+			el.addEventListener("click", close);
+		});
+
+		root.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") {
+				e.preventDefault();
+				close();
+				return;
+			}
+			if (e.key === "ArrowDown") {
+				e.preventDefault();
+				if (visible.length === 0) return;
+				activeIndex = Math.min(activeIndex + 1, visible.length - 1);
+				updateActiveRow();
+				return;
+			}
+			if (e.key === "ArrowUp") {
+				e.preventDefault();
+				if (visible.length === 0) return;
+				activeIndex = Math.max(activeIndex - 1, 0);
+				updateActiveRow();
+				return;
+			}
+			if (e.key === "Enter") {
+				const target = visible[activeIndex];
+				if (target) {
+					e.preventDefault();
+					window.location.href = `/problems/${target.id}/`;
+				}
+			}
+		});
+
+		document.addEventListener("keydown", (e) => {
+			const key = e.key.toLowerCase();
+			if ((e.metaKey || e.ctrlKey) && key === "k") {
+				e.preventDefault();
+				toggle();
+				return;
+			}
+			if (root.hidden && e.key === "/") {
+				const active = document.activeElement;
+				const tag = active ? active.tagName.toLowerCase() : "";
+				const isEditable =
+					tag === "input" ||
+					tag === "textarea" ||
+					(active && active.isContentEditable);
+				if (!isEditable) {
+					e.preventDefault();
+					open();
+				}
+			}
+		});
+
+		document.querySelectorAll("[data-search-open]").forEach((el) => {
+			el.addEventListener("click", (e) => {
+				e.preventDefault();
+				open();
+			});
+			// 装飾用の <span> でもキーボードから開けるようにする。
+			if (!el.hasAttribute("tabindex") && el.tagName.toLowerCase() === "span") {
+				el.setAttribute("tabindex", "0");
+				el.setAttribute("role", "button");
+				el.addEventListener("keydown", (e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						open();
+					}
+				});
+			}
+		});
+	})();
+</script>

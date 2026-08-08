@@ -6,11 +6,14 @@
 //
 // このページはヘッダー等の共有コンポーネントを新設せず、ページ内に閉じた
 // 実装にしている（#66 と並行作業中のため、全ページ共通化は行わない）。
+// ただし ⌘K 検索モーダル（#70）のみ site/src/components/SearchModal.astro
+// を共有コンポーネントとして差し込む（依頼どおり）。
 //
 // 数値のハードコード禁止（design/README.md 実装時の注意 6）。分野名・
 // 問題数はすべて site-data.ts 経由で content/ と fields.yaml から算出する。
 import { computeFieldIndex, computeSiteStats } from "../../lib/site-data";
 import { listPublishedProblems } from "../../lib/dist-content";
+import SearchModal from "../../components/SearchModal.astro";
 
 const fieldIndex = computeFieldIndex();
 const stats = computeSiteStats();
@@ -369,11 +372,13 @@ const fieldsForClient = fieldIndex.map((f) => ({
 				<nav class="site-nav">
 					<a href="/fields/" class="active">分野</a>
 					<a href="/">新着</a>
-					<span class="search-chip"
+					<span class="search-chip" data-search-open
 						>検索<kbd>⌘K</kbd></span
 					>
 				</nav>
 			</header>
+
+			<SearchModal />
 
 			<section class="hero">
 				<div class="hero-copy">
