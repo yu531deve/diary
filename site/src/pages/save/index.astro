@@ -112,34 +112,6 @@ import SearchModal from "../../components/SearchModal.astro";
 				display: flex;
 				flex-direction: column;
 			}
-			.save-row {
-				display: flex;
-				align-items: center;
-				gap: 20px;
-				padding: 20px 0;
-				border-top: 1px solid rgba(255, 255, 255, 0.09);
-			}
-			.save-list a.save-row:last-child {
-				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-			}
-			.save-row:hover {
-				background: rgba(82, 224, 245, 0.04);
-			}
-			.save-row .id {
-				font: 500 13px "IBM Plex Mono", monospace;
-				color: #52e0f5;
-				flex-shrink: 0;
-			}
-			.save-row .title {
-				flex: 1;
-				font-size: 16px;
-				font-weight: 500;
-			}
-			.save-row .meta {
-				font: 400 11px "IBM Plex Mono", monospace;
-				color: #7d8794;
-				flex-shrink: 0;
-			}
 			.empty-state,
 			.unavailable-state {
 				padding: 40px 48px 0;
@@ -168,6 +140,42 @@ import SearchModal from "../../components/SearchModal.astro";
 				}
 			}
 		</style>
+		<style is:global>
+			/*
+			 * .save-row とその子孫は一覧描画スクリプト(下部の <script>)が
+			 * document.createElement で動的生成するため、Astro のスコープ付き
+			 * CSS(data-astro-cid-*)が当たらない。ここだけ is:global にして
+			 * 動的行にもスタイルを適用する。
+			 */
+			.save-list .save-row {
+				display: flex;
+				align-items: center;
+				gap: 20px;
+				padding: 20px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.save-list a.save-row:last-child {
+				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.save-list .save-row:hover {
+				background: rgba(82, 224, 245, 0.04);
+			}
+			.save-list .save-row .id {
+				font: 500 13px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				flex-shrink: 0;
+			}
+			.save-list .save-row .title {
+				flex: 1;
+				font-size: 16px;
+				font-weight: 500;
+			}
+			.save-list .save-row .meta {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				flex-shrink: 0;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="page">
@@ -193,6 +201,9 @@ import SearchModal from "../../components/SearchModal.astro";
 
 			<div id="save-list" class="save-list"></div>
 			<p id="save-empty" class="empty-state" hidden>まだ保存した問題がありません。問題ページの ☆ ボタンから保存できます。</p>
+			<p id="save-load-error" class="empty-state" hidden>
+				保存した問題の読み込みに失敗しました。通信環境を確認して再読み込みしてください。
+			</p>
 			<p id="save-unavailable" class="unavailable-state" hidden>
 				この端末・ブラウザでは保存機能を利用できません（localStorage が無効になっています）。
 			</p>
@@ -206,8 +217,9 @@ import SearchModal from "../../components/SearchModal.astro";
 			async function render() {
 				const listEl = document.getElementById("save-list");
 				const emptyEl = document.getElementById("save-empty");
+				const loadErrorEl = document.getElementById("save-load-error");
 				const unavailableEl = document.getElementById("save-unavailable");
-				if (!listEl || !emptyEl || !unavailableEl) return;
+				if (!listEl || !emptyEl || !loadErrorEl || !unavailableEl) return;
 
 				if (!isStorageAvailable()) {
 					unavailableEl.hidden = false;
@@ -247,7 +259,7 @@ import SearchModal from "../../components/SearchModal.astro";
 						listEl.appendChild(row);
 					}
 				} catch {
-					emptyEl.hidden = false;
+					loadErrorEl.hidden = false;
 				}
 			}
 
