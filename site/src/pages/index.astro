@@ -8,8 +8,10 @@
 //   （0042 / 18 のような数値のハードコード禁止。design/README.md 実装時の注意 6）。
 // - prefers-reduced-motion: reduce では演出を停止し、Diary の静止形のみを表示する。
 //   キャプション等のテキストは通常表示のまま（site/CLAUDE.md 必須条件）。
-// - モバイル幅（<=860px）ではスクロール演出を出さず、静的ヒーロー（#c1 相当）に
-//   差し替える（#68 で軽量版に差し替え予定。当面はこの静的ヒーローで可）。
+// - モバイル幅（<=860px）でも #track のスクロール駆動演出をそのまま使う
+//   （#118, Yu 指示 2026-08-08。site/CLAUDE.md の例外条項を上書き）。
+//   ただし発熱・fps を考慮し、パーティクル数と canvas の devicePixelRatio 上限を
+//   モバイルで下げて軽量化する（詳細は script 内コメント参照）。
 import { computeSiteStats } from "../lib/site-data";
 import LoadingCurtain from "../components/LoadingCurtain.astro";
 import SearchModal from "../components/SearchModal.astro";
@@ -180,11 +182,15 @@ const issueHref =
 			#track {
 				position: relative;
 				height: 560vh;
+				/* iOS Safari 等でアドレスバーの伸縮により 100vh がずれるため、
+				   対応ブラウザでは svh を優先する（未対応時は上の vh 指定が残る）。 */
+				height: 560svh;
 			}
 			#stage {
 				position: sticky;
 				top: 0;
 				height: 100vh;
+				height: 100svh;
 				overflow: hidden;
 			}
 			#fx {
@@ -243,6 +249,7 @@ const issueHref =
 				left: 48px;
 				top: 0;
 				height: 100vh;
+				height: 100svh;
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
@@ -296,6 +303,7 @@ const issueHref =
 				right: 0;
 				top: 0;
 				height: 100vh;
+				height: 100svh;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
@@ -383,71 +391,6 @@ const issueHref =
 				color: #52e0f5;
 			}
 
-			/* ---------- モバイル用の軽量ヒーロー(design/03_mobile.dc.html M トップ) ----------
-			   スクロール駆動ではなく、常に Diary の文字形へ収束・微振動するだけの
-			   軽量パーティクル演出（高さ 376px）。particles/ の共通エンジン（#62）を
-			   使い、ページ側は「Diary の文字形を作って毎フレーム target として返す」
-			   だけを行う（トップのスクロール演出とロジックを共有しない、独立した
-			   軽量版）。 */
-			#mobile-hero {
-				display: none;
-				flex-direction: column;
-			}
-			#mobile-hero-stage {
-				position: relative;
-				height: 376px;
-				overflow: hidden;
-			}
-			#mobile-hero-fx {
-				position: absolute;
-				inset: 0;
-				width: 100%;
-				height: 100%;
-				display: block;
-			}
-			#mobile-hero-caption {
-				position: absolute;
-				left: 0;
-				right: 0;
-				bottom: 26px;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				gap: 12px;
-				padding: 0 24px;
-			}
-			#mobile-hero-caption .eyebrow {
-				font: 500 9px "IBM Plex Mono", monospace;
-				letter-spacing: 0.24em;
-				color: #52e0f5;
-				text-align: center;
-			}
-			#mobile-hero-caption p {
-				margin: 0;
-				font-size: 14px;
-				font-weight: 500;
-				color: #c3ccd8;
-				text-align: center;
-				line-height: 1.8;
-			}
-			#mobile-hero .stats {
-				display: flex;
-				justify-content: space-between;
-				gap: 12px;
-				padding: 14px 24px;
-				border-top: 1px solid rgba(255, 255, 255, 0.08);
-				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-				font: 400 10px "IBM Plex Mono", monospace;
-				color: #5c6572;
-				letter-spacing: 0.1em;
-			}
-			#mobile-hero .stats strong {
-				color: #dfe6ee;
-				font-weight: 400;
-			}
-			#mobile-hero .stats .goal strong {
-				color: #52e0f5;
-			}
 
 			/* ---------- スクロール後のセクション ---------- */
 			.after-stage {
@@ -610,11 +553,66 @@ const issueHref =
 					gap: 16px;
 					font-size: 12px;
 				}
-				#track {
-					display: none;
+				/* #118: モバイルもデスクトップと同じ #track スクロール駆動演出を使う
+				   （Yu 指示 2026-08-08。旧・静的な #mobile-hero は廃止）。
+				   キャプション・固定 UI はモバイル幅向けに縮小・再配置する。
+				   下部の固定タブ(BottomTabNav)と重ならないよう bottom オフセットを確保する。 */
+				#c1 {
+					gap: 12px;
 				}
-				#mobile-hero {
-					display: flex;
+				#c1 .eyebrow {
+					font-size: 9px;
+					letter-spacing: 0.26em;
+					padding: 0 20px;
+				}
+				#c1 p {
+					font-size: 15px;
+					padding: 0 24px;
+				}
+				#c2 {
+					left: 24px;
+					right: 24px;
+					max-width: none;
+				}
+				#c2 h2 {
+					font-size: 26px;
+				}
+				#c2 .formula {
+					font-size: 15px;
+				}
+				#c2 p {
+					font-size: 13px;
+				}
+				#c3 p {
+					font-size: 15px;
+					padding: 0 24px;
+					text-align: center;
+				}
+				#c4 h2 {
+					font-size: 30px;
+					padding: 0 24px;
+				}
+				#c4 .cta {
+					flex-direction: column;
+					width: 100%;
+					padding: 0 24px;
+				}
+				#c4 .cta a {
+					text-align: center;
+				}
+				.scene-indicator {
+					right: 18px;
+					gap: 8px;
+				}
+				.scene-indicator .bar {
+					height: 70px;
+				}
+				.stage-stats {
+					left: 24px;
+					right: 24px;
+					bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+					gap: 20px;
+					flex-wrap: wrap;
 				}
 				.fields-section,
 				.new-section {
@@ -740,21 +738,6 @@ const issueHref =
 			</div>
 		</div>
 
-		<div id="mobile-hero">
-			<div id="mobile-hero-stage">
-				<canvas id="mobile-hero-fx" aria-hidden="true"></canvas>
-				<div id="mobile-hero-caption">
-					<div class="eyebrow">ORIGINAL ENTRANCE-EXAM MATH</div>
-					<p>自作の入試数学、1000問へ。<br />解く価値のある一問を。</p>
-				</div>
-			</div>
-			<div class="stats">
-				<span>PROBLEMS <strong>{problemsPadded}</strong></span>
-				<span>FIELDS <strong>{fieldsPadded}</strong></span>
-				<span class="goal">GOAL <strong>1000+</strong></span>
-			</div>
-		</div>
-
 		<div class="after-stage">
 			<section id="fields" class="fields-section">
 				<div class="section-head">
@@ -830,11 +813,19 @@ const issueHref =
 			const track = document.getElementById("track") as HTMLDivElement | null;
 			const canvas = document.getElementById("fx") as HTMLCanvasElement | null;
 
-			// モバイル幅ではスクロール演出を出さない（#track は CSS で display:none）。
-			// canvas も動かさず、静的ヒーロー（#mobile-hero）だけを表示する。
+			// #118 (Yu 指示 2026-08-08): モバイル幅でもデスクトップと同じ #track
+			// スクロール駆動演出を使う（旧・静的ヒーローの #mobile-hero は廃止）。
+			// 実機の発熱・fps を考慮し、モバイルでは以下を軽量化する:
+			//   - パーティクル数: 2000 → 900（約 55% 減。textShape/curvePoints/
+			//     upwardScatter すべてに適用）
+			//   - devicePixelRatio 上限: 1.5 → 1（Retina 端末での描画負荷を抑える）
+			//   - マウス反発: touch 端末では mousemove が発生しないため無効化
+			// シーン数(4)自体はデスクトップと揃えるという Yu 指示の趣旨に沿って
+			// 変更しない。スクロール量に対する進捗の割り当て(SEGMENTS)も共通のまま。
 			const isMobile = window.matchMedia("(max-width: 860px)").matches;
+			const PARTICLE_COUNT = isMobile ? 900 : 2000;
 
-			if (canvas && track && !isMobile) {
+			if (canvas && track) {
 				// Yu 指示(2026-08-08): 冒頭は「Diary 静止 → 散らばり」の順に変更
 				// (ローディング演出が Diary 収束で終わるため、地続きに見せる)。
 				// 以降(グラフ → 1000+ → 上方拡散)は design/README.md のまま。
@@ -854,7 +845,7 @@ const issueHref =
 				let builtKey = "";
 
 				function buildSets(w: number, h: number) {
-					const scatter = randomScatter(2000, w, h);
+					const scatter = randomScatter(PARTICLE_COUNT, w, h);
 					const diary = textShape("Diary", {
 						width: w,
 						height: h,
@@ -881,7 +872,7 @@ const issueHref =
 						fontPx: Math.min(w * 0.22, 300),
 						centerY: h * 0.44,
 					});
-					const up = upwardScatter(2000, w, h);
+					const up = upwardScatter(PARTICLE_COUNT, w, h);
 					return alignSets([scatter, diary, graph, thousand, up]);
 				}
 
@@ -897,9 +888,10 @@ const issueHref =
 				}
 
 				const engine = new ParticleEngine(canvas, {
-					mouseRepel: { radius: 120, strength: 5 },
+					dprMax: isMobile ? 1 : 1.5,
+					mouseRepel: isMobile ? false : { radius: 120, strength: 5 },
 				});
-				if (!engine.reducedMotion) {
+				if (!engine.reducedMotion && !isMobile) {
 					engine.enableMouseTracking();
 				}
 				ensureSets();
@@ -986,7 +978,7 @@ const issueHref =
 						}
 						if (prog) prog.style.transform = `scaleY(${currentP})`;
 
-						if (cur && curdot) {
+						if (cur && curdot && !isMobile) {
 							cx += (frame.mouse.x - cx) * 0.14;
 							cy += (frame.mouse.y - cy) * 0.14;
 							cur.style.transform = `translate(${cx - 17}px,${cy - 17}px)`;
@@ -997,50 +989,6 @@ const issueHref =
 
 				window.addEventListener("resize", () => {
 					ensureSets();
-				});
-			}
-
-			// ---------- モバイル軽量ヒーロー(design/03_mobile.dc.html M トップ) ----------
-			// スクロール駆動ではなく、常に「Diary」の文字形へ向けて収束・微振動するだけ。
-			// #62 の共通エンジンをそのまま使い、target を常に textShape("Diary") にする
-			// だけで実装できる（ParticleEngine が追従・微振動を担当するため）。
-			// prefers-reduced-motion: reduce のときは ParticleEngine が自動的に
-			// アニメーションループを開始せず、静止形を 1 回描画するだけになる。
-			const mobileHeroCanvas = document.getElementById("mobile-hero-fx") as HTMLCanvasElement | null;
-			if (mobileHeroCanvas && isMobile) {
-				const mEngine = new ParticleEngine(mobileHeroCanvas, {
-					followLerp: 0.06,
-					wobbleAmp: 0.35,
-				});
-
-				let mDiary: ReturnType<typeof textShape> = [];
-				let mBuiltKey = "";
-
-				function ensureMobileDiary() {
-					const w = mobileHeroCanvas!.clientWidth || window.innerWidth;
-					const h = mobileHeroCanvas!.clientHeight || 376;
-					const key = `${w}x${h}`;
-					if (key !== mBuiltKey) {
-						mDiary = textShape("Diary", {
-							width: w,
-							height: h,
-							fontPx: Math.min(w * 0.34, 130),
-							centerY: h * 0.42,
-							gap: 4,
-						});
-						mBuiltKey = key;
-						mEngine.setParticleCount(mDiary.length);
-					}
-				}
-
-				ensureMobileDiary();
-				mEngine.start((i) => {
-					ensureMobileDiary();
-					return mDiary[i];
-				});
-
-				window.addEventListener("resize", () => {
-					ensureMobileDiary();
 				});
 			}
 		</script>
