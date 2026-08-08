@@ -2,7 +2,7 @@
 
 ## 要件（docs/requirements.md §6 の要約）
 
-- ルーティング: `/problems/{id}/` `/solutions/{id}/` `/fields/{major}/` は不変。変更禁止
+- ルーティング: `/problems/{id}/` `/solutions/{id}/` `/fields/{slug}/` は不変。変更禁止
 - 解答ページは「解く前に見えない」導線（直接遷移時にワンクリック挟む）
 - 全ページレスポンシブ。PC・モバイル両対応が必須（モバイル後回し禁止）
 - 検索は Pagefind。対象はタイトル・タグ・地の文のみ。数式検索は仕様外
