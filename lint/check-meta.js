@@ -50,9 +50,19 @@ function isPlainObject(v) {
 }
 
 function loadDicts() {
-  const fields =
+  // fields.yaml は #92 で `{major: [minors]}` のマップ構造から
+  // `- slug / name / minors` のリスト構造に変わった。ここでは呼び出し側
+  // （field.major / field.minor の存在チェック）の互換性のため、
+  // 引き続き `{ major名: [minor名, ...] }` のマップに変換して返す。
+  const fieldsList =
     yaml.load(fs.readFileSync(path.join(REPO_ROOT, "fields.yaml"), "utf8")) ||
-    {};
+    [];
+  const fields = {};
+  for (const entry of fieldsList) {
+    if (entry && typeof entry.name === "string") {
+      fields[entry.name] = Array.isArray(entry.minors) ? entry.minors : [];
+    }
+  }
   const tags =
     yaml.load(fs.readFileSync(path.join(REPO_ROOT, "tags.yaml"), "utf8")) ||
     [];

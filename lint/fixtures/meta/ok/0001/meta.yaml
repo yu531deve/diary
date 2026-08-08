@@ -2,8 +2,8 @@ id: "0001"
 title: "定積分と面積の融合問題"
 status: draft
 field:
-  major: "微分積分"
-  minor: "定積分"
+  major: "微分積分学"
+  minor: "一変数の微分積分"
 tags: ["面積", "融合問題"]
 difficulty: 3
 created: 2026-08-04

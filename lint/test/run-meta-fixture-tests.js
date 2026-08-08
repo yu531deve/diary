@@ -72,7 +72,7 @@ const cases = [
   {
     dir: "bad-minor",
     id: "0007",
-    expect: ['field.minor: "存在しない中分野" は fields.yaml の "微分積分" 配下にありません'],
+    expect: ['field.minor: "存在しない中分野" は fields.yaml の "微分積分学" 配下にありません'],
   },
   {
     dir: "bad-tag",

@@ -2,8 +2,8 @@ id: "0004"
 title: "difficulty が範囲外の問題"
 status: draft
 field:
-  major: "微分積分"
-  minor: "定積分"
+  major: "微分積分学"
+  minor: "一変数の微分積分"
 tags: []
 difficulty: 6
 created: 2026-08-04
