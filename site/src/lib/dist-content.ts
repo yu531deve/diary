@@ -312,22 +312,10 @@ export function markFinalAnswerEquations(html: string): string {
   return marked.join("");
 }
 
-/**
- * 解答本文 HTML から、文書全体で最後の表示数式（＝最終的な答え）の
- * `<math>...</math>` 断片だけを取り出す。右カラムの ANSWER カード用。
- * 見つからなければ null（カードは開示しても値を表示しない）。
- */
-export function extractFinalAnswerMath(html: string): string | null {
-  if (!html) return null;
-  const tableRe = /<table\s+id="[^"]*"\s+class="ltx_equation ltx_eqn_table">[\s\S]*?<\/table>/g;
-  let last: RegExpExecArray | null = null;
-  let m: RegExpExecArray | null;
-  while ((m = tableRe.exec(html))) last = m;
-  if (!last) return null;
-
-  const mathRe = /<math\b[\s\S]*?<\/math>/g;
-  let lastMath: RegExpExecArray | null = null;
-  let mm: RegExpExecArray | null;
-  while ((mm = mathRe.exec(last[0]))) lastMath = mm;
-  return lastMath ? lastMath[0] : null;
-}
+// 旧 extractFinalAnswerMath（文書全体の最後の表示数式を右カラムの ANSWER
+// カードに再レンダリングする関数）は #67 のレビューで削除した。
+// MathML 断片を機械的に抜き出して独立に再レンダリングする方式は、
+// 抜き出した断片が本文の該当式と意味的に完全一致することを保証できず、
+// 実機検証で誤った見え方をする既知のリスクがあったため。
+// 現在は ANSWER カードから本文の答えブロックへのアンカーリンクに
+// 置き換えている（site/src/pages/solutions/[id]/index.astro 参照）。

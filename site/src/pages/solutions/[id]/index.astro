@@ -33,7 +33,17 @@
 //   markFinalAnswerEquations() が各設問（<li class="ltx_item">）内の
 //   最後の表示数式をヒューリスティックに「答え」とみなしてクラスを付与する
 //   （dist-content.ts 参照）。原稿の書き方に依存する近似である。
-//   右カラムの ANSWER カードは文書全体で最後の表示数式を表示する。
+//
+// design からの逸脱（#67 レビュー対応）:
+//   design/README.md では右カラムの ANSWER カードに最終結果の数式
+//   （例: S = 9/2）をそのまま表示する仕様だが、MathML 断片を機械的に
+//   抽出して独立に再レンダリングする方式（extractFinalAnswerMath、
+//   #67 初版で実装）は、抽出した断片が本文の該当式と意味的に完全一致
+//   することを保証できず、実機検証で誤った見え方をする既知のリスクが
+//   あった（レビュー指摘）。正確性を保証できない抽出結果を「答え」として
+//   見せるのは解答ページの信頼性に関わるため、ANSWER カードには数式を
+//   出さず、開示後は本文の答えブロックへのアンカーリンク（✓ 解答を見る）
+//   に置き換える。未開示時は STEP3 と同様に「● ● ●」のみを表示する。
 import {
   listPublishedProblems,
   readSolutionHtml,
@@ -41,7 +51,6 @@ import {
   readPolicyHtml,
   hasSolutionPdf,
   markFinalAnswerEquations,
-  extractFinalAnswerMath,
   DistNotFoundError,
   type ProblemMeta,
 } from "../../../lib/dist-content";
@@ -81,7 +90,8 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 )}`;
 
 const bodyHtml = solutionHtml.isFallback ? "" : markFinalAnswerEquations(solutionHtml.bodyHtml);
-const finalAnswerMath = solutionHtml.isFallback ? null : extractFinalAnswerMath(solutionHtml.bodyHtml);
+// ANSWER カードから本文の答えブロックへ飛ぶためのアンカー ID。
+const answerAnchorId = `answer-body-${meta.id}`;
 
 // 関連問題: 同じ大分野（field.major）から、id 昇順で自分以外を最大 2 件。
 const related = allProblems
@@ -447,18 +457,32 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			}
 			.answer-card .card-value {
 				display: block;
+				max-width: 100%;
+			}
+			/* 未開示: プレースホルダのみ表示。答えの実体は開示前に DOM 上へ
+			   出さない（answer-body 側は blur 済みだが、こちらは別カラムの
+			   独立要素なので "revealed" ノード自体を display:none で隠す）。 */
+			.answer-card .card-value.placeholder {
 				font: italic 400 30px "STIX Two Text", serif;
 				color: #2a3340;
-				transition: color 0.5s;
-				max-width: 100%;
-				overflow-x: auto;
-				overflow-y: hidden;
 			}
-			.answer-card .card-value :global(math) {
-				font-family: "STIX Two Text", serif;
-			}
-			.reveal-checkbox:checked ~ .solution-grid .col-side .answer-card .card-value {
+			.answer-card .card-value.revealed {
+				display: none;
+				font-size: 15px;
+				font-weight: 500;
 				color: #52e0f5;
+				transition: color 0.5s;
+			}
+			.answer-card .card-value.revealed:hover {
+				color: #7ce8f8;
+			}
+			/* 開示後（STEP3 のチェックボックスと連動。別カラムでも
+			   ~ 兄弟結合子で .solution-grid 経由の子孫セレクタとして繋がる） */
+			.reveal-checkbox:checked ~ .solution-grid .col-side .answer-card .card-value.placeholder {
+				display: none;
+			}
+			.reveal-checkbox:checked ~ .solution-grid .col-side .answer-card .card-value.revealed {
+				display: block;
 			}
 
 			.pdf-links {
@@ -662,7 +686,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 									<span class="step-toggle mono" />
 								</div>
 								<div class="answer-reveal-wrap">
-									<div class="answer-body" set:html={bodyHtml} />
+									<div class="answer-body" id={answerAnchorId} set:html={bodyHtml} />
 									<div class="answer-overlay">
 										<p>解き終わりましたか？</p>
 										<label class="reveal-btn" for="answer-reveal">解答を表示する</label>
@@ -677,13 +701,14 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			<div class="col-side">
 				<div class="answer-card">
 					<span class="card-label mono">ANSWER</span>
-					{
-						finalAnswerMath ? (
-							<span class="card-value" set:html={finalAnswerMath} />
-						) : (
-							<span class="card-value">● ● ●</span>
-						)
-					}
+					{/* 未開示は常に ● ● ● のみ。開示後（STEP3 のチェックボックスと
+					    連動）にだけ本文の答えブロックへのアンカーリンクへ切り替える。
+					    未開示状態で答え（の断片）が一切 DOM 上に見える形で
+					    露出しないようにする（#67 レビュー対応）。 */}
+					<span class="card-value placeholder">● ● ●</span>
+					<a class="card-value revealed" href={`#${answerAnchorId}`}>
+						✓ 解答を見る
+					</a>
 				</div>
 
 				<div class="pdf-links">
