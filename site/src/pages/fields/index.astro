@@ -424,6 +424,7 @@ const fieldsForClient = fieldIndex.map((f) => ({
 										class="field-toggle"
 										type="button"
 										aria-expanded={isOpen ? "true" : "false"}
+										aria-controls={`field-panel-${f.slug}`}
 										aria-label="中分野の一覧を開閉"
 										disabled={isEmpty}
 									>
@@ -433,7 +434,7 @@ const fieldsForClient = fieldIndex.map((f) => ({
 										</span>
 									</button>
 								</div>
-								<div class="field-panel">
+								<div class="field-panel" id={`field-panel-${f.slug}`}>
 									<div class="field-subs">
 										{f.minors.map((m) =>
 											m.href ? (
