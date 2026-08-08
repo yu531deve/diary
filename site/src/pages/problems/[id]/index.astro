@@ -30,7 +30,11 @@ import {
   DistNotFoundError,
   type ProblemMeta,
 } from "../../../lib/dist-content";
-import { computeRelatedProblems, type RelatedProblem } from "../../../lib/site-data";
+import {
+  computeRelatedProblems,
+  fieldSlugByMajor,
+  type RelatedProblem,
+} from "../../../lib/site-data";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
@@ -71,7 +75,12 @@ const solutionPdfAvailable = hasSolutionPdf(meta.id);
 const pdfHref = `/problems/${meta.id}/problem.pdf`;
 const solutionPdfHref = `/solutions/${meta.id}/solution.pdf`;
 const solutionHref = `/solutions/${meta.id}/`;
-const fieldHref = `/fields/${encodeURIComponent(meta.field.major)}/`;
+// #92: URL を大分野名（日本語）ではなく fields.yaml の slug ベースにする。
+// 対応する slug が見つからない場合（辞書との不整合。lint で弾かれる想定）は
+// フォールバックとして従来どおり大分野名を使う。
+// 注: /fields/{slug}/ ページ自体は未実装で、このリンクは現状 404 のまま
+// （#115 で対応予定）。今回はリンクの組み立てを slug ベースに直すのみ。
+const fieldHref = `/fields/${fieldSlugByMajor(meta.field.major) ?? encodeURIComponent(meta.field.major)}/`;
 const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeURIComponent(
   `誤植報告: ${meta.id} ${meta.title}`
 )}`;
