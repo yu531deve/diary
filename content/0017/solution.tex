@@ -1,0 +1,28 @@
+\diarytitle{0017}{同次形微分方程式の一般解（(x²+y²)/xy 型）}
+
+$\dfrac{dy}{dx} = f\!\left(\dfrac{y}{x}\right)$ の形（同次形）は $y = vx$ の置換により変数分離形に帰着して解ける。
+
+右辺を $y/x$ のみで表すと
+\[
+\frac{x^{2}+y^{2}}{xy} = \frac{1 + (y/x)^{2}}{y/x}
+\]
+であるから同次形である。$v = y/x$（$y = vx$）と置くと $\dfrac{dy}{dx} = v + x\dfrac{dv}{dx}$ より
+\[
+v + x\frac{dv}{dx} = \frac{1+v^{2}}{v}
+\quad\Longrightarrow\quad
+x\frac{dv}{dx} = \frac{1+v^{2}}{v} - v = \frac{1}{v}
+\]
+変数分離して
+\[
+v\,dv = \frac{dx}{x}
+\quad\Longrightarrow\quad
+\frac{v^{2}}{2} = \ln x + C_{1}
+\quad\Longrightarrow\quad
+v^{2} = 2\ln x + C
+\]
+$v = y/x$ を戻すと $\dfrac{y^{2}}{x^{2}} = 2\ln x + C$ より
+\[
+\boxed{\; y^{2} = x^{2}\left(2\ln x + C\right) \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $y^{2}=x^{2}(2\ln x+C)$ の両辺を $x$ で微分すると $2yy' = 2x(2\ln x+C) + x^{2}\cdot\frac{2}{x} = 2x(2\ln x+C+1)$。よって $y' = \dfrac{x(2\ln x+C+1)}{y}$。一方、右辺は $\dfrac{x^{2}+y^{2}}{xy} = \dfrac{x^{2}+x^{2}(2\ln x+C)}{xy} = \dfrac{x(1+2\ln x+C)}{y}$ となり一致する。）

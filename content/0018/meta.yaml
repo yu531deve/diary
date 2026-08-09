@@ -1,0 +1,10 @@
+id: "0018"
+title: "同次形微分方程式の一般解（y/x + tan(y/x) 型）"
+status: draft
+field:
+  major: "常微分方程式"
+  minor: "一階微分方程式"
+tags: ["同次形", "変数分離"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09
