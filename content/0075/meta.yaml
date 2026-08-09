@@ -1,0 +1,10 @@
+id: "0075"
+title: "3次対称行列の固有値・固有ベクトルと直交対角化"
+status: draft
+field:
+  major: "線形代数"
+  minor: "固有値と対角化"
+tags: ["固有値", "対角化"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09
