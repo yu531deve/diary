@@ -246,7 +246,7 @@ const issueHref =
 				background: linear-gradient(180deg, #52e0f5, transparent);
 				animation: scrollpulse 2s ease-in-out infinite;
 			}
-			#c2,
+			#c-gamma,
 			#c-beta {
 				left: 48px;
 				top: 0;
@@ -258,13 +258,13 @@ const issueHref =
 				gap: 20px;
 				max-width: 440px;
 			}
-			#c2 .eyebrow,
+			#c-gamma .eyebrow,
 			#c-beta .eyebrow {
 				font: 500 11px "IBM Plex Mono", monospace;
 				letter-spacing: 0.24em;
 				color: #52e0f5;
 			}
-			#c2 h2,
+			#c-gamma h2,
 			#c-beta h2 {
 				margin: 0;
 				font-size: 40px;
@@ -272,12 +272,12 @@ const issueHref =
 				line-height: 1.35;
 				text-wrap: pretty;
 			}
-			#c2 .formula,
+			#c-gamma .formula,
 			#c-beta .formula {
 				font: italic 400 21px "STIX Two Text", serif;
 				color: #aab6d4;
 			}
-			#c2 p,
+			#c-gamma p,
 			#c-beta p {
 				margin: 0;
 				font-size: 14px;
@@ -575,21 +575,21 @@ const issueHref =
 					font-size: 15px;
 					padding: 0 24px;
 				}
-				#c2,
+				#c-gamma,
 				#c-beta {
 					left: 24px;
 					right: 24px;
 					max-width: none;
 				}
-				#c2 h2,
+				#c-gamma h2,
 				#c-beta h2 {
 					font-size: 26px;
 				}
-				#c2 .formula,
+				#c-gamma .formula,
 				#c-beta .formula {
 					font-size: 15px;
 				}
-				#c2 p,
+				#c-gamma p,
 				#c-beta p {
 					font-size: 13px;
 				}
@@ -662,7 +662,7 @@ const issueHref =
 				#stage {
 					position: relative;
 				}
-				#c2,
+				#c-gamma,
 				#c-beta,
 				#c3,
 				#c4 {
@@ -719,11 +719,11 @@ const issueHref =
 					</div>
 				</div>
 
-				<div id="c2" class="caption">
-					<div class="eyebrow">PROBLEM 0001</div>
-					<h2>放物線と直線で<br />囲まれた面積</h2>
-					<div class="formula">{"∫₋₁² {(x+2) − x²} dx = 9/2"}</div>
-					<p>すべての問題は完全自作。<br />ブラウザで読んで、PDF で解く。</p>
+				<div id="c-gamma" class="caption">
+					<div class="eyebrow">GAMMA FUNCTION</div>
+					<h2>Γ関数が描く<br />面積</h2>
+					<div class="formula">{"Γ(4) = ∫₀^∞ x³e^(−x) dx = 3! = 6"}</div>
+					<p>階乗を実数へ広げる関数。<br />面積として見れば 3! = 6 が現れる。</p>
 				</div>
 
 				{/*
@@ -731,10 +731,10 @@ const issueHref =
 				  ID を c5 ではなく c-beta にしているのは、既存の #c1〜#c4 を
 				  振り直すと CSS 側のブロックを全部書き換えることになり、
 				  #63 で作り込んだ演出を壊すリスクが高いため。
-				  レイアウトは #c2 と同一なので CSS セレクタを共有している。
+				  レイアウトは #c-gamma と同一なので CSS セレクタを共有している。
 				*/}
 				<div id="c-beta" class="caption">
-					<div class="eyebrow">SPECIAL FUNCTIONS</div>
+					<div class="eyebrow">BETA FUNCTION</div>
 					<h2>β関数が描く<br />面積</h2>
 					<div class="formula">{"B(2,3) = ∫₀¹ x(1−x)² dx = 1/12"}</div>
 					<p>院試で頻出の特殊関数も、<br />面積として見れば値の意味がわかる。</p>
@@ -840,7 +840,7 @@ const issueHref =
 			} from "../lib/particles";
 			// #244: β関数のシーン。値の計算は #93 のプロトタイプで検証済みの
 			// mathviz ライブラリを使い、被積分関数の定義を二重に持たない。
-			import { betaIntegrand } from "../lib/mathviz/gamma";
+			import { betaIntegrand, gammaIntegrand } from "../lib/mathviz/gamma";
 
 			const track = document.getElementById("track") as HTMLDivElement | null;
 			const canvas = document.getElementById("fx") as HTMLCanvasElement | null;
@@ -878,9 +878,10 @@ const issueHref =
 				];
 
 				let sets: ReturnType<typeof alignSets>;
-				let sx: (u: number) => number;
-				let sy: (v: number) => number;
-				// #244: β関数シーン用のスケール（放物線グラフとは軸の範囲が違う）
+				// #244: Γ関数シーン用のスケール
+				let gx: (u: number) => number;
+				let gy: (v: number) => number;
+				// #244: β関数シーン用のスケール（Γ とは軸の範囲が違う）
 				let bx: (u: number) => number;
 				let by: (v: number) => number;
 				let builtKey = "";
@@ -893,19 +894,26 @@ const issueHref =
 						fontPx: Math.min(w * 0.24, 340),
 						centerY: h * 0.42,
 					});
-					// problem 0001 のグラフ: u ∈ [-2.2, 3.2], v ∈ [-1.5, 5.5]
-					// design の pw/L/R 計算を画面幅に対する比で単純化して踏襲する。
-					const L = w > 900 ? w * 0.46 : w * 0.08;
-					const R = w > 900 ? w * 0.98 : w * 0.92;
-					const T = h * 0.16;
-					const B = h * 0.86;
-					sx = (u: number) => L + ((u + 2.2) / 5.4) * (R - L);
-					sy = (v: number) => B - ((v + 1.5) / 7) * (B - T);
-					const graph = curvePoints([
-						{ from: -2.2, to: 3.2, step: 0.018, fn: (u) => ({ x: sx(u), y: sy(u * u) }) },
-						{ from: -2.2, to: 3.2, step: 0.026, fn: (u) => ({ x: sx(u), y: sy(u + 2) }) },
-						{ from: -1.5, to: 5.5, step: 0.09, fn: (v) => ({ x: sx(0), y: sy(v) }) },
-						{ from: -2.2, to: 3.2, step: 0.07, fn: (u) => ({ x: sx(u), y: sy(0) }) },
+					// #244: Γ(4) = ∫₀^∞ x³e^(-x) dx = 3! = 6 の被積分関数。
+					// ピークは x = s-1 = 3 で値は 27e^(-3) ≈ 1.344。裾は x = 12 で
+					// 打ち切る（x³e^(-x) は x=12 で約 0.0106 まで落ちる）。
+					// 被積分関数の定義は mathviz の gammaIntegrand に委ねる。
+					const GAMMA_S = 4;
+					const L = w > 900 ? w * 0.46 : w * 0.1;
+					const R = w > 900 ? w * 0.95 : w * 0.9;
+					const T = h * 0.2;
+					const B = h * 0.8;
+					gx = (u: number) => L + ((u + 0.7) / 13.4) * (R - L);
+					gy = (v: number) => B - ((v + 0.12) / 1.62) * (B - T);
+					const gammaCurve = curvePoints([
+						{
+							from: 0.001,
+							to: 12,
+							step: 0.04,
+							fn: (u) => ({ x: gx(u), y: gy(gammaIntegrand(GAMMA_S, u)) }),
+						},
+						{ from: -0.7, to: 12.7, step: 0.16, fn: (u) => ({ x: gx(u), y: gy(0) }) },
+						{ from: -0.12, to: 1.5, step: 0.026, fn: (v) => ({ x: gx(0), y: gy(v) }) },
 					]);
 					const thousand = textShape("1000+", {
 						width: w,
@@ -935,7 +943,7 @@ const issueHref =
 						{ from: -0.02, to: 0.19, step: 0.0035, fn: (v) => ({ x: bx(0), y: by(v) }) },
 					]);
 					const up = upwardScatter(PARTICLE_COUNT, w, h);
-					return alignSets([scatter, diary, graph, betaCurve, thousand, up]);
+					return alignSets([scatter, diary, gammaCurve, betaCurve, thousand, up]);
 				}
 
 				function ensureSets() {
@@ -959,7 +967,7 @@ const issueHref =
 				ensureSets();
 
 				const c1 = document.getElementById("c1");
-				const c2 = document.getElementById("c2");
+				const cGamma = document.getElementById("c-gamma");
 				const cBeta = document.getElementById("c-beta");
 				const c3 = document.getElementById("c3");
 				const c4 = document.getElementById("c4");
@@ -1015,7 +1023,7 @@ const issueHref =
 						const { from, to, t } = segmentProgress(currentP, SEGMENTS);
 
 						// あるセットが支配的な間だけ、そのシーンの「面積」を塗る。
-						// セット 2 = 放物線と直線が囲む領域、セット 3 = β関数の被積分関数の下側（#244）。
+						// セット 2 = Γ関数、セット 3 = β関数。いずれも被積分関数の下側を塗る（#244）。
 						const setWeight = (target: number) => {
 							if (from === target && to === target) return 1;
 							if (to === target) return t;
@@ -1023,15 +1031,17 @@ const issueHref =
 							return 0;
 						};
 
-						const graphWeight = setWeight(2);
-						if (graphWeight > 0.02 && sx && sy) {
+						const gammaWeight = setWeight(2);
+						if (gammaWeight > 0.02 && gx && gy) {
 							const ctx = frame.ctx;
 							ctx.save();
-							ctx.globalAlpha = graphWeight * 0.9;
+							ctx.globalAlpha = gammaWeight * 0.9;
 							ctx.beginPath();
-							ctx.moveTo(sx(-1), sy(1));
-							for (let u = -1; u <= 2.001; u += 0.05) ctx.lineTo(sx(u), sy(u + 2));
-							for (let u = 2; u >= -1.001; u -= 0.05) ctx.lineTo(sx(u), sy(u * u));
+							ctx.moveTo(gx(0), gy(0));
+							for (let u = 0; u <= 12.001; u += 0.06) {
+								ctx.lineTo(gx(u), gy(gammaIntegrand(4, u)));
+							}
+							ctx.lineTo(gx(12), gy(0));
 							ctx.closePath();
 							ctx.fillStyle = "rgba(82,224,245,0.13)";
 							ctx.fill();
@@ -1057,7 +1067,7 @@ const issueHref =
 
 						// #244: シーンが 1 つ増えたぶん、旧値を 1.28 で割って詰め直している。
 						applyCaption(c1, fade(currentP, -1, 0.102));
-						applyCaption(c2, fade(currentP, 0.234, 0.455));
+						applyCaption(cGamma, fade(currentP, 0.234, 0.455));
 						applyCaption(cBeta, fade(currentP, 0.465, 0.665));
 						applyCaption(c3, fade(currentP, 0.675, 0.86));
 						applyCaption(c4, currentP > 0.875 ? Math.min((currentP - 0.875) / 0.04, 1) : 0);
