@@ -1,0 +1,52 @@
+\diarytitle{0072}{双曲型2階線形偏微分方程式の標準形と一般解（u_xx - 4u_xy + 3u_yy = 0）}
+
+方針: 判別式 $D=B^2-AC$ で型を判定した上で、特性方程式
+\[
+A\left(\frac{dy}{dx}\right)^{2} - 2B\frac{dy}{dx} + C = 0
+\qquad\Longleftrightarrow\qquad
+\frac{dy}{dx} = \frac{B \pm \sqrt{B^{2}-AC}}{A}
+\]
+を解いて特性曲線 $\varphi(x,y)=\text{const.}$ を求め、新変数 $\xi,\eta$ にとると主要部の係数が消えて標準形が得られる。双曲型（$D>0$）では実数の特性曲線が2本得られ、$\xi,\eta$ をそれぞれの特性曲線にとると標準形 $u_{\xi\eta}=0$ が得られる。
+
+$A=1,\ B=-2,\ C=3$ であるから
+\[
+D = B^{2}-AC = 4 - 3 = 1 > 0 \quad (\text{双曲型})
+\]
+特性方程式は
+\[
+\frac{dy}{dx} = \frac{B \pm \sqrt{D}}{A} = -2 \pm 1
+\]
+すなわち $\dfrac{dy}{dx} = -1$ または $\dfrac{dy}{dx} = -3$。それぞれ積分して
+\[
+y + x = c_1, \qquad y + 3x = c_2
+\]
+そこで
+\[
+\xi = y + x, \qquad \eta = y + 3x
+\]
+とおく。逆に $x = \dfrac{\eta-\xi}{2},\ y = \dfrac{3\xi-\eta}{2}$。連鎖律より
+\[
+u_x = u_\xi + 3u_\eta, \qquad u_y = u_\xi + u_\eta
+\]
+\[
+u_{xx} = u_{\xi\xi} + 6u_{\xi\eta} + 9u_{\eta\eta}, \qquad
+u_{xy} = u_{\xi\xi} + 4u_{\xi\eta} + 3u_{\eta\eta}, \qquad
+u_{yy} = u_{\xi\xi} + 2u_{\xi\eta} + u_{\eta\eta}
+\]
+これを元の方程式に代入すると
+\[
+(u_{\xi\xi}+6u_{\xi\eta}+9u_{\eta\eta}) - 4(u_{\xi\xi}+4u_{\xi\eta}+3u_{\eta\eta}) + 3(u_{\xi\xi}+2u_{\xi\eta}+u_{\eta\eta})
+\]
+係数を整理すると、$u_{\xi\xi}$ の係数は $1-4+3=0$、$u_{\eta\eta}$ の係数は $9-12+3=0$、$u_{\xi\eta}$ の係数は $6-16+6=-4$ となるので
+\[
+-4u_{\xi\eta} = 0 \quad\Longrightarrow\quad u_{\xi\eta}=0
+\]
+これが標準形である。$u_{\xi\eta}=0$ を $\eta$ について積分すると $u_\xi = f'(\xi)$（$\eta$ に依らない関数）、さらに $\xi$ について積分して
+\[
+u = f(\xi) + g(\eta)
+\]
+（$f,g$ は任意の $C^2$ 関数）。$\xi,\eta$ をもとに戻すと
+\[
+\boxed{\; u(x,y) = f(y+x) + g(y+3x) \;}
+\]
+（検算: $u=f(y+x)$ とすると $u_{xx}=f'',\,u_{xy}=f'',\,u_{yy}=f''$ より $u_{xx}-4u_{xy}+3u_{yy}=(1-4+3)f''=0$。$u=g(y+3x)$ とすると $u_{xx}=9g'',\,u_{xy}=3g'',\,u_{yy}=g''$ より $(9-12+3)g''=0$。したがって重ね合わせにより一般解は方程式を満たす。）
