@@ -13,6 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { CONTENT_DIR, REPO_ROOT, listPublishedProblems } from "./dist-content";
 import type { ProblemMeta } from "./dist-content";
+import { formatMathTitle } from "./title";
 
 export const FIELDS_YAML_PATH = path.join(REPO_ROOT, "fields.yaml");
 
@@ -163,7 +164,10 @@ export type SearchIndexEntry = {
 export function buildSearchIndex(): SearchIndexEntry[] {
   return listPublishedProblems().map((p) => ({
     id: p.id,
-    title: p.title,
+    // #227: title は LaTeX（\diarytitle 用）が正のため、検索インデックス
+    // には formatMathTitle で $ や LaTeX コマンドを除いた平文を積む
+    // （そうしないと Pagefind の索引・結果表示に $...$ がそのまま出る）。
+    title: formatMathTitle(p.title),
     field: p.field.major,
     sub: p.field.minor,
     tags: p.tags,

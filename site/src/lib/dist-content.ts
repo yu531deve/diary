@@ -40,13 +40,32 @@ export type ProblemMeta = {
  * YAML パーサへの依存を増やしたくないための簡易実装
  * （site/src/pages/index.astro の parseMetaYaml と同方針）。
  */
+/**
+ * YAML のスカラー値からクォートを剥がす。
+ * `"..."` `'...'` どちらの引用符でも、前後が同じ種類の引用符で
+ * 対になっている場合のみ剥がす（#227: バックスラッシュを含む title は
+ * 単一引用符で書かれる。従来は `"?` のみを見ていたため、単一引用符の
+ * 値では引用符自体が本文に残ってしまっていた）。
+ */
+function stripYamlQuotes(value: string): string {
+  const v = value.trim();
+  if (v.length >= 2) {
+    const first = v[0];
+    const last = v[v.length - 1];
+    if ((first === '"' || first === "'") && first === last) {
+      return v.slice(1, -1);
+    }
+  }
+  return v;
+}
+
 export function parseMetaYaml(text: string): ProblemMeta {
   const get = (key: string) => {
-    const m = text.match(new RegExp(`^${key}:\\s*"?([^"\n]+)"?\\s*$`, "m"));
-    return m ? m[1].trim() : "";
+    const m = text.match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m"));
+    return m ? stripYamlQuotes(m[1]) : "";
   };
-  const major = text.match(/^\s*major:\s*"?([^"\n]+)"?\s*$/m);
-  const minor = text.match(/^\s*minor:\s*"?([^"\n]+)"?\s*$/m);
+  const major = text.match(/^\s*major:\s*(.+?)\s*$/m);
+  const minor = text.match(/^\s*minor:\s*(.+?)\s*$/m);
   const tagsLine = text.match(/^tags:\s*\[([^\]]*)\]\s*$/m);
   const tags = tagsLine
     ? tagsLine[1]
@@ -59,8 +78,8 @@ export function parseMetaYaml(text: string): ProblemMeta {
     title: get("title"),
     status: get("status"),
     field: {
-      major: major ? major[1].trim() : "",
-      minor: minor ? minor[1].trim() : "",
+      major: major ? stripYamlQuotes(major[1]) : "",
+      minor: minor ? stripYamlQuotes(minor[1]) : "",
     },
     tags,
     difficulty: get("difficulty"),

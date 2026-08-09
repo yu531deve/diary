@@ -16,6 +16,7 @@ import { computeSiteStats } from "../lib/site-data";
 import LoadingCurtain from "../components/LoadingCurtain.astro";
 import SearchModal from "../components/SearchModal.astro";
 import BottomTabNav from "../components/BottomTabNav.astro";
+import { formatMathTitle } from "../lib/title";
 
 const stats = computeSiteStats();
 
@@ -770,7 +771,7 @@ const issueHref =
 							recent.map((p) => (
 								<a href={`/problems/${p.id}/`} class="new-row">
 									<span class="id">{p.id}</span>
-									<span class="title">{p.title}</span>
+									<span class="title">{formatMathTitle(p.title)}</span>
 									<span class="pill">
 										{p.field.major} / {p.field.minor}
 									</span>
