@@ -1,0 +1,10 @@
+id: "0090"
+title: "x√(1-x^2) の定積分（置換積分）"
+status: draft
+field:
+  major: "微分積分学"
+  minor: "一変数の微分積分"
+tags: ["置換積分"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09
