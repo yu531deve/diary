@@ -1,0 +1,14 @@
+\diarytitle{0086}{x sin x の定積分（部分積分）}
+
+$f(x) = x$, $g'(x) = \sin x$ とおくと $f'(x) = 1$, $g(x) = -\cos x$ であるから、部分積分により
+\[
+\int_{0}^{\pi/2} x\sin x\,dx
+= \Bigl[-x\cos x\Bigr]_{0}^{\pi/2} + \int_{0}^{\pi/2} \cos x\,dx
+= \Bigl[-x\cos x\Bigr]_{0}^{\pi/2} + \Bigl[\sin x\Bigr]_{0}^{\pi/2}
+\]
+ここで $\cos(\pi/2) = 0$ より第1項は $0 - 0 = 0$、第2項は $1 - 0 = 1$ であるから
+\[
+\boxed{\; \int_{0}^{\pi/2} x\sin x\,dx = 1 \;}
+\]
+（検算: 原始関数は $-x\cos x + \sin x$ であり、微分すると
+$-\cos x + x\sin x + \cos x = x\sin x$ となり被積分関数に一致する。）

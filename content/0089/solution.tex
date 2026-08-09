@@ -1,0 +1,29 @@
+\diarytitle{0089}{e^x cos x の定積分（循環型部分積分）}
+
+$e^{x}\sin x$ や $e^{x}\cos x$ のように、部分積分を繰り返しても被積分関数の形が
+変わらない（元に戻ってくる）場合は循環型と呼ばれる。この場合は部分積分を 2 回行うと、
+両辺に同じ形の積分が現れるので、方程式とみなしてそれについて解けばよい。
+
+$I = \displaystyle\int_{0}^{\pi} e^{x}\cos x\,dx$ とおく。$f(x) = \cos x$, $g'(x) = e^{x}$ として部分積分すると
+\[
+I = \Bigl[e^{x}\cos x\Bigr]_{0}^{\pi} + \int_{0}^{\pi} e^{x}\sin x\,dx
+\]
+（$\bigl(\cos x\bigr)' = -\sin x$ より $-\int e^x(-\sin x)\,dx = +\int e^x\sin x\,dx$ となることに注意）。
+さらに $J = \displaystyle\int_{0}^{\pi} e^{x}\sin x\,dx$ に対して同様に $f(x)=\sin x$, $g'(x)=e^{x}$ として部分積分すると
+\[
+J = \Bigl[e^{x}\sin x\Bigr]_{0}^{\pi} - \int_{0}^{\pi} e^{x}\cos x\,dx
+= \Bigl[e^{x}\sin x\Bigr]_{0}^{\pi} - I
+\]
+$\sin 0 = \sin\pi = 0$ であるから $\bigl[e^{x}\sin x\bigr]_{0}^{\pi} = 0$、よって $J = -I$。これを $I$ の式に代入すると
+\[
+I = \Bigl[e^{x}\cos x\Bigr]_{0}^{\pi} + J = \bigl(e^{\pi}\cos\pi - e^{0}\cos 0\bigr) + (-I)
+= \bigl(-e^{\pi} - 1\bigr) - I
+\]
+すなわち $2I = -e^{\pi} - 1$ より
+\[
+\boxed{\; \int_{0}^{\pi} e^{x}\cos x\,dx = -\frac{e^{\pi}+1}{2} \;}
+\]
+（検算: 原始関数は $\dfrac{e^{x}(\sin x + \cos x)}{2}$ であり、微分すると
+$\dfrac{e^{x}(\sin x+\cos x) + e^{x}(\cos x-\sin x)}{2} = \dfrac{2e^{x}\cos x}{2} = e^{x}\cos x$ となり
+被積分関数に一致する。$x=\pi$ で $\dfrac{e^{\pi}(0-1)}{2}=-\dfrac{e^{\pi}}{2}$、$x=0$ で $\dfrac{1(0+1)}{2}=\dfrac12$。
+差は $-\dfrac{e^{\pi}}{2}-\dfrac12=-\dfrac{e^{\pi}+1}{2}$。）

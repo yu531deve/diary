@@ -1,0 +1,22 @@
+\diarytitle{0088}{x ln x の定積分（部分積分）}
+
+$f(x) = \ln x$, $g'(x) = x$ とおくと $f'(x) = \dfrac{1}{x}$, $g(x) = \dfrac{x^{2}}{2}$ であるから、部分積分により
+\[
+\int_{1}^{e} x\ln x\,dx
+= \left[\frac{x^{2}}{2}\ln x\right]_{1}^{e} - \int_{1}^{e} \frac{x^{2}}{2}\cdot\frac{1}{x}\,dx
+= \left[\frac{x^{2}}{2}\ln x\right]_{1}^{e} - \frac{1}{2}\int_{1}^{e} x\,dx
+\]
+第1項は $\dfrac{e^{2}}{2}\cdot 1 - \dfrac{1}{2}\cdot 0 = \dfrac{e^{2}}{2}$、
+第2項は $\dfrac{1}{2}\left[\dfrac{x^{2}}{2}\right]_{1}^{e} = \dfrac{1}{2}\left(\dfrac{e^{2}}{2} - \dfrac{1}{2}\right) = \dfrac{e^{2}}{4} - \dfrac{1}{4}$
+であるから
+\[
+\int_{1}^{e} x\ln x\,dx = \frac{e^{2}}{2} - \left(\frac{e^{2}}{4} - \frac{1}{4}\right) = \frac{e^{2}}{4} + \frac{1}{4}
+\]
+すなわち
+\[
+\boxed{\; \int_{1}^{e} x\ln x\,dx = \frac{e^{2}+1}{4} \;}
+\]
+（検算: 原始関数は $\dfrac{x^{2}}{2}\ln x - \dfrac{x^{2}}{4}$ であり、微分すると
+$x\ln x + \dfrac{x^{2}}{2}\cdot\dfrac{1}{x} - \dfrac{x}{2} = x\ln x + \dfrac{x}{2} - \dfrac{x}{2} = x\ln x$ となり
+被積分関数に一致する。$x=e$ で $\dfrac{e^2}{2}-\dfrac{e^2}{4}=\dfrac{e^2}{4}$、$x=1$ で $0-\dfrac14=-\dfrac14$。
+差は $\dfrac{e^2}{4}+\dfrac14$。）
