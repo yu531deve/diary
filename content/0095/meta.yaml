@@ -1,0 +1,10 @@
+id: "0095"
+title: "(x+1)/(x^2+x-2) の部分分数分解による積分"
+status: draft
+field:
+  major: "微分積分学"
+  minor: "一変数の微分積分"
+tags: ["部分分数分解", "有理関数の積分"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09
