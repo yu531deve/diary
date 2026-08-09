@@ -1,0 +1,47 @@
+\diarytitle{0121}{極座標変換による扇形領域上の√(x^2+y^2) の重積分}
+
+$x = r\cos\theta,\ y = r\sin\theta$（$r \ge 0,\ 0 \le \theta < 2\pi$）と変数変換すると、ヤコビ行列は
+\[
+\frac{\partial(x,y)}{\partial(r,\theta)} =
+\begin{pmatrix}
+\dfrac{\partial x}{\partial r} & \dfrac{\partial x}{\partial \theta} \\[4pt]
+\dfrac{\partial y}{\partial r} & \dfrac{\partial y}{\partial \theta}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\cos\theta & -r\sin\theta \\
+\sin\theta & r\cos\theta
+\end{pmatrix}
+\]
+であり、そのヤコビアン（行列式）は
+\[
+J = \cos\theta \cdot r\cos\theta - (-r\sin\theta)\cdot\sin\theta = r(\cos^{2}\theta + \sin^{2}\theta) = r
+\]
+となる。したがって面積要素は $dx\,dy = |J|\,dr\,d\theta = r\,dr\,d\theta$ と変換され、
+\[
+\iint_{D} f(x,y)\,dx\,dy = \iint_{D'} f(r\cos\theta, r\sin\theta)\, r\,dr\,d\theta
+\]
+が成り立つ（$D'$ は $D$ を $(r,\theta)$ 平面に写した領域）。
+
+$x = r\cos\theta,\ y = r\sin\theta$ とおくと、$D$ は第1象限の半径2の扇形なので
+\[
+D' = \{(r,\theta) \mid 0 \le r \le 2,\ 0 \le \theta \le \tfrac{\pi}{2}\}
+\]
+に対応する。$\sqrt{x^2+y^2} = r$、面積要素は $dx\,dy = r\,dr\,d\theta$ であるから
+\[
+\iint_{D} \sqrt{x^{2}+y^{2}}\,dx\,dy = \int_{0}^{\pi/2}\int_{0}^{2} r \cdot r\,dr\,d\theta
+= \int_{0}^{\pi/2}\left(\int_{0}^{2} r^{2}\,dr\right)d\theta
+\]
+内側の積分は
+\[
+\int_{0}^{2} r^{2}\,dr = \left[\frac{r^{3}}{3}\right]_{0}^{2} = \frac{8}{3}
+\]
+であるから
+\[
+\int_{0}^{\pi/2} \frac{8}{3}\,d\theta = \frac{8}{3}\cdot\frac{\pi}{2} = \frac{4\pi}{3}
+\]
+よって
+\[
+\boxed{\; \iint_{D} \sqrt{x^{2}+y^{2}}\,dx\,dy = \frac{4\pi}{3} \;}
+\]
+（検算: 半径2、中心角 $\pi/2$ の扇形の「重み付き面積」として、$r=2$ での被積分関数の最大値は $2$、扇形の面積は $\pi\cdot2^2/4=\pi$ であるから、答え $4\pi/3 \approx 4.19$ は $0$ から $2\pi\approx6.28$ の間に収まり妥当である。）

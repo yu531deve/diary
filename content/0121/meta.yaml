@@ -1,0 +1,10 @@
+id: "0121"
+title: "極座標変換による扇形領域上の√(x^2+y^2) の重積分"
+status: draft
+field:
+  major: "微分積分学"
+  minor: "重積分"
+tags: ["極座標変換", "変数変換", "ヤコビアン"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09
