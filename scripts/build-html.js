@@ -33,12 +33,24 @@
  * 自動フォールバックする（#24。判定基準・実装は scripts/html-fallback.js
  * および convertOne 内のコメント参照）。
  *
+ * 差分ビルド（#230）:
+ *   build-pdf.js と同様、問題ごとに problem.tex / solution.tex / meta.yaml /
+ *   styles/diary.sty の内容から SHA-256 ハッシュを計算し、
+ *   .cache/html-build-cache.json に前回成功時のハッシュを記録する。
+ *   HTML 変換は latexmlc の起動・バインディング読み込みのオーバーヘッドが
+ *   支配的なため（#230 の実測）、加えて scripts/latexml-bindings/ 配下と
+ *   scripts/build-html.js 自身の内容もハッシュに含める。バインディングや
+ *   変換ロジックが変われば全問の再変換を引き起こす（意図した挙動）。
+ *   フォールバックが発動したケースは「変換の成功」ではないため、
+ *   成功としてキャッシュしない（次回も再変換を試みる）。
+ *
  * 使い方:
  *   node scripts/build-html.js
  */
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const {
   extractTikzPictures,
@@ -53,6 +65,10 @@ const STYLES_DIR = path.join(REPO_ROOT, "styles");
 const BINDINGS_DIR = path.join(REPO_ROOT, "scripts", "latexml-bindings");
 const DIST_HTML_DIR = path.join(REPO_ROOT, "dist", "html");
 const WORK_DIR = path.join(DIST_HTML_DIR, ".work");
+const CACHE_DIR = path.join(REPO_ROOT, ".cache");
+const CACHE_PATH = path.join(CACHE_DIR, "html-build-cache.json");
+const DIARY_STY_PATH = path.join(STYLES_DIR, "diary.sty");
+const BUILD_HTML_JS_PATH = path.join(REPO_ROOT, "scripts", "build-html.js");
 
 const MODES = ["problem", "solution"];
 
@@ -92,6 +108,83 @@ function findProblemDirs() {
     .filter((d) => d.isDirectory() && /^\d{4}$/.test(d.name))
     .map((d) => d.name)
     .sort();
+}
+
+function loadCache() {
+  if (!fs.existsSync(CACHE_PATH)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(CACHE_PATH, "utf8"));
+  } catch (err) {
+    console.error(`[cache] キャッシュファイルの読み込みに失敗したため無視します: ${err.message}`);
+    return {};
+  }
+}
+
+function saveCache(cache) {
+  fs.mkdirSync(CACHE_DIR, { recursive: true });
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2) + "\n");
+}
+
+// dir 配下のファイルを再帰的に列挙し、REPO_ROOT からの相対パスでソートして返す。
+// バインディングディレクトリの追加・削除・リネームもハッシュに反映させるため、
+// ファイル名も内容と一緒にハッシュへ含める。
+function listFilesRecursive(dir) {
+  if (!fs.existsSync(dir)) return [];
+  const results = [];
+  const walk = (d) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (entry.isFile()) {
+        results.push(full);
+      }
+    }
+  };
+  walk(dir);
+  return results.sort();
+}
+
+// 問題によらず共通のハッシュ材料（diary.sty・latexml-bindings 一式・
+// build-html.js 自身）を1本にまとめておき、全問題のハッシュ計算で使い回す。
+// これらのいずれかが変われば全問の再変換を引き起こす。
+function computeSharedContext() {
+  const hash = crypto.createHash("sha256");
+
+  hash.update("diary.sty:\n");
+  hash.update(fs.existsSync(DIARY_STY_PATH) ? fs.readFileSync(DIARY_STY_PATH) : Buffer.from(""));
+  hash.update("\n");
+
+  hash.update("latexml-bindings:\n");
+  for (const file of listFilesRecursive(BINDINGS_DIR)) {
+    hash.update(`${path.relative(REPO_ROOT, file)}:\n`);
+    hash.update(fs.readFileSync(file));
+    hash.update("\n");
+  }
+
+  hash.update("build-html.js:\n");
+  hash.update(
+    fs.existsSync(BUILD_HTML_JS_PATH) ? fs.readFileSync(BUILD_HTML_JS_PATH) : Buffer.from("")
+  );
+
+  return hash.digest("hex");
+}
+
+// 問題 1 件分のハッシュ: problem.tex + solution.tex + meta.yaml + 共通コンテキスト
+// （diary.sty・latexml-bindings・build-html.js 自身）の内容から SHA-256 を取る。
+function computeHash(id, dir, sharedContextHash) {
+  const hash = crypto.createHash("sha256");
+  hash.update(`id:${id}\n`);
+  for (const name of ["problem.tex", "solution.tex", "meta.yaml"]) {
+    const p = path.join(dir, name);
+    const content = fs.existsSync(p) ? fs.readFileSync(p) : Buffer.from("");
+    hash.update(`${name}:\n`);
+    hash.update(content);
+    hash.update("\n");
+  }
+  hash.update("shared:\n");
+  hash.update(sharedContextHash);
+  return hash.digest("hex");
 }
 
 function buildWrapperTex(mode, svgStrippedBodyPath) {
@@ -250,6 +343,11 @@ function main() {
   const failures = [];
   const generated = [];
   const fallbacks = [];
+  const skipped = [];
+
+  const cache = loadCache();
+  const sharedContextHash = computeSharedContext();
+  const nextCache = {};
 
   for (const id of ids) {
     const dir = path.join(CONTENT_DIR, id);
@@ -265,6 +363,35 @@ function main() {
       continue;
     }
 
+    const hash = computeHash(id, dir, sharedContextHash);
+    const prev = cache[id];
+
+    let useCache = false;
+    if (prev && prev.hash === hash && prev.success === true) {
+      const outDir = path.join(DIST_HTML_DIR, id);
+      const problemHtml = path.join(outDir, "problem.html");
+      const solutionHtml = path.join(outDir, "solution.html");
+      if (fs.existsSync(problemHtml) && fs.existsSync(solutionHtml)) {
+        console.log(`[skip] ${id}: 変更なし・スキップ`);
+        skipped.push(id);
+        nextCache[id] = prev;
+        useCache = true;
+      } else {
+        console.log(`[cache] ${id}: HTML 出力が見つからないため再変換します`);
+      }
+    } else if (prev && prev.hash === hash && prev.success === false) {
+      console.log(`[cache] ${id}: ハッシュ一致だが前回変換失敗のため再変換します`);
+    } else if (prev) {
+      console.log(`[cache] ${id}: 変更を検出・再変換します`);
+    } else {
+      console.log(`[cache] ${id}: 初回変換します`);
+    }
+
+    if (useCache) continue;
+
+    const idFailuresBefore = failures.length;
+    const idFallbacksBefore = fallbacks.length;
+
     const figCounter = { next: 1 };
     for (const mode of MODES) {
       const bodyPath = path.join(dir, `${mode}.tex`);
@@ -275,8 +402,19 @@ function main() {
       }
       convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbacks);
     }
+
+    // フォールバックが発動した問題や真の失敗が出た問題は「変換の成功」とは
+    // 見なさない。壊れた/暫定的な出力を成功としてキャッシュしてしまうと、
+    // 原因を修正した後も再変換されず永久にそのまま扱われてしまうため。
+    const hadFailure = failures.length > idFailuresBefore;
+    const hadFallback = fallbacks.length > idFallbacksBefore;
+    const idSuccess = !hadFailure && !hadFallback;
+    nextCache[id] = { hash, success: idSuccess };
   }
 
+  saveCache(nextCache);
+
+  console.log(`スキップされた問題: ${skipped.length} 件`);
   console.log("");
   console.log(`生成された HTML: ${generated.length} 件`);
   for (const p of generated) {
