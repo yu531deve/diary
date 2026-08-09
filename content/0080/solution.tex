@@ -1,0 +1,39 @@
+\diarytitle{0080}{ケーリー・ハミルトンの定理を用いた行列多項式 A^5-A^2-16A の計算}
+
+一般に、多項式 $p(\lambda)$ を固有多項式 $\varphi(\lambda)$ で割った商を $q(\lambda)$、余りを $r(\lambda)$（$\deg r < \deg \varphi$）とすると
+\[
+p(\lambda) = q(\lambda)\varphi(\lambda) + r(\lambda)
+\]
+であり、ケーリー・ハミルトンの定理 $\varphi(A) = O$ より
+\[
+p(A) = q(A)\varphi(A) + r(A) = r(A)
+\]
+となる。すなわち $p(A)$ は余り $r(\lambda)$ に $A$ を代入するだけで求まり、次数の低い行列多項式の計算に帰着できる。
+
+$A$ の固有多項式は
+\[
+\varphi(\lambda) = \lambda^{2} - (\operatorname{tr} A)\lambda + \det A = \lambda^{2} - 2\lambda - 3
+\]
+（$\operatorname{tr} A = 1+1=2$, $\det A = 1\cdot1 - 2\cdot2 = -3$）であるから、ケーリー・ハミルトンの定理より
+\[
+A^{2} - 2A - 3I = O \quad\Longleftrightarrow\quad A^{2} = 2A + 3I
+\]
+
+求めたい多項式 $p(\lambda) = \lambda^{5} - \lambda^{2} - 16\lambda$ を $\varphi(\lambda) = \lambda^{2} - 2\lambda - 3$ で割ると、
+\[
+\lambda^{5} - \lambda^{2} - 16\lambda = (\lambda^{3} + 2\lambda^{2} + 7\lambda + 19)(\lambda^{2} - 2\lambda - 3) + (43\lambda + 57)
+\]
+（実際、$(\lambda^{3}+2\lambda^{2}+7\lambda+19)(\lambda^{2}-2\lambda-3)$ を展開すると $\lambda^{5} - \lambda^{2} - 59\lambda - 57$ となり、これに余り $43\lambda+57$ を加えると $\lambda^{5} - \lambda^{2} - 16\lambda$ に一致し、割り算が正しいことが確かめられる）。したがって $\varphi(A) = O$ より
+\[
+A^{5} - A^{2} - 16A = 43A + 57I
+\]
+ここで
+\[
+43A = \begin{pmatrix} 43 & 86 \\ 86 & 43 \end{pmatrix}, \qquad 57I = \begin{pmatrix} 57 & 0 \\ 0 & 57 \end{pmatrix}
+\]
+であるから
+\[
+\boxed{\; A^{5} - A^{2} - 16A = \begin{pmatrix} 100 & 86 \\ 86 & 100 \end{pmatrix} \;}
+\]
+
+（検算: $A$ の固有値は $\varphi(\lambda)=0$ より $\lambda = 3, -1$。固有値 $3$ を代入すると $3^{5} - 3^{2} - 16\cdot 3 = 243 - 9 - 48 = 186 = 43\cdot 3 + 57$、固有値 $-1$ を代入すると $(-1)^{5} - (-1)^{2} - 16(-1) = -1 - 1 + 16 = 14 = 43\cdot(-1)+57$ となり、いずれも $r(\lambda) = 43\lambda+57$ と一致する。さらに直接 $A^{2} = \begin{pmatrix}5&4\\4&5\end{pmatrix}$, $A^{3}=A\cdot A^2=\begin{pmatrix}13&14\\14&13\end{pmatrix}$, $A^{5}=A^{2}\cdot A^{3}=\begin{pmatrix}5\cdot13+4\cdot14 & 5\cdot14+4\cdot13\\ 4\cdot13+5\cdot14 & 4\cdot14+5\cdot13\end{pmatrix}=\begin{pmatrix}121&122\\122&121\end{pmatrix}$ を計算すると、$A^{5}-A^{2}-16A = \begin{pmatrix}121&122\\122&121\end{pmatrix} - \begin{pmatrix}5&4\\4&5\end{pmatrix} - \begin{pmatrix}16&32\\32&16\end{pmatrix} = \begin{pmatrix}100&86\\86&100\end{pmatrix}$ となり、一致する。）

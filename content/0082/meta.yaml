@@ -1,0 +1,10 @@
+id: "0082"
+title: "ブロック三角行列に対するケーリー・ハミルトンの定理の応用（C^4 の計算）"
+status: draft
+field:
+  major: "線形代数"
+  minor: "固有値と対角化"
+tags: ["ケーリー・ハミルトンの定理"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09
