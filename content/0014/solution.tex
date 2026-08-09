@@ -1,0 +1,20 @@
+\diarytitle{0014}{変数分離形の一般解と特異解（dy/dx = xy^2）}
+
+変数分離形 $\dfrac{dy}{dx} = f(x)g(y)$ は $\dfrac{dy}{g(y)} = f(x)\,dx$ として両辺を積分することで解ける。
+
+$y = 0$ は明らかに解である（特異解）。$y \neq 0$ のとき変数分離して
+\[
+\frac{dy}{y^{2}} = x\,dx
+\]
+両辺を積分すると
+\[
+-\frac{1}{y} = \frac{x^{2}}{2} + C_{1}
+\quad\Longrightarrow\quad
+\frac{1}{y} = -\frac{x^{2}}{2} - C_{1}
+\]
+任意定数を $C = -2C_{1}$ と置き直すと
+\[
+\boxed{\; y = \frac{-2}{x^{2}+C} \;}
+\qquad (C \text{ は任意定数。ほかに特異解 } y=0)
+\]
+（検算: $y=\dfrac{-2}{x^{2}+C}$ より $y' = \dfrac{4x}{(x^{2}+C)^{2}}$。一方 $xy^{2} = x\cdot\dfrac{4}{(x^{2}+C)^{2}} = \dfrac{4x}{(x^{2}+C)^{2}}$ となり両者は一致する。）

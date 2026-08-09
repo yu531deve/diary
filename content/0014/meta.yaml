@@ -1,0 +1,10 @@
+id: "0014"
+title: "変数分離形の一般解と特異解（dy/dx = xy^2）"
+status: draft
+field:
+  major: "常微分方程式"
+  minor: "一階微分方程式"
+tags: ["変数分離", "特異解"]
+difficulty: 1
+created: 2026-08-09
+updated: 2026-08-09

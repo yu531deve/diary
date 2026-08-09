@@ -1,0 +1,10 @@
+id: "0015"
+title: "変数分離形の一般解（逆正接を用いる形）"
+status: draft
+field:
+  major: "常微分方程式"
+  minor: "一階微分方程式"
+tags: ["変数分離"]
+difficulty: 1
+created: 2026-08-09
+updated: 2026-08-09
