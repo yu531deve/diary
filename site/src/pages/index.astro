@@ -182,10 +182,10 @@ const issueHref =
 			/* ---------- スクロール演出トラック ---------- */
 			#track {
 				position: relative;
-				height: 560vh;
+				height: 720vh;
 				/* iOS Safari 等でアドレスバーの伸縮により 100vh がずれるため、
 				   対応ブラウザでは svh を優先する（未対応時は上の vh 指定が残る）。 */
-				height: 560svh;
+				height: 720svh;
 			}
 			#stage {
 				position: sticky;
@@ -246,7 +246,8 @@ const issueHref =
 				background: linear-gradient(180deg, #52e0f5, transparent);
 				animation: scrollpulse 2s ease-in-out infinite;
 			}
-			#c2 {
+			#c2,
+			#c-beta {
 				left: 48px;
 				top: 0;
 				height: 100vh;
@@ -257,23 +258,27 @@ const issueHref =
 				gap: 20px;
 				max-width: 440px;
 			}
-			#c2 .eyebrow {
+			#c2 .eyebrow,
+			#c-beta .eyebrow {
 				font: 500 11px "IBM Plex Mono", monospace;
 				letter-spacing: 0.24em;
 				color: #52e0f5;
 			}
-			#c2 h2 {
+			#c2 h2,
+			#c-beta h2 {
 				margin: 0;
 				font-size: 40px;
 				font-weight: 900;
 				line-height: 1.35;
 				text-wrap: pretty;
 			}
-			#c2 .formula {
+			#c2 .formula,
+			#c-beta .formula {
 				font: italic 400 21px "STIX Two Text", serif;
 				color: #aab6d4;
 			}
-			#c2 p {
+			#c2 p,
+			#c-beta p {
 				margin: 0;
 				font-size: 14px;
 				line-height: 1.9;
@@ -570,18 +575,22 @@ const issueHref =
 					font-size: 15px;
 					padding: 0 24px;
 				}
-				#c2 {
+				#c2,
+				#c-beta {
 					left: 24px;
 					right: 24px;
 					max-width: none;
 				}
-				#c2 h2 {
+				#c2 h2,
+				#c-beta h2 {
 					font-size: 26px;
 				}
-				#c2 .formula {
+				#c2 .formula,
+				#c-beta .formula {
 					font-size: 15px;
 				}
-				#c2 p {
+				#c2 p,
+				#c-beta p {
 					font-size: 13px;
 				}
 				#c3 p {
@@ -654,6 +663,7 @@ const issueHref =
 					position: relative;
 				}
 				#c2,
+				#c-beta,
 				#c3,
 				#c4 {
 					display: none;
@@ -716,6 +726,20 @@ const issueHref =
 					<p>すべての問題は完全自作。<br />ブラウザで読んで、PDF で解く。</p>
 				</div>
 
+				{/*
+				  #244: β関数のシーン（表示順は c1 → c2 → c-beta → c3 → c4）。
+				  ID を c5 ではなく c-beta にしているのは、既存の #c1〜#c4 を
+				  振り直すと CSS 側のブロックを全部書き換えることになり、
+				  #63 で作り込んだ演出を壊すリスクが高いため。
+				  レイアウトは #c2 と同一なので CSS セレクタを共有している。
+				*/}
+				<div id="c-beta" class="caption">
+					<div class="eyebrow">SPECIAL FUNCTIONS</div>
+					<h2>β関数が描く<br />面積</h2>
+					<div class="formula">{"B(2,3) = ∫₀¹ x(1−x)² dx = 1/12"}</div>
+					<p>院試で頻出の特殊関数も、<br />面積として見れば値の意味がわかる。</p>
+				</div>
+
 				<div id="c3" class="caption">
 					<div class="eyebrow">GOAL</div>
 					<p>1000問を目指して、毎日つくる。</p>
@@ -730,7 +754,7 @@ const issueHref =
 				</div>
 
 				<div class="scene-indicator">
-					<span id="scn" class="num">01 / 04</span>
+					<span id="scn" class="num">01 / 05</span>
 					<span class="bar"><i id="prog"></i></span>
 				</div>
 
@@ -814,6 +838,9 @@ const issueHref =
 				lerpPoint,
 				type SegmentTable,
 			} from "../lib/particles";
+			// #244: β関数のシーン。値の計算は #93 のプロトタイプで検証済みの
+			// mathviz ライブラリを使い、被積分関数の定義を二重に持たない。
+			import { betaIntegrand } from "../lib/mathviz/gamma";
 
 			const track = document.getElementById("track") as HTMLDivElement | null;
 			const canvas = document.getElementById("fx") as HTMLCanvasElement | null;
@@ -834,19 +861,28 @@ const issueHref =
 				// Yu 指示(2026-08-08): 冒頭は「Diary 静止 → 散らばり」の順に変更
 				// (ローディング演出が Diary 収束で終わるため、地続きに見せる)。
 				// 以降(グラフ → 1000+ → 上方拡散)は design/README.md のまま。
+				// #244: β関数のシーンを「放物線グラフ」と「1000+」の間に挿入した。
+				// 各シーンのスクロール長は変えず、増えたぶん #track を 560vh →
+				// 720vh に伸ばしている（旧 1.0 に対し新 1.28 倍を 1.0 に正規化）。
+				// セット: 0=散らばり 1=Diary 2=放物線グラフ 3=β関数 4=1000+ 5=上方拡散
 				const SEGMENTS: SegmentTable = [
-					[0, 0.14, 1, 1],
-					[0.14, 0.26, 1, 0],
-					[0.26, 0.42, 0, 2],
-					[0.42, 0.56, 2, 2],
-					[0.56, 0.7, 2, 3],
-					[0.7, 0.8, 3, 3],
-					[0.8, 1.001, 3, 4],
+					[0, 0.109, 1, 1],
+					[0.109, 0.203, 1, 0],
+					[0.203, 0.328, 0, 2],
+					[0.328, 0.438, 2, 2],
+					[0.438, 0.547, 2, 3],
+					[0.547, 0.656, 3, 3],
+					[0.656, 0.766, 3, 4],
+					[0.766, 0.844, 4, 4],
+					[0.844, 1.001, 4, 5],
 				];
 
 				let sets: ReturnType<typeof alignSets>;
 				let sx: (u: number) => number;
 				let sy: (v: number) => number;
+				// #244: β関数シーン用のスケール（放物線グラフとは軸の範囲が違う）
+				let bx: (u: number) => number;
+				let by: (v: number) => number;
 				let builtKey = "";
 
 				function buildSets(w: number, h: number) {
@@ -877,8 +913,29 @@ const issueHref =
 						fontPx: Math.min(w * 0.22, 300),
 						centerY: h * 0.44,
 					});
+					// #244: β関数 B(2,3) = ∫₀¹ x(1-x)² dx の被積分関数。
+					// 最大値は x = 1/3 の 4/27 ≈ 0.148 なので、縦は [-0.02, 0.19] で取る。
+					// 被積分関数の定義は mathviz の betaIntegrand に委ねる（二重定義しない）。
+					const BETA_P = 2;
+					const BETA_Q = 3;
+					const bL = w > 900 ? w * 0.46 : w * 0.1;
+					const bR = w > 900 ? w * 0.95 : w * 0.9;
+					const bT = h * 0.2;
+					const bB = h * 0.8;
+					bx = (u: number) => bL + ((u + 0.12) / 1.24) * (bR - bL);
+					by = (v: number) => bB - ((v + 0.02) / 0.21) * (bB - bT);
+					const betaCurve = curvePoints([
+						{
+							from: 0.001,
+							to: 0.999,
+							step: 0.0035,
+							fn: (u) => ({ x: bx(u), y: by(betaIntegrand(BETA_P, BETA_Q, u)) }),
+						},
+						{ from: -0.12, to: 1.12, step: 0.014, fn: (u) => ({ x: bx(u), y: by(0) }) },
+						{ from: -0.02, to: 0.19, step: 0.0035, fn: (v) => ({ x: bx(0), y: by(v) }) },
+					]);
 					const up = upwardScatter(PARTICLE_COUNT, w, h);
-					return alignSets([scatter, diary, graph, thousand, up]);
+					return alignSets([scatter, diary, graph, betaCurve, thousand, up]);
 				}
 
 				function ensureSets() {
@@ -903,6 +960,7 @@ const issueHref =
 
 				const c1 = document.getElementById("c1");
 				const c2 = document.getElementById("c2");
+				const cBeta = document.getElementById("c-beta");
 				const c3 = document.getElementById("c3");
 				const c4 = document.getElementById("c4");
 				const scn = document.getElementById("scn");
@@ -912,9 +970,14 @@ const issueHref =
 				let cx = 0;
 				let cy = 0;
 
+				// #244: ランプ幅はスクロール進捗 p の割合で効くため、#track を
+				// 560vh → 720vh（1.28 倍）に伸ばすと 0.05 のままでは実スクロール距離で
+				// フェードが 28% 間延びする。元の見え方（約 28vh でフェード）を保つため
+				// 0.05 / 1.28 ≈ 0.039 に詰める。
+				const FADE_RAMP = 0.039;
 				function fade(p: number, a: number, b: number): number {
-					const fi = Math.min(Math.max((p - a) / 0.05, 0), 1);
-					const fo = Math.min(Math.max((b - p) / 0.05, 0), 1);
+					const fi = Math.min(Math.max((p - a) / FADE_RAMP, 0), 1);
+					const fo = Math.min(Math.max((b - p) / FADE_RAMP, 0), 1);
 					return Math.min(fi, fo);
 				}
 
@@ -951,15 +1014,20 @@ const issueHref =
 						currentP = getScrollProgress();
 						const { from, to, t } = segmentProgress(currentP, SEGMENTS);
 
-						// グラフ（セット 2）が支配的な間だけ、放物線と直線が囲む領域を塗る。
-						let weight = 0;
-						if (from === 2 && to === 2) weight = 1;
-						else if (to === 2) weight = t;
-						else if (from === 2) weight = 1 - t;
-						if (weight > 0.02 && sx && sy) {
+						// あるセットが支配的な間だけ、そのシーンの「面積」を塗る。
+						// セット 2 = 放物線と直線が囲む領域、セット 3 = β関数の被積分関数の下側（#244）。
+						const setWeight = (target: number) => {
+							if (from === target && to === target) return 1;
+							if (to === target) return t;
+							if (from === target) return 1 - t;
+							return 0;
+						};
+
+						const graphWeight = setWeight(2);
+						if (graphWeight > 0.02 && sx && sy) {
 							const ctx = frame.ctx;
 							ctx.save();
-							ctx.globalAlpha = weight * 0.9;
+							ctx.globalAlpha = graphWeight * 0.9;
 							ctx.beginPath();
 							ctx.moveTo(sx(-1), sy(1));
 							for (let u = -1; u <= 2.001; u += 0.05) ctx.lineTo(sx(u), sy(u + 2));
@@ -970,15 +1038,43 @@ const issueHref =
 							ctx.restore();
 						}
 
-						applyCaption(c1, fade(currentP, -1, 0.13));
-						applyCaption(c2, fade(currentP, 0.3, 0.58));
-						applyCaption(c3, fade(currentP, 0.6, 0.82));
-						applyCaption(c4, currentP > 0.86 ? Math.min((currentP - 0.86) / 0.05, 1) : 0);
+						const betaWeight = setWeight(3);
+						if (betaWeight > 0.02 && bx && by) {
+							const ctx = frame.ctx;
+							ctx.save();
+							ctx.globalAlpha = betaWeight * 0.9;
+							ctx.beginPath();
+							ctx.moveTo(bx(0), by(0));
+							for (let u = 0; u <= 1.0001; u += 0.005) {
+								ctx.lineTo(bx(u), by(betaIntegrand(2, 3, u)));
+							}
+							ctx.lineTo(bx(1), by(0));
+							ctx.closePath();
+							ctx.fillStyle = "rgba(82,224,245,0.13)";
+							ctx.fill();
+							ctx.restore();
+						}
+
+						// #244: シーンが 1 つ増えたぶん、旧値を 1.28 で割って詰め直している。
+						applyCaption(c1, fade(currentP, -1, 0.102));
+						applyCaption(c2, fade(currentP, 0.234, 0.455));
+						applyCaption(cBeta, fade(currentP, 0.465, 0.665));
+						applyCaption(c3, fade(currentP, 0.675, 0.86));
+						applyCaption(c4, currentP > 0.875 ? Math.min((currentP - 0.875) / 0.04, 1) : 0);
 
 						if (scn) {
+							// #244: 各シーンの「次への遷移が始まる位置」で番号を送る（旧実装と同じ考え方）。
 							const n =
-								currentP < 0.26 ? 1 : currentP < 0.56 ? 2 : currentP < 0.8 ? 3 : 4;
-							const txt = `0${n} / 04`;
+								currentP < 0.203
+									? 1
+									: currentP < 0.438
+										? 2
+										: currentP < 0.656
+											? 3
+											: currentP < 0.844
+												? 4
+												: 5;
+							const txt = `0${n} / 05`;
 							if (scn.textContent !== txt) scn.textContent = txt;
 						}
 						if (prog) prog.style.transform = `scaleY(${currentP})`;
