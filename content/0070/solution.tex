@@ -1,0 +1,36 @@
+\diarytitle{0070}{波動方程式（両端固定）における単一モードの初期速度に対する解}
+
+長さ $L$ の弦の両端を固定した場合の初期値・境界値問題は、変数分離法（フーリエ級数展開）により解く。変数分離 $u=X(x)T(t)$ と境界条件から固有値 $\lambda_n=(n\pi/L)^2$、固有関数 $X_n(x)=\sin(n\pi x/L)$ が定まり、一般解は
+\[
+u(x,t) = \sum_{n=1}^{\infty}\left(A_{n}\cos\frac{n\pi c t}{L} + B_{n}\sin\frac{n\pi c t}{L}\right)\sin\frac{n\pi x}{L}
+\]
+となる（導出は本テーマ他問と同様）。初期条件に代入すると
+\[
+u(x,0) = \sum_{n=1}^{\infty} A_{n}\sin\frac{n\pi x}{L} = 0, \qquad
+\frac{\partial u}{\partial t}(x,0) = \sum_{n=1}^{\infty} \frac{n\pi c}{L}B_{n}\sin\frac{n\pi x}{L} = v_{0}\sin\frac{3\pi x}{L}
+\]
+
+\medskip
+\noindent
+\textbf{初期変位の項}\quad $u(x,0)=0$ より、すべての $n$ について $A_{n}=0$。
+
+\medskip
+\noindent
+\textbf{初期速度の項（$B_n$ の計算）}\quad
+\[
+B_{n} = \frac{2}{n\pi c}\int_{0}^{L} v_{0}\sin\frac{3\pi x}{L}\sin\frac{n\pi x}{L}\,dx
+\]
+右辺の被積分関数はすでに固有関数 $\sin(3\pi x/L)$ そのものなので、$\{\sin(n\pi x/L)\}$ の直交性より $n=3$ のときのみ
+\[
+\int_{0}^{L} v_{0}\sin^{2}\frac{3\pi x}{L}\,dx = v_{0}\cdot\frac{L}{2}
+\]
+であり、それ以外の $n$ では積分は $0$ となる。よって
+\[
+B_{3} = \frac{2}{3\pi c}\cdot v_{0}\cdot\frac{L}{2} = \frac{v_{0}L}{3\pi c}, \qquad B_{n} = 0\ (n \neq 3)
+\]
+したがって
+\[
+\boxed{\; u(x,t) = \frac{v_{0}L}{3\pi c}\,\sin\frac{3\pi c t}{L}\,\sin\frac{3\pi x}{L} \;}
+\]
+
+（検算: $u_{t}(x,t) = \dfrac{v_{0}L}{3\pi c}\cdot\dfrac{3\pi c}{L}\cos\dfrac{3\pi ct}{L}\sin\dfrac{3\pi x}{L} = v_{0}\cos\dfrac{3\pi ct}{L}\sin\dfrac{3\pi x}{L}$ で、$t=0$ とすると $u_{t}(x,0) = v_{0}\sin\dfrac{3\pi x}{L}$ となり初期速度条件に一致する。また $u(x,0)=0$、$u(0,t)=u(L,t)=0$ を満たし、$u_{tt} = -\left(\frac{3\pi c}{L}\right)^2 u$、$c^2 u_{xx} = c^2\left(-\left(\frac{3\pi}{L}\right)^2\right)u = -\left(\frac{3\pi c}{L}\right)^2 u$ で波動方程式も満たす。）

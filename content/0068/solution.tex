@@ -1,0 +1,57 @@
+\diarytitle{0068}{波動方程式（両端固定）の初期値・境界値問題（初期変位が基本固有関数の場合）}
+
+長さ $L$ の弦の両端を固定した場合の初期値・境界値問題は、変数分離法（フーリエ級数展開）により解く。
+
+\medskip
+\noindent
+\textbf{(1) 変数分離}\quad $u(x,t) = X(x)T(t)$ とおいて方程式に代入すると
+\[
+X(x)T''(t) = c^{2}X''(x)T(t)
+\quad\Longrightarrow\quad
+\frac{T''(t)}{c^{2}T(t)} = \frac{X''(x)}{X(x)} = -\lambda
+\]
+（両辺は $x$ と $t$ の独立変数の関数なので定数 $-\lambda$ に等しい。定数を $-\lambda$ とおくのは、後述のように境界条件を満たす非自明解が $\lambda > 0$ のときにしか存在しないためである。）これより連立の常微分方程式
+\[
+X''(x) + \lambda X(x) = 0, \qquad T''(t) + \lambda c^{2} T(t) = 0
+\]
+を得る。
+
+\medskip
+\noindent
+\textbf{(2) 境界条件から固有値・固有関数を決定}\quad $u(0,t) = X(0)T(t) = 0$ かつ $u(L,t) = X(L)T(t) = 0$ が任意の $t$ で成り立つ（$T \equiv 0$ である自明解を除く）ためには
+\[
+X(0) = 0, \qquad X(L) = 0
+\]
+が必要である。$\lambda \le 0$ では $X \equiv 0$ となる自明解しか得られない（$\lambda<0$ なら $X$ は指数関数の和、$\lambda=0$ なら1次関数となり、いずれも両端で $0$ になるのは $X\equiv0$ のみ）。$\lambda = k^{2} > 0$ とおくと
+\[
+X(x) = A\cos kx + B\sin kx
+\]
+$X(0)=0$ より $A=0$。$X(L)=B\sin kL = 0$ で $B \neq 0$ より $\sin kL = 0$、すなわち
+\[
+k = k_{n} = \frac{n\pi}{L} \qquad (n = 1,2,3,\dots)
+\]
+よって固有値は $\lambda_{n} = \left(\dfrac{n\pi}{L}\right)^{2}$、固有関数は
+\[
+X_{n}(x) = \sin\frac{n\pi x}{L}
+\]
+
+\medskip
+\noindent
+\textbf{(3) 時間成分と一般解}\quad $T''(t) + \lambda_{n}c^{2}T(t) = 0$ より、角振動数 $\omega_{n} = \dfrac{n\pi c}{L}$ として $T_{n}(t) = A_{n}\cos\omega_{n}t + B_{n}\sin\omega_{n}t$。各モード $u_{n}(x,t) = X_{n}(x)T_{n}(t)$ の重ね合わせにより、一般解は
+\[
+u(x,t) = \sum_{n=1}^{\infty}\left(A_{n}\cos\frac{n\pi c t}{L} + B_{n}\sin\frac{n\pi c t}{L}\right)\sin\frac{n\pi x}{L}
+\]
+で与えられる。
+
+\medskip
+\noindent
+\textbf{(4) 初期条件の適用}\quad $u_{t}(x,0) = 0$ より、すべての $n$ について $B_{n} = 0$。また
+\[
+u(x,0) = \sum_{n=1}^{\infty} A_{n}\sin\frac{n\pi x}{L} = \sin\frac{\pi x}{L}
+\]
+は右辺がすでに $n=1$ の固有関数そのものであるから、$\{\sin(n\pi x/L)\}$ の直交性より $A_{1} = 1$、$A_{n} = 0\ (n \ge 2)$ と一意に定まる（フーリエ係数の積分計算をするまでもない）。よって
+\[
+\boxed{\; u(x,t) = \cos\frac{\pi c t}{L}\,\sin\frac{\pi x}{L} \;}
+\]
+
+（検算: $u_{tt} = -\left(\dfrac{\pi c}{L}\right)^{2}\cos\dfrac{\pi ct}{L}\sin\dfrac{\pi x}{L}$、$c^{2}u_{xx} = c^{2}\left(-\left(\dfrac{\pi}{L}\right)^{2}\right)\cos\dfrac{\pi ct}{L}\sin\dfrac{\pi x}{L}$ で両者は一致し波動方程式を満たす。$u(0,t)=u(L,t)=0$、$u(x,0)=\sin(\pi x/L)$、$u_t(x,0) = -\frac{\pi c}{L}\sin(0)\sin(\pi x/L)=0$ もすべて満たす。）
