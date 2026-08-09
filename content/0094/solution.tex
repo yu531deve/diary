@@ -1,0 +1,27 @@
+\diarytitle{0094}{log x/x^alpha の不定積分の場合分け}
+
+\textbf{(i) $\alpha = 1$ のとき.}\ $\displaystyle\int \frac{\log x}{x}\, dx$ は $t = \log x$（$dt = \dfrac{1}{x}dx$）と置換すると
+\[
+\int \frac{\log x}{x}\, dx = \int t \, dt = \frac{t^{2}}{2} + C
+\]
+よって
+\[
+\boxed{\; \int \frac{\log x}{x}\, dx = \frac{(\log x)^{2}}{2} + C \;}
+\]
+（検算: $\dfrac{d}{dx}\dfrac{(\log x)^{2}}{2} = \log x \cdot \dfrac{1}{x} = \dfrac{\log x}{x}$ で一致。）
+
+\noindent
+\textbf{(ii) $\alpha \neq 1$ のとき.}\ 部分積分で $u = \log x$, $v' = x^{-\alpha}$（$v = \dfrac{x^{1-\alpha}}{1-\alpha}$）とすると
+\[
+\int \frac{\log x}{x^{\alpha}}\, dx
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \int \frac{x^{1-\alpha}}{1-\alpha}\cdot \frac{1}{x}\, dx
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{1}{1-\alpha}\int x^{-\alpha}\, dx
+\]
+\[
+= \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{x^{1-\alpha}}{(1-\alpha)^{2}} + C
+\]
+よって
+\[
+\boxed{\; \int \frac{\log x}{x^{\alpha}}\, dx = \frac{x^{1-\alpha}}{1-\alpha}\log x - \frac{x^{1-\alpha}}{(1-\alpha)^{2}} + C \quad (\alpha \neq 1) \;}
+\]
+（検算: $\dfrac{d}{dx}\left[\dfrac{x^{1-\alpha}}{1-\alpha}\log x\right] = x^{-\alpha}\log x + \dfrac{x^{-\alpha}}{1-\alpha}$、$\dfrac{d}{dx}\left[-\dfrac{x^{1-\alpha}}{(1-\alpha)^{2}}\right] = -\dfrac{x^{-\alpha}}{1-\alpha}$ であり、両者を加えると $x^{-\alpha}\log x = \dfrac{\log x}{x^{\alpha}}$ となり一致する。）

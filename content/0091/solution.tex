@@ -1,0 +1,15 @@
+\diarytitle{0091}{対数関数 log x の不定積分}
+
+部分積分の公式
+\[
+\int u\, v' \, dx = uv - \int u'\, v \, dx
+\]
+において $u = \log x$, $v' = 1$（$v = x$）とすると
+\[
+\int \log x \, dx = x\log x - \int x\cdot\frac{1}{x}\, dx = x\log x - \int 1 \, dx
+\]
+よって
+\[
+\boxed{\; \int \log x \, dx = x\log x - x + C \;}
+\]
+（検算: $\dfrac{d}{dx}(x\log x - x) = \log x + x\cdot\dfrac{1}{x} - 1 = \log x + 1 - 1 = \log x$ となり被積分関数と一致する。）
