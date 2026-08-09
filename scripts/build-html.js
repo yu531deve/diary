@@ -49,9 +49,10 @@
  */
 
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const crypto = require("crypto");
-const { execFileSync } = require("child_process");
+const { execFileSync, execFile } = require("child_process");
 const {
   extractTikzPictures,
   buildSvgsForId,
@@ -84,6 +85,25 @@ const MODES = ["problem", "solution"];
 // （通常時の実測の数十倍。ハング検知が目的であり、日常運用では到達しない
 // 想定の値）。
 const LATEXMLC_TIMEOUT_SEC = 120;
+
+// 同時実行数（#231）。latexmlc の起動オーバーヘッドが支配的で、各問題の
+// 変換は独立したプロセス・作業ディレクトリで完結するため、問題（id）単位で
+// 並列に実行する。id 内では problem → solution の順を維持する
+// （図番号カウンタが id 単位で通番のため。下記 processId 参照）。
+// デフォルトは CPU コア数と 8 の小さい方。環境変数 DIARY_HTML_JOBS で
+// 上書き可能（CI のリソース制約や検証時の逐次比較用）。
+function resolveJobs() {
+  const envValue = process.env.DIARY_HTML_JOBS;
+  if (envValue !== undefined && envValue !== "") {
+    const n = Number(envValue);
+    if (Number.isFinite(n) && n >= 1) return Math.floor(n);
+    console.error(
+      `[warn] DIARY_HTML_JOBS の値が不正です（${envValue}）。デフォルト値を使用します。`
+    );
+  }
+  return Math.max(1, Math.min(8, os.cpus().length));
+}
+const JOBS = resolveJobs();
 
 // build-pdf.js と同じ簡易パーサー（meta.yaml は id / status 等の
 // フラットなキーのみを使う想定）。
@@ -198,9 +218,19 @@ function buildWrapperTex(mode, svgStrippedBodyPath) {
   ].join("\n");
 }
 
+// execFileSync 版の latexmlc 呼び出しを Promise でラップしたもの。
+// 並列実行時にイベントループをブロックしないよう execFile（非同期）を使う。
+function runLatexmlc(args, options) {
+  return new Promise((resolve) => {
+    execFile("latexmlc", args, options, (err, stdout, stderr) => {
+      resolve({ err, stdout, stderr });
+    });
+  });
+}
+
 // id 単位で problem → solution の順に図番号を通番で振るためのカウンタ。
 // 呼び出し側（main）が id ごとに { next: 1 } を渡す。
-function convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbacks) {
+async function convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbacks) {
   const workDir = path.join(WORK_DIR, id, mode);
   fs.mkdirSync(workDir, { recursive: true });
 
@@ -245,35 +275,33 @@ function convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbac
   //      （タグを剥がした後のテキストが空。isHtmlBodyMissing 参照）
   let failureReason = null;
 
-  try {
-    execFileSync(
-      "latexmlc",
-      [
-        `--path=${STYLES_DIR}`,
-        `--path=${BINDINGS_DIR}`,
-        "--format=html5",
-        "--pmml", // MathML (Presentation) を出力に含める
-        // #150: alttext が生 LaTeX のまま露出し、semantics/annotation も
-        // 無かった問題への対応。--mathtex により各 <math> を
-        // <semantics>...<annotation encoding="application/x-tex">元のTeX</annotation></semantics>
-        // でラップする（LaTeXML 標準機能。見た目の Presentation MathML 部分は
-        // 変更されないため、数式表示への影響はない）。
-        "--mathtex",
-        "--nodefaultresources",
-        `--timeout=${LATEXMLC_TIMEOUT_SEC}`,
-        `--dest=${outPath}`,
-        wrapperPath,
-      ],
-      {
-        cwd: workDir,
-        stdio: ["ignore", "pipe", "pipe"],
-      }
-    );
-  } catch (err) {
+  const { err, stderr: latexmlcStderr } = await runLatexmlc(
+    [
+      `--path=${STYLES_DIR}`,
+      `--path=${BINDINGS_DIR}`,
+      "--format=html5",
+      "--pmml", // MathML (Presentation) を出力に含める
+      // #150: alttext が生 LaTeX のまま露出し、semantics/annotation も
+      // 無かった問題への対応。--mathtex により各 <math> を
+      // <semantics>...<annotation encoding="application/x-tex">元のTeX</annotation></semantics>
+      // でラップする（LaTeXML 標準機能。見た目の Presentation MathML 部分は
+      // 変更されないため、数式表示への影響はない）。
+      "--mathtex",
+      "--nodefaultresources",
+      `--timeout=${LATEXMLC_TIMEOUT_SEC}`,
+      `--dest=${outPath}`,
+      wrapperPath,
+    ],
+    {
+      cwd: workDir,
+      stdio: ["ignore", "pipe", "pipe"],
+    }
+  );
+  if (err) {
     // 判定基準1: latexmlc が非 0 で終了した（=致命的エラー）。
     failureReason = "latexmlc-nonzero-exit";
     console.error(`[fail] ${id} ${mode}: latexmlc 変換失敗（exit 非 0）`);
-    const log = err.stderr ? err.stderr.toString() : "";
+    const log = latexmlcStderr ? latexmlcStderr.toString() : "";
     if (log) {
       console.error(log.split("\n").slice(-40).join("\n"));
     }
@@ -330,7 +358,52 @@ function checkLatexmlAvailable() {
   }
 }
 
-function main() {
+// id 1 件分の変換処理（problem → solution を直列で実行し、図番号の通番を守る）。
+// 呼び出し元（main）が id ごとに並列実行する。失敗/フォールバック/生成物は
+// 呼び出し元で共有される配列に直接 push するが、Node.js はシングルスレッド
+// でこれらの await の間にしか他の処理が挟まらないため（真の同時書き込みは
+// 発生しない）、配列操作自体の競合は起きない。並列化による時間短縮は
+// 外部プロセス（latexmlc）の起動・実行がイベントループをブロックせずに
+// 複数同時に進行することで得られる。
+async function processId(id, dir, hash, failures, generated, fallbacks) {
+  const idFailuresBefore = failures.length;
+  const idFallbacksBefore = fallbacks.length;
+
+  const figCounter = { next: 1 };
+  for (const mode of MODES) {
+    const bodyPath = path.join(dir, `${mode}.tex`);
+    if (!fs.existsSync(bodyPath)) {
+      failures.push({ id, mode });
+      console.error(`[fail] ${id} ${mode}: ${mode}.tex が見つかりません`);
+      continue;
+    }
+    await convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbacks);
+  }
+
+  // フォールバックが発動した問題や真の失敗が出た問題は「変換の成功」とは
+  // 見なさない。壊れた/暫定的な出力を成功としてキャッシュしてしまうと、
+  // 原因を修正した後も再変換されず永久にそのまま扱われてしまうため。
+  const hadFailure = failures.length > idFailuresBefore;
+  const hadFallback = fallbacks.length > idFallbacksBefore;
+  const idSuccess = !hadFailure && !hadFallback;
+  return { hash, success: idSuccess };
+}
+
+// 単純な固定サイズのワーカープール。tasks は () => Promise<void> の配列。
+// 同時実行数は JOBS（DIARY_HTML_JOBS または CPU コア数から算出）。
+async function runPool(tasks, concurrency) {
+  let cursor = 0;
+  const workers = Array.from({ length: Math.min(concurrency, tasks.length) }, async () => {
+    while (cursor < tasks.length) {
+      const i = cursor;
+      cursor += 1;
+      await tasks[i]();
+    }
+  });
+  await Promise.all(workers);
+}
+
+async function main() {
   if (!checkLatexmlAvailable()) {
     console.error(
       "[fatal] latexmlc が見つかりません。devcontainer（latexml パッケージ導入済み）で実行してください。"
@@ -349,6 +422,9 @@ function main() {
   const sharedContextHash = computeSharedContext();
   const nextCache = {};
 
+  console.log(`[jobs] 同時実行数: ${JOBS}`);
+
+  const targets = [];
   for (const id of ids) {
     const dir = path.join(CONTENT_DIR, id);
     const metaPath = path.join(dir, "meta.yaml");
@@ -389,28 +465,15 @@ function main() {
 
     if (useCache) continue;
 
-    const idFailuresBefore = failures.length;
-    const idFallbacksBefore = fallbacks.length;
-
-    const figCounter = { next: 1 };
-    for (const mode of MODES) {
-      const bodyPath = path.join(dir, `${mode}.tex`);
-      if (!fs.existsSync(bodyPath)) {
-        failures.push({ id, mode });
-        console.error(`[fail] ${id} ${mode}: ${mode}.tex が見つかりません`);
-        continue;
-      }
-      convertOne(id, mode, bodyPath, failures, generated, figCounter, fallbacks);
-    }
-
-    // フォールバックが発動した問題や真の失敗が出た問題は「変換の成功」とは
-    // 見なさない。壊れた/暫定的な出力を成功としてキャッシュしてしまうと、
-    // 原因を修正した後も再変換されず永久にそのまま扱われてしまうため。
-    const hadFailure = failures.length > idFailuresBefore;
-    const hadFallback = fallbacks.length > idFallbacksBefore;
-    const idSuccess = !hadFailure && !hadFallback;
-    nextCache[id] = { hash, success: idSuccess };
+    targets.push({ id, dir, hash });
   }
+
+  // id 単位を並列化の単位とする（id 内では problem → solution の直列を維持）。
+  const tasks = targets.map(({ id, dir, hash }) => async () => {
+    const result = await processId(id, dir, hash, failures, generated, fallbacks);
+    nextCache[id] = result;
+  });
+  await runPool(tasks, JOBS);
 
   saveCache(nextCache);
 
@@ -485,4 +548,7 @@ function main() {
   }
 }
 
-main();
+main().catch((err) => {
+  console.error(`[fatal] 予期しないエラーで終了しました: ${err.stack || err.message}`);
+  process.exitCode = 1;
+});
