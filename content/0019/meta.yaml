@@ -1,6 +1,6 @@
 id: "0019"
 title: "同次形微分方程式の初期値問題（(x+y)/(x-y) 型）"
-status: draft
+status: published
 field:
   major: "常微分方程式"
   minor: "一階微分方程式"

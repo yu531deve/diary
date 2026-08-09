@@ -1,6 +1,6 @@
 id: "0030"
 title: "定数係数二階線形同次微分方程式の一般解（重根）"
-status: draft
+status: published
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"

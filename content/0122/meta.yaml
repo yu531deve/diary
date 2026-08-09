@@ -1,6 +1,6 @@
 id: "0122"
 title: "曲面 $z = 4 - x^2 - y^2$ の下側の体積（極座標変換）"
-status: draft
+status: published
 field:
   major: "微分積分学"
   minor: "重積分"

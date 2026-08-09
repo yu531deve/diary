@@ -1,6 +1,6 @@
 id: "0047"
 title: "定数係数線形微分方程式の初期値問題（ラプラス変換、非同次項 $e^{-t}$）"
-status: draft
+status: published
 field:
   major: "偏微分方程式・積分変換"
   minor: "ラプラス変換"
