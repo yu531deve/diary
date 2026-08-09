@@ -1,6 +1,6 @@
 id: "0058"
 title: "ラグランジュの補助方程式と初期条件による1階非線形偏微分方程式の求解（$xu_x - yu_y = u^2$）"
-status: draft
+status: published
 field:
   major: "偏微分方程式・積分変換"
   minor: "熱・波動・ラプラス方程式"

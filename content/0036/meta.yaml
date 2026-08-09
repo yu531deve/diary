@@ -1,6 +1,6 @@
 id: "0036"
 title: "y'' + y = 1/cos x の一般解（定数変化法）"
-status: draft
+status: published
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"
