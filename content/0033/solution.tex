@@ -1,0 +1,46 @@
+\diarytitle{0033}{定数係数2階線形非同次微分方程式の一般解（非同次項が同次解と共鳴する場合）}
+
+未定係数法を用いて特殊解を求める。定数係数2階線形非同次方程式 $y'' + a y' + b y = f(x)$ の一般解は、対応する同次方程式の一般解 $y_h$ と、非同次方程式の特殊解 $y_p$ の和
+\[
+y = y_h + y_p
+\]
+で与えられる。特殊解は $f(x)$ の形に応じて多項式・指数関数・三角関数などの仮定形を置き、方程式に代入して未定係数を決定する。ただし仮定した形が同次解と重なる場合（共鳴）は、仮定形に $x$ の適当なべきを掛けて同次解と一次独立にする必要がある。
+
+\medskip
+\noindent
+\textbf{同次解:} 特性方程式 $r^{2}+4=0$ より $r = \pm 2i$。よって
+\[
+y_h = C_{1}\cos 2x + C_{2}\sin 2x
+\]
+
+\noindent
+\textbf{特殊解（共鳴あり）:} 素朴には $y_p = A\cos 2x + B\sin 2x$ とおきたいが、これは同次解と一次従属（共鳴）であるため、$x$ 倍した
+\[
+y_p = x(A\cos 2x + B\sin 2x)
+\]
+を仮定する。
+\[
+y_p' = A\cos 2x - 2Ax\sin 2x + B\sin 2x + 2Bx\cos 2x
+\]
+\[
+y_p'' = -4A\sin 2x - 4Ax\cos 2x + 4B\cos 2x - 4Bx\sin 2x
+\]
+したがって
+\[
+y_p'' + 4y_p = \bigl(-4A\sin 2x - 4Ax\cos 2x + 4B\cos 2x - 4Bx\sin 2x\bigr) + 4x(A\cos 2x + B\sin 2x)
+= -4A\sin 2x + 4B\cos 2x
+\]
+（$x\cos 2x,\ x\sin 2x$ の項は打ち消し合う。）これが $\sin 2x$ に等しいので
+\[
+-4A = 1,\qquad 4B = 0 \quad\Longrightarrow\quad A = -\frac{1}{4},\ B = 0
+\]
+よって $y_p = -\dfrac{x}{4}\cos 2x$。
+
+\noindent
+したがって一般解は
+\[
+\boxed{\; y = C_{1}\cos 2x + C_{2}\sin 2x - \frac{x}{4}\cos 2x \;}
+\qquad (C_1, C_2 \text{ は任意定数})
+\]
+
+（検算: 上式に $A=-1/4,\,B=0$ を代入すると $y_p''+4y_p = -4A\sin2x+4B\cos2x = \sin 2x$ OK）
