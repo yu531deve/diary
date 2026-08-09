@@ -1,0 +1,36 @@
+\diarytitle{0081}{固有多項式の剰余を利用した行列のべき乗 B^6 の計算}
+
+一般に、多項式 $p(\lambda)$ を固有多項式 $\varphi(\lambda)$ で割った商を $q(\lambda)$、余りを $r(\lambda)$（$\deg r < \deg \varphi$）とすると
+\[
+p(\lambda) = q(\lambda)\varphi(\lambda) + r(\lambda)
+\]
+であり、ケーリー・ハミルトンの定理 $\varphi(B) = O$ より
+\[
+p(B) = q(B)\varphi(B) + r(B) = r(B)
+\]
+となる。すなわち $p(B)$ は余り $r(\lambda)$ に $B$ を代入するだけで求まる。
+
+$B$ は上三角行列なので固有値は対角成分 $2, 3$ であり、固有多項式は
+\[
+\varphi(\lambda) = (\lambda - 2)(\lambda - 3) = \lambda^{2} - 5\lambda + 6
+\]
+ケーリー・ハミルトンの定理より $B^{2} = 5B - 6I$ が成り立つ。
+
+$\lambda^{6}$ を $\varphi(\lambda) = \lambda^{2} - 5\lambda + 6$ で割ると
+\[
+\lambda^{6} = (\lambda^{4} + 5\lambda^{3} + 19\lambda^{2} + 65\lambda + 211)(\lambda^{2} - 5\lambda + 6) + (665\lambda - 1266)
+\]
+であるから
+\[
+B^{6} = 665B - 1266I
+\]
+ここで
+\[
+665B = \begin{pmatrix} 1330 & 665 \\ 0 & 1995 \end{pmatrix}, \qquad 1266I = \begin{pmatrix} 1266 & 0 \\ 0 & 1266 \end{pmatrix}
+\]
+より
+\[
+\boxed{\; B^{6} = \begin{pmatrix} 64 & 665 \\ 0 & 729 \end{pmatrix} \;}
+\]
+
+（検算: 固有値 $\lambda=2$ を余りの式に代入すると $2^{6} = 64$ に対し $665\cdot2 - 1266 = 1330-1266=64$ で一致。固有値 $\lambda=3$ では $3^{6}=729$ に対し $665\cdot3-1266=1995-1266=729$ で一致。また $B$ は上三角行列なので $B^{6}$ の対角成分は各対角成分の6乗 $2^{6}=64$, $3^{6}=729$ に一致しており、これも検算と整合する。）
