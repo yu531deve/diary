@@ -1,0 +1,10 @@
+id: "0073"
+title: "放物型2階線形偏微分方程式の標準形と初期値問題（u_xx - 2u_xy + u_yy = 0）"
+status: draft
+field:
+  major: "偏微分方程式・積分変換"
+  minor: "熱・波動・ラプラス方程式"
+tags: ["特性曲線法", "初期値問題"]
+difficulty: 4
+created: 2026-08-09
+updated: 2026-08-09
