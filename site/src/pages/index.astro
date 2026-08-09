@@ -182,10 +182,10 @@ const issueHref =
 			/* ---------- スクロール演出トラック ---------- */
 			#track {
 				position: relative;
-				height: 720vh;
+				height: 850vh;
 				/* iOS Safari 等でアドレスバーの伸縮により 100vh がずれるため、
 				   対応ブラウザでは svh を優先する（未対応時は上の vh 指定が残る）。 */
-				height: 720svh;
+				height: 850svh;
 			}
 			#stage {
 				position: sticky;
@@ -246,8 +246,10 @@ const issueHref =
 				background: linear-gradient(180deg, #52e0f5, transparent);
 				animation: scrollpulse 2s ease-in-out infinite;
 			}
-			#c-gamma,
-			#c-beta {
+			#c-vec,
+			#c-calc,
+			#c-stat,
+			#c-lin {
 				left: 48px;
 				top: 0;
 				height: 100vh;
@@ -258,27 +260,35 @@ const issueHref =
 				gap: 20px;
 				max-width: 440px;
 			}
-			#c-gamma .eyebrow,
-			#c-beta .eyebrow {
+			#c-vec .eyebrow,
+			#c-calc .eyebrow,
+			#c-stat .eyebrow,
+			#c-lin .eyebrow {
 				font: 500 11px "IBM Plex Mono", monospace;
 				letter-spacing: 0.24em;
 				color: #52e0f5;
 			}
-			#c-gamma h2,
-			#c-beta h2 {
+			#c-vec h2,
+			#c-calc h2,
+			#c-stat h2,
+			#c-lin h2 {
 				margin: 0;
 				font-size: 40px;
 				font-weight: 900;
 				line-height: 1.35;
 				text-wrap: pretty;
 			}
-			#c-gamma .formula,
-			#c-beta .formula {
+			#c-vec .formula,
+			#c-calc .formula,
+			#c-stat .formula,
+			#c-lin .formula {
 				font: italic 400 21px "STIX Two Text", serif;
 				color: #aab6d4;
 			}
-			#c-gamma p,
-			#c-beta p {
+			#c-vec p,
+			#c-calc p,
+			#c-stat p,
+			#c-lin p {
 				margin: 0;
 				font-size: 14px;
 				line-height: 1.9;
@@ -662,8 +672,10 @@ const issueHref =
 				#stage {
 					position: relative;
 				}
-				#c-gamma,
-				#c-beta,
+				#c-vec,
+				#c-calc,
+				#c-stat,
+				#c-lin,
 				#c3,
 				#c4 {
 					display: none;
@@ -719,25 +731,38 @@ const issueHref =
 					</div>
 				</div>
 
-				<div id="c-gamma" class="caption">
-					<div class="eyebrow">GAMMA FUNCTION</div>
-					<h2>Γ関数が描く<br />面積</h2>
-					<div class="formula">{"Γ(4) = ∫₀^∞ x³e^(−x) dx = 3! = 6"}</div>
-					<p>階乗を実数へ広げる関数。<br />面積として見れば 3! = 6 が現れる。</p>
+				{/*
+				  #244: 分野を横断して 4 つ並べるシーン群（表示順は c1 → vec → calc →
+				  stat → lin → c3 → c4）。ID を連番にしていないのは、既存の #c1/#c3/#c4 を
+				  振り直すと CSS ブロックを全部書き換えることになり #63 で作り込んだ
+				  演出を壊すリスクが高いため。4 つはレイアウトが同一なのでセレクタを共有する。
+				*/}
+				<div id="c-vec" class="caption">
+					<div class="eyebrow">VECTOR ANALYSIS</div>
+					<h2>線積分が<br />面積を測る</h2>
+					<div class="formula">{"∮c (x dy − y dx) = 2S"}</div>
+					<p>グリーンの定理。<br />境界をたどるだけで、内部の面積が出る。</p>
 				</div>
 
-				{/*
-				  #244: β関数のシーン（表示順は c1 → c2 → c-beta → c3 → c4）。
-				  ID を c5 ではなく c-beta にしているのは、既存の #c1〜#c4 を
-				  振り直すと CSS 側のブロックを全部書き換えることになり、
-				  #63 で作り込んだ演出を壊すリスクが高いため。
-				  レイアウトは #c-gamma と同一なので CSS セレクタを共有している。
-				*/}
-				<div id="c-beta" class="caption">
-					<div class="eyebrow">BETA FUNCTION</div>
-					<h2>β関数が描く<br />面積</h2>
-					<div class="formula">{"B(2,3) = ∫₀¹ x(1−x)² dx = 1/12"}</div>
-					<p>院試で頻出の特殊関数も、<br />面積として見れば値の意味がわかる。</p>
+				<div id="c-calc" class="caption">
+					<div class="eyebrow">CALCULUS</div>
+					<h2>裾まで積めば<br />√π になる</h2>
+					<div class="formula">{"∫ e^(−x²) dx = √π"}</div>
+					<p>ガウス積分。<br />原始関数を持たない関数の、確定した面積。</p>
+				</div>
+
+				<div id="c-stat" class="caption">
+					<div class="eyebrow">STATISTICS</div>
+					<h2>ばらつきは<br />釣鐘に集まる</h2>
+					<div class="formula">{"(X̄ − μ) / (σ/√n) → N(0, 1)"}</div>
+					<p>中心極限定理。<br />もとの分布が何であれ、平均は正規分布へ。</p>
+				</div>
+
+				<div id="c-lin" class="caption">
+					<div class="eyebrow">LINEAR ALGEBRA</div>
+					<h2>行列式は<br />面積の倍率</h2>
+					<div class="formula">{"det A = 3 — 面積は 3 倍に"}</div>
+					<p>単位円が楕円へ。<br />広がり方そのものが行列式の値。</p>
 				</div>
 
 				<div id="c3" class="caption">
@@ -754,7 +779,7 @@ const issueHref =
 				</div>
 
 				<div class="scene-indicator">
-					<span id="scn" class="num">01 / 05</span>
+					<span id="scn" class="num">01 / 07</span>
 					<span class="bar"><i id="prog"></i></span>
 				</div>
 
@@ -838,10 +863,7 @@ const issueHref =
 				lerpPoint,
 				type SegmentTable,
 			} from "../lib/particles";
-			// #244: β関数のシーン。値の計算は #93 のプロトタイプで検証済みの
-			// mathviz ライブラリを使い、被積分関数の定義を二重に持たない。
-			import { betaIntegrand, gammaIntegrand } from "../lib/mathviz/gamma";
-
+			
 			const track = document.getElementById("track") as HTMLDivElement | null;
 			const canvas = document.getElementById("fx") as HTMLCanvasElement | null;
 
@@ -861,29 +883,37 @@ const issueHref =
 				// Yu 指示(2026-08-08): 冒頭は「Diary 静止 → 散らばり」の順に変更
 				// (ローディング演出が Diary 収束で終わるため、地続きに見せる)。
 				// 以降(グラフ → 1000+ → 上方拡散)は design/README.md のまま。
-				// #244: β関数のシーンを「放物線グラフ」と「1000+」の間に挿入した。
-				// 各シーンのスクロール長は変えず、増えたぶん #track を 560vh →
-				// 720vh に伸ばしている（旧 1.0 に対し新 1.28 倍を 1.0 に正規化）。
 				// セット: 0=散らばり 1=Diary 2=放物線グラフ 3=β関数 4=1000+ 5=上方拡散
+				// #244: Diary → 4 分野 → 1000+ → 上方拡散 の 7 シーン構成。
+				// 全体 850vh に対する割合。セット:
+				//   0=散らばり 1=Diary 2=ベクトル解析 3=微分積分学
+				//   4=統計学 5=線形代数 6=1000+ 7=上方拡散
 				const SEGMENTS: SegmentTable = [
-					[0, 0.109, 1, 1],
-					[0.109, 0.203, 1, 0],
-					[0.203, 0.328, 0, 2],
-					[0.328, 0.438, 2, 2],
-					[0.438, 0.547, 2, 3],
-					[0.547, 0.656, 3, 3],
-					[0.656, 0.766, 3, 4],
-					[0.766, 0.844, 4, 4],
-					[0.844, 1.001, 4, 5],
+					[0, 0.0706, 1, 1],
+					[0.0706, 0.1294, 1, 0],
+					[0.1294, 0.2118, 0, 2],
+					[0.2118, 0.2941, 2, 2],
+					[0.2941, 0.3647, 2, 3],
+					[0.3647, 0.4471, 3, 3],
+					[0.4471, 0.5176, 3, 4],
+					[0.5176, 0.6, 4, 4],
+					[0.6, 0.6706, 4, 5],
+					[0.6706, 0.7529, 5, 5],
+					[0.7529, 0.8235, 5, 6],
+					[0.8235, 0.8824, 6, 6],
+					[0.8824, 1.001, 6, 7],
 				];
 
 				let sets: ReturnType<typeof alignSets>;
-				// #244: Γ関数シーン用のスケール
-				let gx: (u: number) => number;
-				let gy: (v: number) => number;
-				// #244: β関数シーン用のスケール（Γ とは軸の範囲が違う）
-				let bx: (u: number) => number;
-				let by: (v: number) => number;
+				// #244: 4 分野シーンそれぞれのスケール（軸の範囲が違うので個別に持つ）
+				let vx: (u: number) => number; // ベクトル解析
+				let vy: (v: number) => number;
+				let ax: (u: number) => number; // 微分積分学
+				let ay: (v: number) => number;
+				let tx: (u: number) => number; // 統計学
+				let ty: (v: number) => number;
+				let lx: (u: number) => number; // 線形代数
+				let ly: (v: number) => number;
 				let builtKey = "";
 
 				function buildSets(w: number, h: number) {
@@ -894,56 +924,104 @@ const issueHref =
 						fontPx: Math.min(w * 0.24, 340),
 						centerY: h * 0.42,
 					});
-					// #244: Γ(4) = ∫₀^∞ x³e^(-x) dx = 3! = 6 の被積分関数。
-					// ピークは x = s-1 = 3 で値は 27e^(-3) ≈ 1.344。裾は x = 12 で
-					// 打ち切る（x³e^(-x) は x=12 で約 0.0106 まで落ちる）。
-					// 被積分関数の定義は mathviz の gammaIntegrand に委ねる。
-					const GAMMA_S = 4;
+					// #244: 4 分野を横断して見せるシーン群。
+					// 共通の描画枠（デスクトップは右寄せ、モバイルは全幅）。
 					const L = w > 900 ? w * 0.46 : w * 0.1;
 					const R = w > 900 ? w * 0.95 : w * 0.9;
 					const T = h * 0.2;
 					const B = h * 0.8;
-					gx = (u: number) => L + ((u + 0.7) / 13.4) * (R - L);
-					gy = (v: number) => B - ((v + 0.12) / 1.62) * (B - T);
-					const gammaCurve = curvePoints([
+					// 枠の中に収まる等方スケール（円が楕円に潰れないようにする）
+					const midX = (L + R) / 2;
+					const midY = (T + B) / 2;
+					const iso = Math.min((R - L) / 6.4, (B - T) / 4.4);
+
+					// --- ベクトル解析: グリーンの定理 ∮c (x dy − y dx) = 2S ---
+					// 境界の閉曲線 r(θ) = 1 + 0.28 sin 3θ と、内部を示す入れ子の輪。
+					const blobR = (th: number) => 1 + 0.28 * Math.sin(3 * th);
+					vx = (u: number) => midX + u * iso * 1.45;
+					vy = (v: number) => midY - v * iso * 1.45;
+					const vectorShape = curvePoints([
 						{
-							from: 0.001,
-							to: 12,
-							step: 0.04,
-							fn: (u) => ({ x: gx(u), y: gy(gammaIntegrand(GAMMA_S, u)) }),
+							from: 0,
+							to: Math.PI * 2,
+							step: 0.006,
+							fn: (t) => ({ x: vx(blobR(t) * Math.cos(t)), y: vy(blobR(t) * Math.sin(t)) }),
 						},
-						{ from: -0.7, to: 12.7, step: 0.16, fn: (u) => ({ x: gx(u), y: gy(0) }) },
-						{ from: -0.12, to: 1.5, step: 0.026, fn: (v) => ({ x: gx(0), y: gy(v) }) },
+						...[0.72, 0.48, 0.24].map((k) => ({
+							from: 0,
+							to: Math.PI * 2,
+							step: 0.03,
+							fn: (t: number) => ({
+								x: vx(k * blobR(t) * Math.cos(t)),
+								y: vy(k * blobR(t) * Math.sin(t)),
+							}),
+						})),
 					]);
+
+					// --- 微分積分学: ガウス積分 ∫ e^(−x²) dx = √π ---
+					ax = (u: number) => midX + (u / 3.4) * ((R - L) / 2);
+					ay = (v: number) => B - ((v + 0.1) / 1.25) * (B - T);
+					const calcShape = curvePoints([
+						{ from: -3.4, to: 3.4, step: 0.0075, fn: (u) => ({ x: ax(u), y: ay(Math.exp(-u * u)) }) },
+						{ from: -3.4, to: 3.4, step: 0.03, fn: (u) => ({ x: ax(u), y: ay(0) }) },
+						{ from: -0.1, to: 1.15, step: 0.012, fn: (v) => ({ x: ax(0), y: ay(v) }) },
+					]);
+
+					// --- 統計学: 中心極限定理（ヒストグラム → 正規分布）---
+					// 唯一の「離散」な絵にして他シーンと差を付ける。棒の輪郭 + 正規分布曲線。
+					const NBIN = 11;
+					const binW = 0.56;
+					const pdf = (u: number) => Math.exp(-(u * u) / 2) / Math.sqrt(2 * Math.PI);
+					tx = (u: number) => midX + (u / 3.6) * ((R - L) / 2);
+					ty = (v: number) => B - ((v + 0.04) / 0.5) * (B - T);
+					const bars: Parameters<typeof curvePoints>[0] = [];
+					for (let i = 0; i < NBIN; i++) {
+						const c = (i - (NBIN - 1) / 2) * binW;
+						const hgt = pdf(c);
+						const l = c - binW / 2;
+						const r = c + binW / 2;
+						bars.push({ from: 0, to: hgt, step: hgt / 26, fn: (v) => ({ x: tx(l), y: ty(v) }) });
+						bars.push({ from: 0, to: hgt, step: hgt / 26, fn: (v) => ({ x: tx(r), y: ty(v) }) });
+						bars.push({ from: l, to: r, step: binW / 22, fn: (u) => ({ x: tx(u), y: ty(hgt) }) });
+					}
+					const statShape = curvePoints([
+						...bars,
+						{ from: -3.6, to: 3.6, step: 0.012, fn: (u) => ({ x: tx(u), y: ty(pdf(u)) }) },
+						{ from: -3.6, to: 3.6, step: 0.03, fn: (u) => ({ x: tx(u), y: ty(0) }) },
+					]);
+
+					// --- 線形代数: det A = 3（単位円 → 楕円）---
+					// A = [[2, 1], [0, 1.5]] なので det A = 2*1.5 − 1*0 = 3。
+					lx = (u: number) => midX + u * iso;
+					ly = (v: number) => midY - v * iso;
+					const linShape = curvePoints([
+						{
+							from: 0,
+							to: Math.PI * 2,
+							step: 0.0075,
+							fn: (t) => ({
+								x: lx(2 * Math.cos(t) + Math.sin(t)),
+								y: ly(1.5 * Math.sin(t)),
+							}),
+						},
+						{
+							from: 0,
+							to: Math.PI * 2,
+							step: 0.022,
+							fn: (t) => ({ x: lx(Math.cos(t)), y: ly(Math.sin(t)) }),
+						},
+						{ from: -2.6, to: 2.6, step: 0.05, fn: (u) => ({ x: lx(u), y: ly(0) }) },
+						{ from: -1.9, to: 1.9, step: 0.05, fn: (v) => ({ x: lx(0), y: ly(v) }) },
+					]);
+
 					const thousand = textShape("1000+", {
 						width: w,
 						height: h,
 						fontPx: Math.min(w * 0.22, 300),
 						centerY: h * 0.44,
 					});
-					// #244: β関数 B(2,3) = ∫₀¹ x(1-x)² dx の被積分関数。
-					// 最大値は x = 1/3 の 4/27 ≈ 0.148 なので、縦は [-0.02, 0.19] で取る。
-					// 被積分関数の定義は mathviz の betaIntegrand に委ねる（二重定義しない）。
-					const BETA_P = 2;
-					const BETA_Q = 3;
-					const bL = w > 900 ? w * 0.46 : w * 0.1;
-					const bR = w > 900 ? w * 0.95 : w * 0.9;
-					const bT = h * 0.2;
-					const bB = h * 0.8;
-					bx = (u: number) => bL + ((u + 0.12) / 1.24) * (bR - bL);
-					by = (v: number) => bB - ((v + 0.02) / 0.21) * (bB - bT);
-					const betaCurve = curvePoints([
-						{
-							from: 0.001,
-							to: 0.999,
-							step: 0.0035,
-							fn: (u) => ({ x: bx(u), y: by(betaIntegrand(BETA_P, BETA_Q, u)) }),
-						},
-						{ from: -0.12, to: 1.12, step: 0.014, fn: (u) => ({ x: bx(u), y: by(0) }) },
-						{ from: -0.02, to: 0.19, step: 0.0035, fn: (v) => ({ x: bx(0), y: by(v) }) },
-					]);
 					const up = upwardScatter(PARTICLE_COUNT, w, h);
-					return alignSets([scatter, diary, gammaCurve, betaCurve, thousand, up]);
+					return alignSets([scatter, diary, vectorShape, calcShape, statShape, linShape, thousand, up]);
 				}
 
 				function ensureSets() {
@@ -967,8 +1045,10 @@ const issueHref =
 				ensureSets();
 
 				const c1 = document.getElementById("c1");
-				const cGamma = document.getElementById("c-gamma");
-				const cBeta = document.getElementById("c-beta");
+				const cVec = document.getElementById("c-vec");
+				const cCalc = document.getElementById("c-calc");
+				const cStat = document.getElementById("c-stat");
+				const cLin = document.getElementById("c-lin");
 				const c3 = document.getElementById("c3");
 				const c4 = document.getElementById("c4");
 				const scn = document.getElementById("scn");
@@ -979,10 +1059,10 @@ const issueHref =
 				let cy = 0;
 
 				// #244: ランプ幅はスクロール進捗 p の割合で効くため、#track を
-				// 560vh → 720vh（1.28 倍）に伸ばすと 0.05 のままでは実スクロール距離で
+				// 560vh → 850vh（約 1.52 倍）に伸ばすと 0.05 のままでは実スクロール距離で
 				// フェードが 28% 間延びする。元の見え方（約 28vh でフェード）を保つため
-				// 0.05 / 1.28 ≈ 0.039 に詰める。
-				const FADE_RAMP = 0.039;
+				// 0.05 / (850/560) ≈ 0.033 に詰める。
+				const FADE_RAMP = 0.033;
 				function fade(p: number, a: number, b: number): number {
 					const fi = Math.min(Math.max((p - a) / FADE_RAMP, 0), 1);
 					const fo = Math.min(Math.max((b - p) / FADE_RAMP, 0), 1);
@@ -1023,7 +1103,7 @@ const issueHref =
 						const { from, to, t } = segmentProgress(currentP, SEGMENTS);
 
 						// あるセットが支配的な間だけ、そのシーンの「面積」を塗る。
-						// セット 2 = Γ関数、セット 3 = β関数。いずれも被積分関数の下側を塗る（#244）。
+						// セット 2 = ベクトル解析、3 = 微分積分学、5 = 線形代数 の「面積」を塗る（#244）。
 						const setWeight = (target: number) => {
 							if (from === target && to === target) return 1;
 							if (to === target) return t;
@@ -1031,60 +1111,89 @@ const issueHref =
 							return 0;
 						};
 
-						const gammaWeight = setWeight(2);
-						if (gammaWeight > 0.02 && gx && gy) {
+						// ベクトル解析: 閉曲線の内部（グリーンの定理で測る面積）
+						const wVec = setWeight(2);
+						if (wVec > 0.02 && vx && vy) {
 							const ctx = frame.ctx;
 							ctx.save();
-							ctx.globalAlpha = gammaWeight * 0.9;
+							ctx.globalAlpha = wVec * 0.9;
 							ctx.beginPath();
-							ctx.moveTo(gx(0), gy(0));
-							for (let u = 0; u <= 12.001; u += 0.06) {
-								ctx.lineTo(gx(u), gy(gammaIntegrand(4, u)));
+							for (let t = 0; t <= Math.PI * 2 + 0.001; t += 0.02) {
+								const r = 1 + 0.28 * Math.sin(3 * t);
+								const px = vx(r * Math.cos(t));
+								const py = vy(r * Math.sin(t));
+								if (t === 0) ctx.moveTo(px, py);
+								else ctx.lineTo(px, py);
 							}
-							ctx.lineTo(gx(12), gy(0));
 							ctx.closePath();
 							ctx.fillStyle = "rgba(82,224,245,0.13)";
 							ctx.fill();
 							ctx.restore();
 						}
 
-						const betaWeight = setWeight(3);
-						if (betaWeight > 0.02 && bx && by) {
+						// 微分積分学: ガウス積分の下側
+						const wCalc = setWeight(3);
+						if (wCalc > 0.02 && ax && ay) {
 							const ctx = frame.ctx;
 							ctx.save();
-							ctx.globalAlpha = betaWeight * 0.9;
+							ctx.globalAlpha = wCalc * 0.9;
 							ctx.beginPath();
-							ctx.moveTo(bx(0), by(0));
-							for (let u = 0; u <= 1.0001; u += 0.005) {
-								ctx.lineTo(bx(u), by(betaIntegrand(2, 3, u)));
-							}
-							ctx.lineTo(bx(1), by(0));
+							ctx.moveTo(ax(-3.4), ay(0));
+							for (let u = -3.4; u <= 3.401; u += 0.02) ctx.lineTo(ax(u), ay(Math.exp(-u * u)));
+							ctx.lineTo(ax(3.4), ay(0));
 							ctx.closePath();
 							ctx.fillStyle = "rgba(82,224,245,0.13)";
 							ctx.fill();
 							ctx.restore();
 						}
 
-						// #244: シーンが 1 つ増えたぶん、旧値を 1.28 で割って詰め直している。
-						applyCaption(c1, fade(currentP, -1, 0.102));
-						applyCaption(cGamma, fade(currentP, 0.234, 0.455));
-						applyCaption(cBeta, fade(currentP, 0.465, 0.665));
-						applyCaption(c3, fade(currentP, 0.675, 0.86));
-						applyCaption(c4, currentP > 0.875 ? Math.min((currentP - 0.875) / 0.04, 1) : 0);
+						// 統計学は「離散（棒グラフ）」で他と差を付けるため塗らない。
+
+						// 線形代数: 単位円の像である楕円（面積が det A 倍になる）
+						const wLin = setWeight(5);
+						if (wLin > 0.02 && lx && ly) {
+							const ctx = frame.ctx;
+							ctx.save();
+							ctx.globalAlpha = wLin * 0.9;
+							ctx.beginPath();
+							for (let t = 0; t <= Math.PI * 2 + 0.001; t += 0.02) {
+								const px = lx(2 * Math.cos(t) + Math.sin(t));
+								const py = ly(1.5 * Math.sin(t));
+								if (t === 0) ctx.moveTo(px, py);
+								else ctx.lineTo(px, py);
+							}
+							ctx.closePath();
+							ctx.fillStyle = "rgba(82,224,245,0.13)";
+							ctx.fill();
+							ctx.restore();
+						}
+
+						// #244: 各シーンの「静止区間」を中心にフェードさせる。
+						applyCaption(c1, fade(currentP, -1, 0.075));
+						applyCaption(cVec, fade(currentP, 0.175, 0.305));
+						applyCaption(cCalc, fade(currentP, 0.328, 0.458));
+						applyCaption(cStat, fade(currentP, 0.481, 0.611));
+						applyCaption(cLin, fade(currentP, 0.634, 0.764));
+						applyCaption(c3, fade(currentP, 0.79, 0.893));
+						applyCaption(c4, currentP > 0.905 ? Math.min((currentP - 0.905) / 0.035, 1) : 0);
 
 						if (scn) {
-							// #244: 各シーンの「次への遷移が始まる位置」で番号を送る（旧実装と同じ考え方）。
+							// #244: 各シーンの「次への遷移が始まる位置」で番号を送る。
 							const n =
-								currentP < 0.203
+								currentP < 0.1294
 									? 1
-									: currentP < 0.438
+									: currentP < 0.2941
 										? 2
-										: currentP < 0.656
+										: currentP < 0.4471
 											? 3
-											: currentP < 0.844
+											: currentP < 0.6
 												? 4
-												: 5;
-							const txt = `0${n} / 05`;
+												: currentP < 0.7529
+													? 5
+													: currentP < 0.8824
+														? 6
+														: 7;
+							const txt = `0${n} / 07`;
 							if (scn.textContent !== txt) scn.textContent = txt;
 						}
 						if (prog) prog.style.transform = `scaleY(${currentP})`;
