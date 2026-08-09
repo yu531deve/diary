@@ -1,0 +1,27 @@
+\diarytitle{0003}{ベルヌーイ型微分方程式の一般解（n = 3、指数関数係数）}
+
+この方程式は $y' + P(x)y = Q(x)y^{n}$ の形（ベルヌーイ型）であり、$u = y^{1-n}$ の置換により線形方程式に帰着できる。
+
+$n = 3$ のベルヌーイ型。両辺を $y^{3}$ で割ると
+\[
+y^{-3}\frac{dy}{dx} - y^{-2} = e^{x}
+\]
+$u = y^{-2}$ とおくと $\dfrac{du}{dx} = -2y^{-3}\dfrac{dy}{dx}$ より
+\[
+-\frac{1}{2}\frac{du}{dx} - u = e^{x}
+\quad\Longleftrightarrow\quad
+\frac{du}{dx} + 2u = -2e^{x}
+\]
+積分因子は $\mu = e^{2x}$ であるから
+\[
+\frac{d}{dx}\left(u\,e^{2x}\right) = -2e^{3x}
+\quad\Longrightarrow\quad
+u\,e^{2x} = -\frac{2}{3}e^{3x} + C
+\quad\Longrightarrow\quad
+u = Ce^{-2x} - \frac{2}{3}e^{x}
+\]
+$u = y^{-2}$ を戻して
+\[
+\boxed{\; \frac{1}{y^{2}} = Ce^{-2x} - \frac{2}{3}e^{x} \;}
+\qquad (C \text{ は任意定数})
+\]

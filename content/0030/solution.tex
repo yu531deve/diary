@@ -1,0 +1,21 @@
+\diarytitle{0030}{定数係数二階線形同次微分方程式の一般解（重根）}
+
+この方程式は定数係数2階線形同次微分方程式 $y'' + ay' + by = 0$ の形であり、特性方程式 $\lambda^{2} + a\lambda + b = 0$ が重根 $\lambda_{1}=\lambda_{2}=\lambda$（判別式 $D=0$）をもつ場合、$y_{1} = e^{\lambda x}$ だけでは解が 1 つ足りない。$y_{2} = xe^{\lambda x}$ を代入すると
+\[
+y_{2}'' + a y_{2}' + b y_{2}
+= e^{\lambda x}\Bigl[x(\lambda^{2}+a\lambda+b) + (2\lambda + a)\Bigr]
+\]
+であり、重根条件 $\lambda^{2}+a\lambda+b=0$ かつ $\lambda = -\dfrac{a}{2}$ より $2\lambda+a=0$ となるから、右辺は $0$ に等しく $y_2$ も解であることが分かる。$y_1, y_2$ は一次独立なので、一般解は $y = (C_{1}+C_{2}x)e^{\lambda x}$ で与えられる。
+
+特性方程式は
+\[
+\lambda^{2} + 4\lambda + 4 = 0 \quad\Longrightarrow\quad (\lambda+2)^{2} = 0
+\quad\Longrightarrow\quad \lambda = -2 \ (\text{重根})
+\]
+重根であるから、一般解は
+\[
+\boxed{\; y = (C_{1} + C_{2}x)\,e^{-2x} \;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $y' = (C_{2} - 2C_{1} - 2C_{2}x)e^{-2x}$、$y'' = (4C_{1} - 4C_{2} + 4C_{2}x)e^{-2x}$ より
+$y''+4y'+4y = \bigl[(4C_{1}-4C_{2}) + 4(C_{2}-2C_{1}) + 4C_{1}\bigr]e^{-2x} + \bigl[4C_{2} - 8C_{2} + 4C_{2}\bigr]xe^{-2x} = 0$。成立。）

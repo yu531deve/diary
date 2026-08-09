@@ -1,0 +1,25 @@
+\diarytitle{0006}{リカッチ方程式の一般解（特解 y1 = 1/x）}
+
+リカッチ方程式は特解 $y_{1}$ が1つ分かれば、$y = y_{1} + \dfrac{1}{u}$ の置換により $u$ についての1階線形方程式に変換できる。
+
+$y_{1} = \dfrac{1}{x}$ を代入すると、左辺 $= -\dfrac{1}{x^{2}}$、右辺 $= -\dfrac{1}{x^{2}} - \dfrac{1}{x^{2}} + \dfrac{1}{x^{2}} = -\dfrac{1}{x^{2}}$ となり一致するので特解である。
+
+$q_{1}(x) = -\dfrac{1}{x}$, $q_{2}(x) = 1$ であるから、$y = y_{1} + \dfrac{1}{u}$ の置換により $u$ は
+\[
+\frac{du}{dx} + \left(q_{1} + 2q_{2}y_{1}\right)u = -q_{2}
+\quad\Longleftrightarrow\quad
+\frac{du}{dx} + \frac{u}{x} = -1
+\]
+を満たす。積分因子は $\mu = x$ であるから
+\[
+\frac{d}{dx}(xu) = -x
+\quad\Longrightarrow\quad
+xu = -\frac{x^{2}}{2} + \frac{C}{2}
+\quad\Longrightarrow\quad
+u = \frac{C - x^{2}}{2x}
+\]
+したがって一般解は
+\[
+\boxed{\; y = \frac{1}{x} + \frac{2x}{C - x^{2}} \;}
+\qquad (C \text{ は任意定数})
+\]
