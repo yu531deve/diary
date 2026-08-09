@@ -1,0 +1,74 @@
+\diarytitle{0062}{熱伝導方程式の初期値・境界値問題（ディリクレ境界条件、単一固有モード）}
+
+\textbf{手順1: 変数分離。}\ $u(x,t) = X(x)\,T(t)$ とおいて $u_t = k\,u_{xx}$ に代入すると
+\[
+X(x)\,T'(t) = k\,X''(x)\,T(t)
+\]
+両辺を $k\,X(x)\,T(t)$ で割ると
+\[
+\frac{T'(t)}{k\,T(t)} = \frac{X''(x)}{X(x)}
+\]
+左辺は $t$ のみ、右辺は $x$ のみの関数なのに両者が等しいので、その値は $x$ にも $t$ にも依存しない定数である。これを $-\lambda$ とおくと、2本の常微分方程式
+\[
+X''(x) + \lambda X(x) = 0, \qquad T'(t) + k\lambda\,T(t) = 0
+\]
+に分離される。
+
+\textbf{手順2: 境界条件を $X$ に移す。}\ $u(0,t) = X(0)\,T(t) = 0$ がすべての $t$ で成り立つには、$T \equiv 0$（自明解）でない限り $X(0) = 0$。同様に $X(L) = 0$。
+
+\textbf{手順3: 固有値問題を解く（$\lambda$ の場合分け）。}
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+X = A\cosh(\mu x) + B\sinh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+X(0) &= A = 0 \\
+X(L) &= B\sinh(\mu L) = 0
+\end{align*}
+$\sinh(\mu L) \neq 0$ より $B = 0$。自明解のみ。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解は $X = A + Bx$。$X(0) = A = 0$、$X(L) = BL = 0$ より $B = 0$。自明解のみ。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+X = A\cos(\mu x) + B\sin(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+X(0) &= A = 0 \\
+X(L) &= B\sin(\mu L) = 0
+\end{align*}
+自明でない解（$B \neq 0$）が存在するためには $\sin(\mu L) = 0$、すなわち
+\[
+\mu_n = \frac{n\pi}{L}, \qquad \lambda_n = \left(\frac{n\pi}{L}\right)^{2}, \qquad X_n(x) = \sin\frac{n\pi x}{L} \qquad (n = 1, 2, 3, \dots)
+\]
+
+\textbf{手順4: 時間成分を解く。}\ $T' = -k\lambda_n T$ は変数分離形で
+\[
+\frac{dT}{T} = -k\lambda_n\,dt
+\quad\Longrightarrow\quad
+\ln|T| = -k\lambda_n t + C
+\quad\Longrightarrow\quad
+T_n(t) = e^{-k\lambda_n t}
+\]
+（定数倍は後の $c_n$ に吸収させる。）
+
+\textbf{手順5: 重ね合わせと初期条件。}\ 各 $X_n(x)T_n(t)$ は方程式と境界条件を満たすので、線形性からその重ね合わせ
+\[
+u(x,t) = \sum_{n=1}^{\infty} c_n \sin\frac{n\pi x}{L}\,e^{-k(n\pi/L)^2 t}
+\]
+も満たす。$t=0$ とおくと
+\[
+u(x,0) = \sum_{n=1}^{\infty} c_n \sin\frac{n\pi x}{L} = \sin\frac{\pi x}{L}
+\]
+右辺はすでに $n=1$ の固有関数そのものなので、係数比較により $c_1 = 1$、$c_n = 0\ (n \ge 2)$（固有関数系 $\{\sin\frac{n\pi x}{L}\}$ の直交性から、この対応は一意である）。よって
+\[
+\boxed{\; u(x,t) = \sin\frac{\pi x}{L}\,\exp\!\left(-k\left(\frac{\pi}{L}\right)^{2} t\right) \;}
+\]
+
+（検算: $u_t = -k(\pi/L)^2 \sin\frac{\pi x}{L}e^{-k(\pi/L)^2t}$、$u_{xx} = -(\pi/L)^2\sin\frac{\pi x}{L}e^{-k(\pi/L)^2t}$ より $u_t = k u_{xx}$ が成り立ち、$u(0,t)=u(L,t)=0$、$u(x,0)=\sin\frac{\pi x}{L}$ も満たす。）
