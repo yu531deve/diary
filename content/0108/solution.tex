@@ -1,0 +1,25 @@
+\diarytitle{0108}{陰関数定理を用いたdy/dxの計算}
+
+陰関数 $F(x,y)=0$ が定める $y=y(x)$ については、両辺を $x$ で微分し連鎖律を用いると
+\[
+F_{x} + F_{y}\frac{dy}{dx} = 0 \quad\Longrightarrow\quad \frac{dy}{dx} = -\frac{F_{x}}{F_{y}} \quad (F_{y} \ne 0)
+\]
+が成り立つ（陰関数定理）。これを用いる。
+
+$F(x,y) = x^{3} + y^{3} - 3xy$ とおくと
+\[
+F_{x} = 3x^{2} - 3y, \qquad F_{y} = 3y^{2} - 3x
+\]
+であるから、陰関数定理より
+\[
+\frac{dy}{dx} = -\frac{F_{x}}{F_{y}} = -\frac{3x^{2}-3y}{3y^{2}-3x} = \frac{y-x^{2}}{y^{2}-x}
+\]
+点 $\left(\dfrac{3}{2},\dfrac{3}{2}\right)$ はこの曲線上にある（実際 $\left(\tfrac{3}{2}\right)^{3}+\left(\tfrac{3}{2}\right)^{3}-3\cdot\tfrac{3}{2}\cdot\tfrac{3}{2} = \tfrac{27}{8}+\tfrac{27}{8}-\tfrac{27}{4} = \tfrac{27}{4}-\tfrac{27}{4}=0$）。この点で
+\[
+\frac{dy}{dx} = \frac{\frac{3}{2} - \left(\frac{3}{2}\right)^{2}}{\left(\frac{3}{2}\right)^{2} - \frac{3}{2}} = \frac{\frac{3}{2}-\frac{9}{4}}{\frac{9}{4}-\frac{3}{2}} = \frac{-\frac{3}{4}}{\frac{3}{4}} = -1
+\]
+したがって
+\[
+\boxed{\; \frac{dy}{dx} = \frac{y-x^{2}}{y^{2}-x}, \quad \left.\frac{dy}{dx}\right|_{(3/2,\,3/2)} = -1 \;}
+\]
+（検算: $F_y = 3\left(\tfrac{9}{4}\right)-3\cdot\tfrac{3}{2} = \tfrac{27}{4}-\tfrac{18}{4}=\tfrac{9}{4}\ne 0$ より陰関数定理が適用できる。）

@@ -1,0 +1,64 @@
+\diarytitle{0110}{極座標変換によるラプラシアンの極座標表示の導出}
+
+$z=f(x,y)$、$x=x(u,v)$、$y=y(u,v)$ のとき
+\[
+\frac{\partial z}{\partial u} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial u} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial u}, \qquad
+\frac{\partial z}{\partial v} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial v} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial v}
+\]
+が成り立つ。極座標変換 $x = r\cos\theta$、$y = r\sin\theta$ の場合は
+\[
+\frac{\partial x}{\partial r} = \cos\theta,\quad \frac{\partial y}{\partial r} = \sin\theta,\quad
+\frac{\partial x}{\partial \theta} = -r\sin\theta,\quad \frac{\partial y}{\partial \theta} = r\cos\theta
+\]
+であるから、
+\[
+\frac{\partial z}{\partial r} = z_{x}\cos\theta + z_{y}\sin\theta, \qquad
+\frac{\partial z}{\partial \theta} = -r z_{x}\sin\theta + r z_{y}\cos\theta
+\]
+となる。逆に $r,\theta$ を $x,y$ の関数とみると、$r = \sqrt{x^{2}+y^{2}}$、$\theta = \arctan(y/x)$ より
+\[
+r_{x} = \cos\theta,\ r_{y} = \sin\theta,\qquad
+\theta_{x} = -\frac{\sin\theta}{r},\ \theta_{y} = \frac{\cos\theta}{r}
+\]
+であり、これを連鎖律に代入すると、偏微分の作用素として
+\[
+\frac{\partial}{\partial x} = \cos\theta\,\frac{\partial}{\partial r} - \frac{\sin\theta}{r}\frac{\partial}{\partial \theta}, \qquad
+\frac{\partial}{\partial y} = \sin\theta\,\frac{\partial}{\partial r} + \frac{\cos\theta}{r}\frac{\partial}{\partial \theta}
+\]
+という表示（作用素の合成）が得られる。この作用素を2回適用する。
+
+まず
+\[
+z_{x} = \cos\theta\, z_{r} - \frac{\sin\theta}{r} z_{\theta}
+\]
+に再び $\partial/\partial x$ を作用させる。$\theta$ に依存する $\cos\theta,\sin\theta$ と $r$ に依存する $1/r$ に注意して積の微分を行うと
+\[
+\partial_{r}\left(\cos\theta\,z_{r} - \frac{\sin\theta}{r}z_{\theta}\right)
+= \cos\theta\,z_{rr} + \frac{\sin\theta}{r^{2}}z_{\theta} - \frac{\sin\theta}{r}z_{r\theta}
+\]
+\[
+\partial_{\theta}\left(\cos\theta\,z_{r} - \frac{\sin\theta}{r}z_{\theta}\right)
+= -\sin\theta\,z_{r} + \cos\theta\,z_{r\theta} - \frac{\cos\theta}{r}z_{\theta} - \frac{\sin\theta}{r}z_{\theta\theta}
+\]
+であるから
+\[
+z_{xx} = \cos\theta\left[\cos\theta\,z_{rr} + \frac{\sin\theta}{r^{2}}z_{\theta} - \frac{\sin\theta}{r}z_{r\theta}\right]
+- \frac{\sin\theta}{r}\left[-\sin\theta\,z_{r} + \cos\theta\,z_{r\theta} - \frac{\cos\theta}{r}z_{\theta} - \frac{\sin\theta}{r}z_{\theta\theta}\right]
+\]
+\[
+= \cos^{2}\theta\, z_{rr} + \frac{\sin^{2}\theta}{r}z_{r} + \frac{\sin^{2}\theta}{r^{2}}z_{\theta\theta} - \frac{2\sin\theta\cos\theta}{r}z_{r\theta} + \frac{2\sin\theta\cos\theta}{r^{2}}z_{\theta}
+\]
+同様に $z_{y} = \sin\theta\,z_{r} + \dfrac{\cos\theta}{r}z_{\theta}$ にもう一度 $\partial/\partial y$ を作用させると
+\[
+z_{yy} = \sin^{2}\theta\, z_{rr} + \frac{\cos^{2}\theta}{r}z_{r} + \frac{\cos^{2}\theta}{r^{2}}z_{\theta\theta} + \frac{2\sin\theta\cos\theta}{r}z_{r\theta} - \frac{2\sin\theta\cos\theta}{r^{2}}z_{\theta}
+\]
+両者を加えると、$z_{r\theta}$ の項（符号が逆で係数が同じ）と $z_{\theta}$ の項（同様）はすべて相殺し、$\cos^{2}\theta+\sin^{2}\theta=1$ を用いて
+\[
+z_{xx}+z_{yy} = z_{rr} + \frac{1}{r}z_{r} + \frac{1}{r^{2}}z_{\theta\theta}
+\]
+すなわち
+\[
+\boxed{\; \frac{\partial^{2} z}{\partial x^{2}} + \frac{\partial^{2} z}{\partial y^{2}} = \frac{\partial^{2} z}{\partial r^{2}} + \frac{1}{r}\frac{\partial z}{\partial r} + \frac{1}{r^{2}}\frac{\partial^{2} z}{\partial \theta^{2}} \;}
+\]
+が示された。
+（検算: $z=x^{2}+y^{2}=r^{2}$ とおくと、左辺は $z_{xx}+z_{yy}=2+2=4$。右辺は $z_r=2r,\,z_{rr}=2,\,z_\theta=z_{\theta\theta}=0$ より $2+\tfrac{1}{r}\cdot2r+0=2+2=4$ で一致する。）

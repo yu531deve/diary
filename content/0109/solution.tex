@@ -1,0 +1,32 @@
+\diarytitle{0109}{u,v変換による偏微分の連鎖律表示とxyの具体計算}
+
+$z=f(x,y)$、$x=x(u,v)$、$y=y(u,v)$ のとき
+\[
+\frac{\partial z}{\partial u} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial u} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial u}, \qquad
+\frac{\partial z}{\partial v} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial v} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial v}
+\]
+が成り立つ。これを用いる。
+
+$x_{u} = 2u$、$y_{u} = 2v$、$x_{v} = -2v$、$y_{v} = 2u$ であるから、連鎖律より
+\[
+\frac{\partial z}{\partial u} = z_{x}\cdot 2u + z_{y}\cdot 2v = 2u\,z_{x} + 2v\,z_{y}
+\]
+\[
+\frac{\partial z}{\partial v} = z_{x}\cdot(-2v) + z_{y}\cdot 2u = -2v\,z_{x} + 2u\,z_{y}
+\]
+次に $f(x,y) = xy$ のとき $z_{x} = y$、$z_{y} = x$ であるから、$x = u^{2}-v^{2}$、$y=2uv$ を用いて
+\[
+\frac{\partial z}{\partial u} = 2u\cdot y + 2v\cdot x = 2u(2uv) + 2v(u^{2}-v^{2}) = 4u^{2}v + 2u^{2}v - 2v^{3} = 6u^{2}v - 2v^{3}
+\]
+\[
+\frac{\partial z}{\partial v} = -2v\cdot y + 2u\cdot x = -2v(2uv) + 2u(u^{2}-v^{2}) = -4uv^{2} + 2u^{3} - 2uv^{2} = 2u^{3} - 6uv^{2}
+\]
+したがって
+\[
+\boxed{\; \frac{\partial z}{\partial u} = 2u\,z_{x}+2v\,z_{y},\qquad \frac{\partial z}{\partial v} = -2v\,z_{x}+2u\,z_{y} \;}
+\]
+\[
+f=xy \text{ のとき }\quad
+\boxed{\; \frac{\partial z}{\partial u} = 6u^{2}v-2v^{3},\qquad \frac{\partial z}{\partial v} = 2u^{3}-6uv^{2} \;}
+\]
+（検算: $z = xy = (u^{2}-v^{2})(2uv) = 2u^{3}v - 2uv^{3}$ を直接 $u,v$ で偏微分すると $\partial z/\partial u = 6u^{2}v-2v^{3}$、$\partial z/\partial v = 2u^{3}-6uv^{2}$ となり一致する。）
