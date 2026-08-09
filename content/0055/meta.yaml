@@ -1,0 +1,10 @@
+id: "0055"
+title: "スツルム・リウヴィル型境界値問題（混合境界条件）の固有値・固有関数"
+status: draft
+field:
+  major: "常微分方程式"
+  minor: "定数係数線形方程式"
+tags: ["境界値問題", "特性方程式"]
+difficulty: 4
+created: 2026-08-09
+updated: 2026-08-09

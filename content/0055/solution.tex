@@ -1,0 +1,54 @@
+\diarytitle{0055}{スツルム・リウヴィル型境界値問題（混合境界条件）の固有値・固有関数}
+
+方針: $\lambda$ の符号（$\lambda < 0$, $\lambda = 0$, $\lambda > 0$）によって特性方程式の解の形が変わるため、場合分けして各場合に境界条件を課し、自明でない解が存在するかを調べる。
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cosh(\mu x) + B\sinh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y'(L) &= B\mu\cosh(\mu L) = 0
+\end{align*}
+$\cosh(\mu L) \ge 1 > 0$ より $B = 0$。
+自明解のみで、固有値は存在しない。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解とその導関数は
+\[
+y = A + Bx, \qquad y' = B
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y'(L) &= B = 0
+\end{align*}
+よって $A=B=0$ で自明解のみ。$\lambda=0$ は固有値ではない。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cos(\mu x) + B\sin(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y'(L) &= B\mu\cos(\mu L) = 0
+\end{align*}
+自明でない解（$B \neq 0$）が存在するためには
+\[
+\cos(\mu L) = 0 \quad\Longrightarrow\quad \mu L = \frac{\pi}{2} + n\pi = \frac{(2n+1)\pi}{2} \quad (n = 0, 1, 2, \dots)
+\]
+よって
+\[
+\mu_{n} = \frac{(2n+1)\pi}{2L}, \qquad \lambda_{n} = \mu_{n}^{2} = \left(\frac{(2n+1)\pi}{2L}\right)^{2}
+\]
+固有関数は $y_{n}(x) = \sin\!\left(\dfrac{(2n+1)\pi x}{2L}\right)$（定数倍を除く）。
+
+（検算: $y_n(0) = \sin 0 = 0$。$y_n'(x) = \frac{(2n+1)\pi}{2L}\cos\left(\frac{(2n+1)\pi x}{2L}\right)$ より $y_n'(L) = \frac{(2n+1)\pi}{2L}\cos\left(\frac{(2n+1)\pi}{2}\right) = 0$（$\cos$ の引数が $\pi/2$ の奇数倍のため）。また $y_n'' + \lambda_n y_n = -\mu_n^2 y_n + \mu_n^2 y_n = 0$ も満たす。）
+
+\[
+\boxed{\; \lambda_{n} = \left(\frac{(2n+1)\pi}{2L}\right)^{2}, \quad y_{n}(x) = \sin\!\left(\frac{(2n+1)\pi x}{2L}\right) \qquad (n = 0, 1, 2, \dots) \;}
+\]

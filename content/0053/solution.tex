@@ -1,0 +1,54 @@
+\diarytitle{0053}{スツルム・リウヴィル型境界値問題（ディリクレ境界条件）の固有値・固有関数}
+
+方針: $\lambda$ の符号（$\lambda < 0$, $\lambda = 0$, $\lambda > 0$）によって特性方程式の解の形が変わるため、場合分けして各場合に境界条件を課し、自明でない解が存在するかを調べる。
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cosh(\mu x) + B\sinh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y(L) &= B\sinh(\mu L) = 0
+\end{align*}
+$\mu L > 0$ より $\sinh(\mu L) \neq 0$ であるから $B = 0$。
+したがって自明解のみで、固有値は存在しない。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解は
+\[
+y = A + Bx
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y(L) &= BL = 0
+\end{align*}
+$L > 0$ より $B = 0$。自明解のみで、$\lambda = 0$ は固有値ではない。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解は
+\[
+y = A\cos(\mu x) + B\sin(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y(0) &= A = 0 \\
+y(L) &= B\sin(\mu L) = 0
+\end{align*}
+自明でない解（$B \neq 0$）が存在するためには
+\[
+\sin(\mu L) = 0 \quad\Longrightarrow\quad \mu L = n\pi \quad (n = 1, 2, 3, \dots)
+\]
+（$n=0$ は $\mu=0$ となり $\lambda>0$ の仮定に反するので除く。負の $n$ は符号を $B$ に吸収できるので $n \ge 1$ でよい。）よって
+\[
+\mu_{n} = \frac{n\pi}{L}, \qquad \lambda_{n} = \mu_{n}^{2} = \left(\frac{n\pi}{L}\right)^{2}
+\]
+対応する固有関数は $y_{n}(x) = \sin\!\left(\dfrac{n\pi x}{L}\right)$（定数倍を除く）。
+
+（検算: $y_n'' = -\left(\frac{n\pi}{L}\right)^2 \sin\left(\frac{n\pi x}{L}\right) = -\lambda_n y_n$ より $y_n'' + \lambda_n y_n = 0$ を満たす。また $y_n(0) = \sin 0 = 0$、$y_n(L) = \sin(n\pi) = 0$ も満たす。）
+
+\[
+\boxed{\; \lambda_{n} = \left(\frac{n\pi}{L}\right)^{2}, \quad y_{n}(x) = \sin\!\left(\frac{n\pi x}{L}\right) \qquad (n = 1, 2, 3, \dots) \;}
+\]
