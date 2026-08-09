@@ -1,0 +1,45 @@
+\diarytitle{0085}{計画行列を用いた直線フィットの正規方程式の導出}
+
+一般に $f(x) = \sum_{j=0}^{m} c_j x^j$（$m$ 次多項式）のフィットは、計画行列 $A \in \mathbb{R}^{n\times(m+1)}$、パラメータベクトル $\bm{c}$、観測ベクトル $\bm{y}$ を用いて $\|\bm{y} - A\bm{c}\|^2$ の最小化に帰着する。直線フィット $f(x)=ax+b$ の場合はこれを $\bm{x} = \begin{pmatrix} a \\ b \end{pmatrix}$ として考えればよい。
+
+計画行列とパラメータ・観測ベクトルを
+\[
+A = \begin{pmatrix} x_1 & 1 \\ x_2 & 1 \\ \vdots & \vdots \\ x_n & 1 \end{pmatrix}, \qquad
+\bm{x} = \begin{pmatrix} a \\ b \end{pmatrix}, \qquad
+\bm{y} = \begin{pmatrix} y_1 \\ \vdots \\ y_n \end{pmatrix}
+\]
+とおくと、$i$ 番目の行成分により $(A\bm{x})_i = ax_i + b$ となるから、誤差二乗和は
+\[
+S(\bm{x}) = \|\bm{y} - A\bm{x}\|^2 = (\bm{y}-A\bm{x})^{\top}(\bm{y}-A\bm{x})
+= \bm{y}^{\top}\bm{y} - 2\bm{x}^{\top}A^{\top}\bm{y} + \bm{x}^{\top}A^{\top}A\bm{x}
+\]
+と展開できる。これを $\bm{x}$ で微分すると
+\[
+\nabla_{\bm{x}} S = -2A^{\top}\bm{y} + 2A^{\top}A\,\bm{x}
+\]
+であり、これを $\bm{0}$ とおくことで正規方程式
+\[
+\boxed{\; A^{\top}A\,\bm{x} = A^{\top}\bm{y} \;}
+\]
+を得る。ここで
+\[
+A^{\top}A = \begin{pmatrix} \sum x_i^2 & \sum x_i \\ \sum x_i & n \end{pmatrix}, \qquad
+A^{\top}\bm{y} = \begin{pmatrix} \sum x_i y_i \\ \sum y_i \end{pmatrix}
+\]
+であるから、成分ごとに書き下すと
+\[
+\sum x_i^2\, a + \sum x_i\, b = \sum x_i y_i, \qquad \sum x_i\, a + n\, b = \sum y_i
+\]
+となる。
+
+これを $(x_1,y_1)=(0,1),\ (1,2),\ (2,2),\ (3,4)$ のデータに当てはめる。$n=4$, $\sum x_i^2=14,\ \sum x_i=6,\ \sum x_iy_i=18,\ \sum y_i=9$ であるから、成分ごとの式は
+\[
+14a+6b=18, \qquad 6a+4b=9
+\]
+となり、これは偏微分により直接導出した正規方程式と完全に一致する。
+
+（検算: この式を解くと $a=b=\dfrac{9}{10}$ が得られる。これを $A^{\top}A\bm{x}$ に代入すると
+\[
+A^{\top}A\bm{x} = \begin{pmatrix}14\cdot\frac{9}{10}+6\cdot\frac{9}{10}\\ 6\cdot\frac{9}{10}+4\cdot\frac{9}{10}\end{pmatrix} = \begin{pmatrix}18\\9\end{pmatrix} = A^{\top}\bm{y}
+\]
+となり、確かに正規方程式を満たす。）

@@ -1,0 +1,13 @@
+\diarytitle{0085}{計画行列を用いた直線フィットの正規方程式の導出}
+
+データ点 $(x_i, y_i)$ ($i=1,\dots,n$) に直線 $y = ax + b$ をフィットする最小二乗問題を、計画行列
+\[
+A = \begin{pmatrix} x_1 & 1 \\ x_2 & 1 \\ \vdots & \vdots \\ x_n & 1 \end{pmatrix}, \qquad
+\bm{x} = \begin{pmatrix} a \\ b \end{pmatrix}, \qquad
+\bm{y} = \begin{pmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{pmatrix}
+\]
+を用いて $\|\bm{y} - A\bm{x}\|^2$ の最小化として定式化し、正規方程式 $A^{\top}A\,\bm{x} = A^{\top}\bm{y}$ を導け。さらに、この行列形式が
+\[
+(x_1,y_1)=(0,1),\quad (x_2,y_2)=(1,2),\quad (x_3,y_3)=(2,2),\quad (x_4,y_4)=(3,4)
+\]
+というデータに対する偏微分による正規方程式と一致することを確認せよ。

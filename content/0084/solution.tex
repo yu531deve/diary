@@ -1,0 +1,40 @@
+\diarytitle{0084}{5点データに対する2次関数の最小二乗フィット}
+
+$f(x) = ax^2+bx+c$ は未知パラメータ $a,b,c$ について線形であるから、誤差二乗和
+\[
+S(a,b,c) = \sum_i (y_i - ax_i^2 - bx_i - c)^2
+\]
+は $a,b,c$ の2次関数であり、最小値では各偏微分がすべて $0$ になる。$a,b,c$ で偏微分して $0$ とおくと
+\[
+\left\{
+\begin{aligned}
+a\sum_i x_i^4 + b\sum_i x_i^3 + c\sum_i x_i^2 &= \sum_i x_i^2 y_i \\
+a\sum_i x_i^3 + b\sum_i x_i^2 + c\sum_i x_i &= \sum_i x_i y_i \\
+a\sum_i x_i^2 + b\sum_i x_i + c\, n &= \sum_i y_i
+\end{aligned}
+\right.
+\]
+という3元連立1次方程式（正規方程式）が得られる。
+
+$n=5$ とし、必要な和を計算する。$x_i$ が原点対称なので $\sum x_i = 0$, $\sum x_i^3 = 0$ となることに注意すると
+\[
+\sum x_i^2 = 10,\quad \sum x_i^4 = 34,\quad \sum y_i = 12,\quad \sum x_i y_i = 4,\quad \sum x_i^2 y_i = 42
+\]
+正規方程式は
+\[
+34a + 10c = 42, \qquad 10b = 4, \qquad 10a + 5c = 12
+\]
+第2式より直ちに $b = \dfrac{2}{5}$。第3式より $c = \dfrac{12 - 10a}{5}$ を第1式に代入すると
+\[
+34a + 10\cdot\frac{12-10a}{5} = 42 \ \Longrightarrow\ 34a + 24 - 20a = 42 \ \Longrightarrow\ 14a = 18 \ \Longrightarrow\ a = \frac{9}{7}
+\]
+このとき
+\[
+c = \frac{12 - 10\cdot\frac{9}{7}}{5} = \frac{\frac{84-90}{7}}{5} = \frac{-6/7}{5} = -\frac{6}{35}
+\]
+したがって求める2次関数は
+\[
+\boxed{\; y = \frac{9}{7}x^2 + \frac{2}{5}x - \frac{6}{35} \;}
+\]
+
+（検算: 予測値は $\hat y(-2)=\frac{146}{35},\ \hat y(-1)=\frac{25}{35},\ \hat y(0)=-\frac{6}{35},\ \hat y(1)=\frac{53}{35},\ \hat y(2)=\frac{202}{35}$ となり、残差 $r_i=y_i-\hat y(x_i)$ は $\sum r_i = 0$, $\sum x_i r_i = 0$, $\sum x_i^2 r_i = 0$ を満たす（正規方程式の各式に対応）。）
