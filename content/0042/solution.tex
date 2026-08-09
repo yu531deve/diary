@@ -1,0 +1,29 @@
+\diarytitle{0042}{階数低下法による初期値問題 $yy'' = (y')^2$ の求解}
+
+この方程式は $x$ を含まない型 $F(y, y', y'') = 0$ であり、$p = y'$ とおき $y$ を独立変数とみなすと $y'' = p\dfrac{dp}{dy}$ となって、$p$ と $y$ に関する1階の方程式に帰着できる。
+
+$p = y'$, $y'' = p\dfrac{dp}{dy}$ とおくと
+\[
+y\,p\,\frac{dp}{dy} = p^{2}
+\]
+$p \neq 0$（$y'(0) = 2 \neq 0$ よりこの範囲で妥当）のとき両辺を $p$ で割って
+\[
+y\,\frac{dp}{dy} = p
+\quad\Longrightarrow\quad
+\frac{dp}{p} = \frac{dy}{y}
+\quad\Longrightarrow\quad
+\ln|p| = \ln|y| + C_{1}
+\quad\Longrightarrow\quad
+p = C_{1}'\,y
+\]
+すなわち $\dfrac{dy}{dx} = C_{1}'\,y$。再び変数分離して
+\[
+\frac{dy}{y} = C_{1}'\,dx
+\quad\Longrightarrow\quad
+y = C_{2}\,e^{C_{1}' x}
+\]
+初期条件 $y(0) = 1$ より $C_{2} = 1$。また $y' = C_{1}' C_{2} e^{C_{1}' x}$ に $x=0$ を代入して $y'(0) = C_{1}' C_{2} = C_{1}' = 2$。よって
+\[
+\boxed{\; y = e^{2x} \;}
+\]
+（検算: $y' = 2e^{2x}$, $y'' = 4e^{2x}$ より $y\,y'' = e^{2x}\cdot 4e^{2x} = 4e^{4x} = (2e^{2x})^{2} = (y')^{2}$。また $y(0)=1$, $y'(0)=2$ も満たす。成立。）
