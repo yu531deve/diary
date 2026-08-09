@@ -1,0 +1,24 @@
+\diarytitle{0021}{一階線形非同次微分方程式の一般解（exp(x^2) 型）}
+
+一階線形非同次方程式 $y' + P(x)\,y = Q(x)$ は、積分因子 $\mu(x) = \exp\left(\int P(x)\,dx\right)$ を両辺に掛けて $(\mu y)' = \mu Q$ の形に直し、積分することで解ける。
+
+$P(x) = -2x$ であるから、積分因子は
+\[
+\mu(x) = \exp\left(\int (-2x)\,dx\right) = e^{-x^{2}}
+\]
+両辺に $\mu(x) = e^{-x^{2}}$ を掛けると
+\[
+e^{-x^{2}}\frac{dy}{dx} - 2x\,e^{-x^{2}}y = e^{-x^{2}}e^{x^{2}} = 1
+\quad\Longleftrightarrow\quad
+\frac{d}{dx}\bigl(e^{-x^{2}}y\bigr) = 1
+\]
+両辺を積分して
+\[
+e^{-x^{2}}y = x + C
+\]
+よって
+\[
+\boxed{\; y = (x + C)\,e^{x^{2}} \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $y = (x+C)e^{x^{2}}$ を微分すると $y' = e^{x^{2}} + (x+C)\cdot 2x\,e^{x^{2}} = e^{x^{2}}\bigl(1 + 2x^{2} + 2xC\bigr)$。一方 $2xy = 2x(x+C)e^{x^{2}} = e^{x^{2}}(2x^{2}+2xC)$ であるから、$y' - 2xy = e^{x^{2}}\bigl(1+2x^{2}+2xC-2x^{2}-2xC\bigr) = e^{x^{2}}$ が成り立つ。）

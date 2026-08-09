@@ -1,0 +1,24 @@
+\diarytitle{0020}{一階線形非同次微分方程式の一般解（sin x / x 型）}
+
+一階線形非同次方程式 $y' + P(x)\,y = Q(x)$ は、積分因子 $\mu(x) = \exp\left(\int P(x)\,dx\right)$ を両辺に掛けて $(\mu y)' = \mu Q$ の形に直し、積分することで解ける。
+
+$P(x) = 1/x$ であるから、積分因子は
+\[
+\mu(x) = \exp\left(\int \frac{1}{x}\,dx\right) = \exp(\ln x) = x
+\]
+両辺に $\mu(x) = x$ を掛けると
+\[
+x\frac{dy}{dx} + y = \sin x
+\quad\Longleftrightarrow\quad
+\frac{d}{dx}(xy) = \sin x
+\]
+両辺を積分して
+\[
+xy = -\cos x + C
+\]
+よって
+\[
+\boxed{\; y = \frac{C - \cos x}{x} \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $y = (C-\cos x)/x$ を微分すると $y' = \dfrac{\sin x \cdot x - (C-\cos x)}{x^{2}} = \dfrac{\sin x}{x} - \dfrac{C-\cos x}{x^{2}} = \dfrac{\sin x}{x} - \dfrac{y}{x}$。すなわち $y' + y/x = \sin x / x$ が成り立つ。）
