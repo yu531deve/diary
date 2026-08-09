@@ -1,0 +1,25 @@
+\diarytitle{0114}{ガウス積分の極座標変換による導出とそのスケーリング}
+
+\[
+I = \int_{-\infty}^{\infty} e^{-x^{2}}\, dx
+\]
+とおく。$I > 0$ であり、
+\[
+I^{2} = \left(\int_{-\infty}^{\infty} e^{-x^{2}}\, dx\right)\left(\int_{-\infty}^{\infty} e^{-y^{2}}\, dy\right)
+= \iint_{\mathbb{R}^{2}} e^{-(x^{2}+y^{2})}\, dx\, dy
+\]
+ここで極座標 $x = r\cos\theta,\ y = r\sin\theta$（$r \ge 0,\ 0 \le \theta < 2\pi$）に変換すると、面積要素は $dx\,dy = r\, dr\, d\theta$ であるから
+\[
+I^{2} = \int_{0}^{2\pi}\!\! \int_{0}^{\infty} e^{-r^{2}}\, r\, dr\, d\theta
+= 2\pi\left[-\frac{1}{2}e^{-r^{2}}\right]_{0}^{\infty}
+= 2\pi \cdot \frac{1}{2} = \pi
+\]
+$I > 0$ より
+\[
+\boxed{\; \int_{-\infty}^{\infty} e^{-x^{2}}\, dx = \sqrt{\pi} \;}
+\]
+続いて $t = \sqrt{a}\, x$ と置換すると $dx = \dfrac{dt}{\sqrt{a}}$ であり、$x \to \pm\infty$ のとき $t \to \pm\infty$ だから
+\[
+\int_{-\infty}^{\infty} e^{-a x^{2}}\, dx = \frac{1}{\sqrt{a}} \int_{-\infty}^{\infty} e^{-t^{2}}\, dt = \boxed{\; \sqrt{\dfrac{\pi}{a}} \;}
+\]
+検算: $a=1$ のとき $\sqrt{\pi/1} = \sqrt{\pi}$ となり最初の結果と一致する。
