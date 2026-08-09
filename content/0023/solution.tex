@@ -1,0 +1,22 @@
+\diarytitle{0023}{完全微分方程式の判定と一般解（多項式係数）}
+
+$M(x,y)\,dx + N(x,y)\,dy = 0$ が完全微分方程式であるとは、$\dfrac{\partial M}{\partial y} = \dfrac{\partial N}{\partial x}$ を満たし、ある関数 $F(x,y)$ が存在して $dF = M\,dx + N\,dy$ となることをいう。このとき一般解は $F(x,y) = C$ で与えられる。
+
+$M = 2xy + 3x^{2}$、$N = x^{2} + 2y$ とおくと
+\[
+\frac{\partial M}{\partial y} = 2x, \qquad \frac{\partial N}{\partial x} = 2x
+\]
+一致するので完全微分方程式である。$F_x = M$ より
+\[
+F = \int (2xy + 3x^{2})\,dx = x^{2}y + x^{3} + g(y)
+\]
+$F_y = x^{2} + g'(y) = N = x^{2} + 2y$ より $g'(y) = 2y$、よって $g(y) = y^{2}$。したがって
+\[
+F(x,y) = x^{2}y + x^{3} + y^{2}
+\]
+一般解は
+\[
+\boxed{\; x^{2}y + x^{3} + y^{2} = C \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $F_x = 2xy + 3x^{2} = M$、$F_y = x^{2} + 2y = N$ で一致する。）

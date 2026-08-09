@@ -1,0 +1,38 @@
+\diarytitle{0024}{積分因子による完全化と一般解（μ(x) の場合）}
+
+$M(x,y)\,dx + N(x,y)\,dy = 0$ が完全でない（$M_y \neq N_x$）場合でも、適当な関数 $\mu$（積分因子）を掛けた $\mu M\,dx + \mu N\,dy = 0$ が完全微分方程式になることがある。もし $\dfrac{M_y - N_x}{N}$ が $x$ のみの関数ならば、$\mu = \mu(x)$ ととれて
+\[
+\mu(x) = \exp\left(\int \frac{M_y - N_x}{N}\,dx\right)
+\]
+と求まる。積分因子を掛けた後は、通常の完全微分方程式と同様に $F(x,y) = C$ を求めればよい。
+
+$M = 3xy + y^{2}$、$N = x^{2} + xy$ とおくと
+\[
+\frac{\partial M}{\partial y} = 3x + 2y, \qquad \frac{\partial N}{\partial x} = 2x + y
+\]
+一致しないので完全ではない。
+\[
+\frac{M_y - N_x}{N} = \frac{(3x+2y)-(2x+y)}{x^{2}+xy} = \frac{x+y}{x(x+y)} = \frac{1}{x}
+\]
+は $x$ のみの関数だから、$x$ のみに依存する積分因子が存在し
+\[
+\mu(x) = \exp\left(\int \frac{1}{x}\,dx\right) = e^{\ln x} = x
+\]
+両辺に $\mu(x) = x$ を掛けると
+\[
+(3x^{2}y + xy^{2})\,dx + (x^{3} + x^{2}y)\,dy = 0
+\]
+新しい $M^{*} = 3x^{2}y + xy^{2}$、$N^{*} = x^{3} + x^{2}y$ について
+\[
+\frac{\partial M^{*}}{\partial y} = 3x^{2} + 2xy, \qquad \frac{\partial N^{*}}{\partial x} = 3x^{2} + 2xy
+\]
+一致し完全である。$F_x = M^{*}$ より
+\[
+F = \int (3x^{2}y + xy^{2})\,dx = x^{3}y + \frac{x^{2}y^{2}}{2} + g(y)
+\]
+$F_y = x^{3} + x^{2}y + g'(y) = N^{*} = x^{3} + x^{2}y$ より $g'(y) = 0$。よって一般解は
+\[
+\boxed{\; x^{3}y + \frac{x^{2}y^{2}}{2} = C \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $F_x = 3x^{2}y + xy^{2} = M^{*}$、$F_y = x^{3} + x^{2}y = N^{*}$ で一致する。）
