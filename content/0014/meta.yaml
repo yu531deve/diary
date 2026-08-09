@@ -1,5 +1,5 @@
 id: "0014"
-title: "変数分離形の一般解（dy/dx = xy^2）"
+title: "変数分離形の一般解（$dy/dx = xy^2$）"
 status: draft
 field:
   major: "常微分方程式"
