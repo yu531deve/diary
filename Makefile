@@ -11,6 +11,7 @@ CHECK_IMAGE := ghcr.io/$(CHECK_IMAGE_OWNER)/diary-devcontainer:latest
 #       （order-only 依存。存在すれば再インストールせず高速に lint のみ走る）。
 lint: | lint/node_modules
 	node lint/check-forbidden-commands.js
+	node lint/check-meta.js
 
 lint/node_modules:
 	npm ci --prefix lint
