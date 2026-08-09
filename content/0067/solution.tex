@@ -1,0 +1,53 @@
+\diarytitle{0067}{ラプラス方程式の境界値問題（円板領域、極座標での有界解）}
+
+極座標形式のラプラス方程式は $u = R(r)\Theta(\theta)$ の積の形を仮定すると常微分方程式に帰着でき、変数分離法で解ける。
+
+\textbf{手順1: 変数分離。}\ $u(r,\theta) = R(r)\Theta(\theta)$ とおいて代入し、全体に $r^2$ を掛けると
+\[
+r^2 R'' \Theta + r R' \Theta + R \Theta'' = 0
+\]
+両辺を $R\Theta$ で割って移項すると
+\[
+\frac{r^2 R'' + r R'}{R} = -\frac{\Theta''}{\Theta}
+\]
+左辺は $r$ のみ、右辺は $\theta$ のみの関数だから両者は定数に等しい。これを $\nu$ とおくと
+\[
+\Theta'' + \nu\,\Theta = 0, \qquad r^2 R'' + rR' - \nu R = 0
+\]
+
+\textbf{手順2: 周期条件で分離定数が決まる。}\ $\theta$ と $\theta + 2\pi$ は円板上の同じ点を表すから、$\Theta$ には境界条件の代わりに周期条件 $\Theta(\theta + 2\pi) = \Theta(\theta)$ が課される。$\nu < 0$ なら $\Theta$ は指数関数となり周期的になれない。$\nu \ge 0$ で $\nu = \omega^2$ とおくと $\Theta = a\cos\omega\theta + b\sin\omega\theta$ であり、これが周期 $2\pi$ をもつのは $\omega$ が整数のときに限る。よって
+\[
+\nu = n^2, \qquad
+\Theta_n(\theta) = a_n \cos n\theta + b_n \sin n\theta \qquad (n = 0, 1, 2, \dots)
+\]
+（$n=0$ のときは定数 $\Theta_0 = a_0$。）
+
+\textbf{手順3: $r$ 方向はオイラー方程式。}\ $\nu = n^2$ を代入した $r^2 R'' + rR' - n^2 R = 0$ は係数が $r$ のべきになっているオイラー方程式なので、$R = r^m$ を試すと
+\[
+m(m-1) + m - n^2 = 0
+\quad\Longrightarrow\quad
+m^2 = n^2
+\quad\Longrightarrow\quad
+m = \pm n
+\]
+$n \ge 1$ では2つの独立解 $r^n$, $r^{-n}$ が得られ、$R = C r^{n} + D r^{-n}$。$n = 0$ のときは重根 $m = 0$ となり、2つ目の独立解として $\ln r$ が現れて $R = C + D\ln r$ である。
+
+\textbf{手順4: 有界性で解を絞る。}\ 円板の内部（原点を含む）で解を求めるので、$r \to 0$ で $u$ が有界でなければならない。$r^{-n} \to \infty$、$\ln r \to -\infty$ だからいずれも捨てて $D = 0$、すなわち $R_n(r) = r^n$。したがって重ね合わせにより、円板内で有界な一般解は
+\[
+u(r,\theta) = \frac{a_0}{2} + \sum_{n=1}^{\infty} r^{n}\bigl(a_n\cos n\theta + b_n\sin n\theta\bigr)
+\]
+
+\textbf{手順5: 境界条件と係数比較。}\ $r = 3$ を代入すると
+\[
+\frac{a_0}{2} + \sum_{n=1}^{\infty} 3^{n}\bigl(a_n\cos n\theta + b_n\sin n\theta\bigr) = 4 + 6\cos\theta - 3\sin 2\theta
+\]
+右辺はすでに三角多項式（定数＋$\cos\theta$＋$\sin 2\theta$）の形なので、フーリエ級数の一意性から同じ関数の係数どうしを比較して
+\[
+\frac{a_0}{2} = 4, \qquad 3\,a_1 = 6, \qquad 3^{2}\,b_2 = -3
+\]
+（他の $a_n, b_n$ はすべて $0$）よって $a_0 = 8$, $a_1 = 2$, $b_2 = -\dfrac{1}{3}$ より
+\[
+\boxed{\; u(r,\theta) = 4 + 2r\cos\theta - \frac{1}{3}r^{2}\sin 2\theta \;}
+\]
+
+\textbf{検算。}\ $r\cos\theta$，$r^2\sin2\theta$ はいずれも調和関数（$r^n\cos n\theta$, $r^n\sin n\theta$ 型）であり定数関数も調和だから、$u$ は円板内で調和である。$r=3$ を代入すると $u(3,\theta) = 4 + 6\cos\theta - \dfrac{9}{3}\sin2\theta = 4 + 6\cos\theta - 3\sin2\theta$ となり境界条件と一致する。また $r \to 0$ で $u \to 4$ となり有界である。
