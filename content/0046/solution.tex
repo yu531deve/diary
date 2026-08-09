@@ -1,0 +1,35 @@
+\diarytitle{0046}{連立線形微分方程式の初期値問題（相異なる実固有値の場合）}
+
+この連立方程式は $\dfrac{d}{dt}\begin{pmatrix} x \\ y \end{pmatrix} = A \begin{pmatrix} x \\ y \end{pmatrix}$ の形であり、係数行列 $A$ の固有値・固有ベクトルを求め、それらを用いて一般解を構成した上で初期条件から任意定数を定める。
+
+係数行列は $A = \begin{pmatrix} 4 & -2 \\ 1 & 1 \end{pmatrix}$。特性方程式は
+\[
+\det(A - \lambda I) = (4-\lambda)(1-\lambda) + 2 = \lambda^{2} - 5\lambda + 6 = (\lambda-2)(\lambda-3) = 0
+\]
+より固有値は $\lambda_{1} = 3,\ \lambda_{2} = 2$。
+
+\noindent
+$\lambda_{1} = 3$ に対して $(4-3)x - 2y = 0 \Rightarrow x = 2y$ より固有ベクトル $\bm{v}_{1} = \begin{pmatrix} 2 \\ 1 \end{pmatrix}$。
+
+\noindent
+$\lambda_{2} = 2$ に対して $(4-2)x - 2y = 0 \Rightarrow x = y$ より固有ベクトル $\bm{v}_{2} = \begin{pmatrix} 1 \\ 1 \end{pmatrix}$。
+
+\noindent
+一般解は
+\[
+x(t) = 2C_{1}e^{3t} + C_{2}e^{2t}, \qquad
+y(t) = C_{1}e^{3t} + C_{2}e^{2t}
+\]
+初期条件 $x(0) = 1,\ y(0) = 0$ を代入すると
+\[
+2C_{1} + C_{2} = 1, \qquad C_{1} + C_{2} = 0
+\]
+これを解いて $C_{1} = 1,\ C_{2} = -1$。したがって
+\[
+\boxed{\;
+x(t) = 2e^{3t} - e^{2t}, \qquad
+y(t) = e^{3t} - e^{2t}
+\;}
+\]
+
+（検算: $x(0) = 2-1 = 1$, $y(0) = 1-1 = 0$ で初期条件を満たす。$x' = 6e^{3t}-2e^{2t}$ に対し $4x-2y = 4(2e^{3t}-e^{2t})-2(e^{3t}-e^{2t}) = 8e^{3t}-4e^{2t}-2e^{3t}+2e^{2t} = 6e^{3t}-2e^{2t} = x'$。$y' = 3e^{3t}-2e^{2t}$ に対し $x+y = (2e^{3t}-e^{2t})+(e^{3t}-e^{2t}) = 3e^{3t}-2e^{2t} = y'$。いずれも一致するので正しい。）

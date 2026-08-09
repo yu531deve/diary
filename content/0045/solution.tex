@@ -1,0 +1,29 @@
+\diarytitle{0045}{連立線形微分方程式の一般解（複素固有値の場合）}
+
+この連立方程式は $\dfrac{d}{dt}\begin{pmatrix} x \\ y \end{pmatrix} = A \begin{pmatrix} x \\ y \end{pmatrix}$ の形であり、係数行列 $A$ の固有値・固有ベクトルを求め、それらを用いて一般解を構成する。
+
+係数行列は $A = \begin{pmatrix} 1 & -1 \\ 1 & 1 \end{pmatrix}$。特性方程式は
+\[
+\det(A - \lambda I) = (1-\lambda)^{2} + 1 = \lambda^{2} - 2\lambda + 2 = 0
+\]
+より固有値は $\lambda = 1 \pm i$。
+
+\noindent
+$\lambda = 1 + i$ に対して $(1 - (1+i))x - y = 0 \Rightarrow -ix - y = 0 \Rightarrow y = -ix$ より固有ベクトル $\bm{v} = \begin{pmatrix} 1 \\ -i \end{pmatrix}$。
+
+\noindent
+複素解 $\bm{v}\,e^{(1+i)t} = e^{t}(\cos t + i \sin t)\begin{pmatrix} 1 \\ -i \end{pmatrix}$ の実部・虚部を成分ごとに計算すると
+\[
+\begin{pmatrix} x \\ y \end{pmatrix}
+= e^{t}\begin{pmatrix} \cos t \\ \sin t \end{pmatrix} + i\, e^{t}\begin{pmatrix} \sin t \\ -\cos t \end{pmatrix}
+\]
+したがって実部 $e^{t}(\cos t, \sin t)$ と虚部 $e^{t}(\sin t, -\cos t)$ はそれぞれ実数解であり、一般解は両者の線形結合として
+\[
+\boxed{\;
+x(t) = e^{t}(C_{1}\cos t + C_{2}\sin t), \qquad
+y(t) = e^{t}(C_{1}\sin t - C_{2}\cos t)
+\;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+
+（検算: $x' = e^{t}(C_{1}\cos t+C_{2}\sin t) + e^{t}(-C_{1}\sin t+C_{2}\cos t) = e^{t}[(C_{1}+C_{2})\cos t+(C_{2}-C_{1})\sin t]$。一方 $x-y = e^{t}(C_{1}\cos t+C_{2}\sin t) - e^{t}(C_{1}\sin t-C_{2}\cos t) = e^{t}[(C_{1}+C_{2})\cos t+(C_{2}-C_{1})\sin t]$ で一致。$y' = e^{t}(C_{1}\sin t-C_{2}\cos t)+e^{t}(C_{1}\cos t+C_{2}\sin t) = e^{t}[(C_{1}-C_{2})\cos t+(C_{1}+C_{2})\sin t]$。一方 $x+y = e^{t}(C_{1}\cos t+C_{2}\sin t)+e^{t}(C_{1}\sin t-C_{2}\cos t) = e^{t}[(C_{1}-C_{2})\cos t+(C_{1}+C_{2})\sin t]$ で一致。よって正しい。）
