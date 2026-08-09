@@ -1,0 +1,32 @@
+\diarytitle{0018}{同次形微分方程式の一般解（y/x + tan(y/x) 型）}
+
+$\dfrac{dy}{dx} = f\!\left(\dfrac{y}{x}\right)$ の形（同次形）は $y = vx$ の置換により変数分離形に帰着して解ける。
+
+右辺が $y/x$ のみの関数なので同次形である。$v = y/x$（$y=vx$）と置くと
+\[
+v + x\frac{dv}{dx} = v + \tan v
+\quad\Longrightarrow\quad
+x\frac{dv}{dx} = \tan v
+\]
+変数分離して
+\[
+\frac{\cos v}{\sin v}\,dv = \frac{dx}{x}
+\quad\Longrightarrow\quad
+\ln|\sin v| = \ln x + C_{1}
+\quad\Longrightarrow\quad
+\sin v = Cx
+\]
+$v = y/x$ を戻すと
+\[
+\boxed{\; \sin\frac{y}{x} = Cx \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $\sin(y/x) = Cx$ の両辺を $x$ で微分すると、$u=y/x$ とおいて $\cos u \cdot u' = C$。$u' = \dfrac{y'x - y}{x^{2}}$ であり、また $C = \dfrac{\sin u}{x}$ であるから
+\[
+\cos u\cdot\frac{y'x-y}{x^{2}} = \frac{\sin u}{x}
+\;\Longrightarrow\;
+\cos u\,(y'x - y) = x\sin u
+\;\Longrightarrow\;
+y' = \tan u + \frac{y}{x} = \tan\frac{y}{x} + \frac{y}{x}
+\]
+となり元の方程式と一致する。）

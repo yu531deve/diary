@@ -1,0 +1,10 @@
+id: "0016"
+title: "置換による変数分離形への帰着と初期値問題（u = x + y）"
+status: draft
+field:
+  major: "常微分方程式"
+  minor: "一階微分方程式"
+tags: ["変数分離", "初期値問題"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09

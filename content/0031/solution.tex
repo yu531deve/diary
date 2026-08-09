@@ -1,0 +1,23 @@
+\diarytitle{0031}{定数係数二階線形同次微分方程式の初期値問題（共役虚根）}
+
+この方程式は定数係数2階線形同次微分方程式 $y'' + ay' + by = 0$ の形であり、特性方程式 $\lambda^{2} + a\lambda + b = 0$ が共役虚根 $\lambda = p \pm qi$（判別式 $D<0$、$q \neq 0$）をもつ場合、複素数解 $e^{(p+qi)x} = e^{px}(\cos qx + i\sin qx)$（オイラーの公式）の実部・虚部 $e^{px}\cos qx$、$e^{px}\sin qx$ がそれぞれ実数値解となり、一次独立である。よって一般解は $y = e^{px}(C_{1}\cos qx + C_{2}\sin qx)$ で与えられ、初期値問題ではこれと 1 回微分した式に初期条件を代入して $C_{1}, C_{2}$ を定める。
+
+特性方程式は
+\[
+\lambda^{2} + 2\lambda + 5 = 0 \quad\Longrightarrow\quad \lambda = \frac{-2 \pm \sqrt{4-20}}{2} = -1 \pm 2i
+\]
+共役虚根 $p = -1$、$q = 2$ であるから、一般解は
+\[
+y = e^{-x}\bigl(C_{1}\cos 2x + C_{2}\sin 2x\bigr)
+\]
+$y(0) = C_{1} = 1$。また
+\[
+y' = -e^{-x}\bigl(C_{1}\cos 2x + C_{2}\sin 2x\bigr) + e^{-x}\bigl(-2C_{1}\sin 2x + 2C_{2}\cos 2x\bigr)
+\]
+より $y'(0) = -C_{1} + 2C_{2} = -1$。$C_{1}=1$ を代入して $2C_{2} = 0$、$C_{2} = 0$。したがって
+\[
+\boxed{\; y = e^{-x}\cos 2x \;}
+\]
+（検算: $y' = -e^{-x}\cos 2x - 2e^{-x}\sin 2x$、
+$y'' = e^{-x}\cos 2x + 2e^{-x}\sin 2x + 2e^{-x}\sin 2x - 4e^{-x}\cos 2x = -3e^{-x}\cos 2x + 4e^{-x}\sin 2x$。
+よって $y''+2y'+5y = (-3-2+5)e^{-x}\cos 2x + (4-4+0)e^{-x}\sin 2x = 0$。また $y(0)=1$、$y'(0)=-1$ も満たす。成立。）

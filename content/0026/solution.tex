@@ -1,0 +1,26 @@
+\diarytitle{0026}{クレロー方程式の一般解と特異解（y = xy' + (y')^2）}
+
+クレロー方程式 $y = xy' + f(y')$ は $p = y'$ とおいて両辺を $x$ で微分すると $(x + f'(p))\dfrac{dp}{dx} = 0$ となり、一般解（直線族）$y = Cx + f(C)$ と、特異解（$p$ を消去して得られる一般解の包絡線）が得られる。
+
+$p = y'$ とおくと $y = xp + p^{2}$。$f(p) = p^{2}$ なので $f'(p) = 2p$。両辺を $x$ で微分すると
+\[
+p = p + (x + 2p)\frac{dp}{dx}
+\quad\Longrightarrow\quad
+(x + 2p)\frac{dp}{dx} = 0
+\]
+\textbf{一般解}: $\dfrac{dp}{dx} = 0$ より $p = C$。よって
+\[
+\boxed{\; y = Cx + C^{2} \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $y' = C$ なので $xy' + (y')^{2} = xC + C^{2} = y$。成立。）
+
+\textbf{特異解}: $x + 2p = 0$ より $x = -2p$、すなわち $p = -\dfrac{x}{2}$。これを $y = xp+p^{2}$ に代入すると
+\[
+y = x\left(-\frac{x}{2}\right) + \left(-\frac{x}{2}\right)^{2}
+= -\frac{x^{2}}{2} + \frac{x^{2}}{4}
+\]
+\[
+\boxed{\; y = -\frac{x^{2}}{4} \;}
+\]
+（検算: $y' = -\dfrac{x}{2}$ であり、$xy' + (y')^{2} = x\left(-\dfrac{x}{2}\right) + \dfrac{x^{2}}{4} = -\dfrac{x^{2}}{2}+\dfrac{x^{2}}{4} = -\dfrac{x^{2}}{4} = y$。成立。この放物線は一般解の直線族 $y=Cx+C^2$ すべてに接する包絡線になっている。）

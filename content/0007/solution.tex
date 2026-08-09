@@ -1,0 +1,25 @@
+\diarytitle{0007}{リカッチ方程式の一般解（特解 y1 = e^x）}
+
+リカッチ方程式は特解 $y_{1}$ が1つ分かれば、$y = y_{1} + \dfrac{1}{u}$ の置換により $u$ についての1階線形方程式に変換できる。
+
+（確認: $y_{1} = e^{x}$ のとき右辺 $= e^{-x}e^{2x} + e^{x} - e^{x} = e^{x} = y_{1}'$。）
+
+$q_{1}(x) = 1$, $q_{2}(x) = e^{-x}$ であるから、$y = e^{x} + \dfrac{1}{u}$ の置換により
+\[
+\frac{du}{dx} + \left(1 + 2e^{-x}\cdot e^{x}\right)u = -e^{-x}
+\quad\Longleftrightarrow\quad
+\frac{du}{dx} + 3u = -e^{-x}
+\]
+積分因子は $\mu = e^{3x}$ であるから
+\[
+\frac{d}{dx}\left(u\,e^{3x}\right) = -e^{2x}
+\quad\Longrightarrow\quad
+u\,e^{3x} = -\frac{1}{2}e^{2x} + \frac{C}{2}
+\quad\Longrightarrow\quad
+u = \frac{C - e^{2x}}{2e^{3x}}
+\]
+したがって一般解は
+\[
+\boxed{\; y = e^{x} + \frac{2e^{3x}}{C - e^{2x}} \;}
+\qquad (C \text{ は任意定数})
+\]

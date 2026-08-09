@@ -1,0 +1,16 @@
+\diarytitle{0029}{定数係数二階線形同次微分方程式の一般解（相異なる実根）}
+
+この方程式は定数係数2階線形同次微分方程式 $y'' + ay' + by = 0$ の形であり、$y = e^{\lambda x}$ を代入すると特性方程式 $\lambda^{2} + a\lambda + b = 0$ が得られる。相異なる実根 $\lambda_{1} \neq \lambda_{2}$（判別式 $D = a^{2}-4b > 0$）をもつ場合、$e^{\lambda_{1}x}$ と $e^{\lambda_{2}x}$ は互いに一次独立な解となり、一般解は $y = C_{1}e^{\lambda_{1}x} + C_{2}e^{\lambda_{2}x}$ で与えられる。
+
+特性方程式は
+\[
+\lambda^{2} - 3\lambda + 2 = 0 \quad\Longrightarrow\quad (\lambda-1)(\lambda-2) = 0
+\quad\Longrightarrow\quad \lambda = 1,\ 2
+\]
+相異なる実根であるから、一般解は
+\[
+\boxed{\; y = C_{1}e^{x} + C_{2}e^{2x} \;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $y' = C_{1}e^{x}+2C_{2}e^{2x}$、$y'' = C_{1}e^{x}+4C_{2}e^{2x}$ より
+$y''-3y'+2y = (1-3+2)C_{1}e^{x} + (4-6+2)C_{2}e^{2x} = 0$。成立。）

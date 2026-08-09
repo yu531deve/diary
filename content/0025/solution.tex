@@ -1,0 +1,33 @@
+\diarytitle{0025}{完全微分方程式の初期値問題（陰関数の陽な解表示）}
+
+$M(x,y)\,dx + N(x,y)\,dy = 0$ が完全微分方程式であるとは、$\dfrac{\partial M}{\partial y} = \dfrac{\partial N}{\partial x}$ を満たし、ある関数 $F(x,y)$ が存在して $dF = M\,dx + N\,dy$ となることをいう。このとき一般解は $F(x,y) = C$ で与えられ、初期条件が与えられた場合はこれに代入して $C$ を定める。
+
+$M = 2x + y\cos x$、$N = \sin x - 2y$ とおくと
+\[
+\frac{\partial M}{\partial y} = \cos x, \qquad \frac{\partial N}{\partial x} = \cos x
+\]
+一致するので完全微分方程式である。$F_x = M$ より
+\[
+F = \int (2x + y\cos x)\,dx = x^{2} + y\sin x + g(y)
+\]
+$F_y = \sin x + g'(y) = N = \sin x - 2y$ より $g'(y) = -2y$、よって $g(y) = -y^{2}$。したがって
+\[
+F(x,y) = x^{2} + y\sin x - y^{2}
+\]
+一般解は $x^{2} + y\sin x - y^{2} = C$。初期条件 $y(0) = 3$（$x=0$ のとき $\sin 0 = 0$）を代入すると
+\[
+0 + 0 - 9 = C \quad\Longrightarrow\quad C = -9
+\]
+よって
+\[
+x^{2} + y\sin x - y^{2} = -9
+\]
+これを $y$ について解くと（$y$ に関する 2 次方程式 $y^{2} - (\sin x)\,y - (x^{2}+9) = 0$ として解の公式を用いる）
+\[
+y = \frac{\sin x \pm \sqrt{\sin^{2}x + 4x^{2} + 36}}{2}
+\]
+初期条件 $y(0) = 3$ を満たすのは根号の前が $+$ の場合（$x=0$ で $y = \dfrac{0 + \sqrt{36}}{2} = 3$）であるから
+\[
+\boxed{\; y = \frac{\sin x + \sqrt{\sin^{2}x + 4x^{2} + 36}}{2} \;}
+\]
+（検算: $x=0$ のとき $y = \dfrac{0+6}{2} = 3$ で初期条件を満たす。また $x^{2} + y\sin x - y^{2} = -9$ に代入すると恒等的に成り立つことが $y$ の定義から確認できる。）
