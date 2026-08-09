@@ -1,0 +1,36 @@
+\diarytitle{0118}{1次変換 u=x+y, v=x-y による重積分の計算}
+
+$u = x+y,\ v = x-y$ とおくと、逆変換は
+\[
+x = \frac{u+v}{2}, \qquad y = \frac{u-v}{2}
+\]
+であり、
+\[
+\frac{\partial(u,v)}{\partial(x,y)} = \det \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} = -2
+\]
+であるから、逆関数定理より
+\[
+\frac{\partial(x,y)}{\partial(u,v)} = \frac{1}{\partial(u,v)/\partial(x,y)} = -\frac{1}{2}, \qquad
+\left| \frac{\partial(x,y)}{\partial(u,v)} \right| = \frac{1}{2}
+\]
+（検算: 直接 $x_u = \tfrac12,\ x_v = \tfrac12,\ y_u = \tfrac12,\ y_v = -\tfrac12$ を用いて
+$\det\begin{pmatrix}1/2 & 1/2 \\ 1/2 & -1/2\end{pmatrix} = -\tfrac14 - \tfrac14 = -\tfrac12$ となり、同じ値を得る。）
+
+また
+\[
+x^{2} - y^{2} = (x+y)(x-y) = uv
+\]
+であり、積分領域は $u = x+y \in [0,1]$，$v = x-y \in [0,1]$ という条件から、$D$ は $D' = \{(u,v) \mid 0 \le u \le 1,\ 0 \le v \le 1\}$（単位正方形）に写る。したがって
+\[
+I = \iint_{D'} uv\, e^{u} \cdot \frac{1}{2}\, du\, dv
+= \frac{1}{2} \left( \int_{0}^{1} u\, e^{u}\, du \right) \left( \int_{0}^{1} v\, dv \right)
+\]
+部分積分により
+\[
+\int_{0}^{1} u\, e^{u}\, du = \bigl[ u e^{u} - e^{u} \bigr]_{0}^{1} = (e - e) - (0 - 1) = 1
+\]
+また $\displaystyle \int_{0}^{1} v\, dv = \frac{1}{2}$ であるから
+\[
+I = \frac{1}{2} \cdot 1 \cdot \frac{1}{2} = \boxed{\; \frac{1}{4} \;}
+\]
+（検算: 数値積分によっても $I = 1/4 = 0.25$ と一致することを確認できる。）

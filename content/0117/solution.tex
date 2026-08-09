@@ -1,0 +1,42 @@
+\diarytitle{0117}{極座標変換と球座標変換のヤコビ行列式}
+
+\textbf{(i) 極座標。}
+\[
+\frac{\partial(x,y)}{\partial(r,\theta)} = \det \begin{pmatrix} \dfrac{\partial x}{\partial r} & \dfrac{\partial x}{\partial \theta} \\[2mm] \dfrac{\partial y}{\partial r} & \dfrac{\partial y}{\partial \theta} \end{pmatrix}
+= \det \begin{pmatrix} \cos\theta & -r\sin\theta \\ \sin\theta & r\cos\theta \end{pmatrix}
+= r\cos^{2}\theta + r\sin^{2}\theta
+\]
+よって
+\[
+\boxed{\; \frac{\partial(x,y)}{\partial(r,\theta)} = r \;}
+\]
+（検算: $r \ge 0$ のとき面積要素 $r\, dr\, d\theta$ は常に非負であり、原点 $r=0$ で $0$ になることも幾何的に正しい。）
+
+\medskip
+\noindent
+\textbf{(ii) 球座標。}
+\[
+\frac{\partial(x,y,z)}{\partial(r,\theta,\varphi)}
+= \det \begin{pmatrix}
+\sin\theta\cos\varphi & r\cos\theta\cos\varphi & -r\sin\theta\sin\varphi \\
+\sin\theta\sin\varphi & r\cos\theta\sin\varphi & r\sin\theta\cos\varphi \\
+\cos\theta & -r\sin\theta & 0
+\end{pmatrix}
+\]
+第3行に沿って余因子展開すると
+\[
+= \cos\theta \det\begin{pmatrix} r\cos\theta\cos\varphi & -r\sin\theta\sin\varphi \\ r\cos\theta\sin\varphi & r\sin\theta\cos\varphi \end{pmatrix}
+- (-r\sin\theta) \det\begin{pmatrix} \sin\theta\cos\varphi & -r\sin\theta\sin\varphi \\ \sin\theta\sin\varphi & r\sin\theta\cos\varphi \end{pmatrix}
+\]
+第1項の行列式は $r^{2}\sin\theta\cos\theta\cos^{2}\varphi + r^{2}\sin\theta\cos\theta\sin^{2}\varphi = r^{2}\sin\theta\cos\theta$、
+第2項の行列式は $r\sin^{2}\theta\cos^{2}\varphi + r\sin^{2}\theta\sin^{2}\varphi = r\sin^{2}\theta$ であるから、
+\[
+= \cos\theta \cdot r^{2}\sin\theta\cos\theta + r\sin\theta \cdot r\sin^{2}\theta
+= r^{2}\sin\theta\cos^{2}\theta + r^{2}\sin^{3}\theta
+= r^{2}\sin\theta(\cos^{2}\theta + \sin^{2}\theta)
+\]
+よって
+\[
+\boxed{\; \frac{\partial(x,y,z)}{\partial(r,\theta,\varphi)} = r^{2}\sin\theta \;}
+\]
+（検算: $\theta \in [0,\pi]$ で $\sin\theta \ge 0$ なので体積要素 $r^{2}\sin\theta\, dr\, d\theta\, d\varphi$ は非負。$r=0$ または $\theta=0,\pi$（$z$軸上）で退化して $0$ になることも座標特異点の位置と一致し、球の体積 $\int_0^{2\pi}\!\!\int_0^{\pi}\!\!\int_0^{a} r^2\sin\theta\, dr\, d\theta\, d\varphi = 2\pi \cdot 2 \cdot \dfrac{a^3}{3} = \dfrac{4}{3}\pi a^3$ という既知の公式を再現する。）
