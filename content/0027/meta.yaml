@@ -1,0 +1,10 @@
+id: "0027"
+title: "クレロー方程式の一般解と特異解（y = xy' - ln y'）"
+status: draft
+field:
+  major: "常微分方程式"
+  minor: "一階微分方程式"
+tags: ["クレロー型", "特異解"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09
