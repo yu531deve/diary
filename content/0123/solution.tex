@@ -1,0 +1,15 @@
+\diarytitle{0123}{パラメータ表示された曲線に沿う線積分}
+
+$x = t$, $y = t^{2}$ より $dx = dt$, $dy = 2t\,dt$。よって
+\[
+\int_{C} y\,dx + x^{2}\,dy = \int_{0}^{1} \Bigl[ t^{2} \cdot 1 + t^{2} \cdot 2t \Bigr] dt
+= \int_{0}^{1} \left( t^{2} + 2t^{3} \right) dt
+\]
+\[
+= \left[ \frac{t^{3}}{3} + \frac{t^{4}}{2} \right]_{0}^{1} = \frac{1}{3} + \frac{1}{2} = \frac{2}{6} + \frac{3}{6} = \frac{5}{6}
+\]
+したがって
+\[
+\boxed{\; \int_{C} \bm{F}\cdot d\bm{r} = \frac{5}{6} \;}
+\]
+（検算: 被積分関数 $t^{2}+2t^{3}$ を $[0,1]$ で数値積分しても $\frac{5}{6}\approx 0.8333$ と一致する。原始関数の微分は $\frac{d}{dt}\left(\frac{t^3}{3}+\frac{t^4}{2}\right)=t^2+2t^3$ で被積分関数に戻る。）
