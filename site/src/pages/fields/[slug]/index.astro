@@ -14,6 +14,7 @@
 // のため装飾アニメ・重い JS は禁止（site/CLAUDE.md）。中分野の絞り込みは
 // ページ内フィルタ（表示/非表示の切り替えのみ、アニメーションなし）で行う。
 import { parseFieldsTree } from "../../../lib/site-data";
+import { formatMathTitle } from "../../../lib/title";
 import { listPublishedProblems } from "../../../lib/dist-content";
 import type { ProblemMeta } from "../../../lib/dist-content";
 import SearchModal from "../../../components/SearchModal.astro";
@@ -452,7 +453,7 @@ function formatDate(d: string): string {
 						{sorted.map((p) => (
 							<a href={`/problems/${p.id}/`} class="problem-row" data-minor={p.field.minor}>
 								<span class="id">{p.id}</span>
-								<span class="title">{p.title}</span>
+								<span class="title">{formatMathTitle(p.title)}</span>
 								<span class="pill">{p.field.minor}</span>
 								<span class="dots">
 									{difficultyDots(p.difficulty).map((on) => (

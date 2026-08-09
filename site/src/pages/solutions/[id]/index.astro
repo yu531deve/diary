@@ -75,6 +75,7 @@ import {
   DistNotFoundError,
   type ProblemMeta,
 } from "../../../lib/dist-content";
+import { formatMathTitle } from "../../../lib/title";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
@@ -106,8 +107,11 @@ const policyHtml = readPolicyHtml(meta.id);
 const pdfAvailable = hasSolutionPdf(meta.id);
 const pdfHref = `/solutions/${meta.id}/solution.pdf`;
 const problemHref = `/problems/${meta.id}/`;
+// #227: title は LaTeX（\diarytitle 用）が正のため formatMathTitle で
+// 表示用平文に整形してから使う（problems/[id]/index.astro と同方針）。
+const displayTitle = formatMathTitle(meta.title);
 const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeURIComponent(
-  `誤植報告: ${meta.id} ${meta.title}（解答）`
+  `誤植報告: ${meta.id} ${displayTitle}（解答）`
 )}`;
 
 const bodyHtml = solutionHtml.isFallback ? "" : markFinalAnswerEquations(solutionHtml.bodyHtml);
@@ -138,7 +142,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<title>解答 | {meta.id} {meta.title} | Diary</title>
+		<title>解答 | {meta.id} {displayTitle} | Diary</title>
 		<link
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap"
@@ -661,7 +665,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			<div class="col-main">
 				<div class="head-block">
 					<span class="eyebrow mono">SOLUTION / {meta.id}</span>
-					<h1 class="title-heading">{meta.title}</h1>
+					<h1 class="title-heading">{displayTitle}</h1>
 					<p class="lede">まず自分で解いてから。必要な分だけ開いてください。</p>
 				</div>
 
@@ -790,7 +794,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 						related.length > 0 ? (
 							related.map((p) => (
 								<a href={`/problems/${p.id}/`}>
-									{p.id} — {p.title}
+									{p.id} — {formatMathTitle(p.title)}
 								</a>
 							))
 						) : (

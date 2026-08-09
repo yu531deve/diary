@@ -17,6 +17,7 @@
 import { listPublishedProblems } from "../../lib/dist-content";
 import type { ProblemMeta } from "../../lib/dist-content";
 import { computeSiteStats } from "../../lib/site-data";
+import { formatMathTitle } from "../../lib/title";
 import SearchModal from "../../components/SearchModal.astro";
 import BottomTabNav from "../../components/BottomTabNav.astro";
 
@@ -405,7 +406,7 @@ for (const p of problems) {
 								{g.items.map((p) => (
 									<a href={`/problems/${p.id}/`} class="problem-row">
 										<span class="id">{p.id}</span>
-										<span class="title">{p.title}</span>
+										<span class="title">{formatMathTitle(p.title)}</span>
 										<span class="pill">
 											{p.field.major} / {p.field.minor}
 										</span>
