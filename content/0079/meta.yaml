@@ -1,0 +1,10 @@
+id: "0079"
+title: "パラメータを含む3次正方行列が正則でない条件"
+status: draft
+field:
+  major: "線形代数"
+  minor: "行列式"
+tags: ["余因子展開"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09
