@@ -1,0 +1,23 @@
+\diarytitle{0048}{デルタ関数を外力とする初期値問題のラプラス変換による解法}
+
+ディラックのデルタ関数 $\delta(t-a)$（$a>0$）は $\mathcal{L}[\delta(t-a)](s) = e^{-as}$ を満たし、$y'' + \omega^{2} y = \delta(t-a)$ のように用いると外力は $t=a$ で $y'$ に大きさ $1$ の飛び（ジャンプ）を与える瞬間的な衝撃として作用する。また単位階段関数 $u(t-a)$（$t<a$ で $0$、$t \ge a$ で $1$）については第二移動定理 $\mathcal{L}[u(t-a)\,f(t-a)](s) = e^{-as} F(s)$ が成り立つ。
+
+両辺をラプラス変換すると
+\[
+s^{2}Y(s) + Y(s) = e^{-\pi s}
+\quad\Longrightarrow\quad
+Y(s) = \frac{e^{-\pi s}}{s^{2}+1}
+\]
+$\mathcal{L}^{-1}\!\left[\dfrac{1}{s^{2}+1}\right] = \sin t$ であるから、第二移動定理より
+\[
+y(t) = u(t-\pi)\,\sin(t-\pi)
+\]
+$\sin(t-\pi) = -\sin t$ であるから、$t<\pi$ では $y(t)=0$、$t \ge \pi$ では $y(t) = -\sin t$ である。まとめて
+\[
+\boxed{\; y(t) = u(t-\pi)\,\sin(t-\pi) =
+\begin{cases}
+0 & (0 \le t < \pi) \\
+-\sin t & (t \ge \pi)
+\end{cases} \;}
+\]
+検算: $t \ne \pi$ では $y''+y=0$ を満たす（$\sin$ は同次方程式の解）。$y$ は $t=\pi$ で連続（$y(\pi^{-})=0$、$y(\pi^{+})=-\sin\pi=0$）。$y'(t) = -\cos t\ (t>\pi)$ より $y'(\pi^{+})=-\cos\pi=1$、一方 $y'(\pi^{-})=0$ であるから $y'$ は $t=\pi$ で大きさ $1$ の飛びを持ち、これは $\delta(t-\pi)$ の係数 $1$ と一致する。

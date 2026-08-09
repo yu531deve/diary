@@ -1,0 +1,10 @@
+id: "0048"
+title: "デルタ関数を外力とする初期値問題のラプラス変換による解法"
+status: draft
+field:
+  major: "偏微分方程式・積分変換"
+  minor: "ラプラス変換"
+tags: ["初期値問題", "逆ラプラス変換"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09
