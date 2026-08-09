@@ -1,0 +1,19 @@
+\diarytitle{0095}{(x+1)/(x^2+x-2) の部分分数分解による積分}
+
+分母を因数分解すると $x^{2}+x-2 = (x+2)(x-1)$ であるから
+\[
+\frac{x+1}{(x+2)(x-1)} = \frac{A}{x+2} + \frac{B}{x-1}
+\]
+とおく。両辺に $(x+2)(x-1)$ を掛けると
+\[
+x+1 = A(x-1) + B(x+2)
+\]
+$x=1$ を代入すると $2 = 3B$ より $B = \dfrac{2}{3}$。$x=-2$ を代入すると $-1 = -3A$ より $A = \dfrac{1}{3}$。よって
+\[
+\int \frac{x+1}{x^{2}+x-2}\, dx = \int \left(\frac{1/3}{x+2} + \frac{2/3}{x-1}\right) dx = \frac{1}{3}\log|x+2| + \frac{2}{3}\log|x-1| + C
+\]
+よって
+\[
+\boxed{\; \int \frac{x+1}{x^{2}+x-2}\, dx = \frac{1}{3}\log|x+2| + \frac{2}{3}\log|x-1| + C \;}
+\]
+（検算: $\dfrac{d}{dx}\left[\dfrac{1}{3}\log|x+2| + \dfrac{2}{3}\log|x-1|\right] = \dfrac{1}{3(x+2)} + \dfrac{2}{3(x-1)} = \dfrac{(x-1) + 2(x+2)}{3(x+2)(x-1)} = \dfrac{3x+3}{3(x^{2}+x-2)} = \dfrac{x+1}{x^{2}+x-2}$ となり一致する。）

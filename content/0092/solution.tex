@@ -1,0 +1,11 @@
+\diarytitle{0092}{tan x の不定積分}
+
+$\tan x = \dfrac{\sin x}{\cos x}$ であるから $t = \cos x$（$dt = -\sin x \, dx$）と置換すると
+\[
+\int \tan x \, dx = \int \frac{\sin x}{\cos x}\, dx = -\int \frac{dt}{t} = -\log|t| + C
+\]
+よって
+\[
+\boxed{\; \int \tan x \, dx = -\log|\cos x| + C \;}
+\]
+（検算: $\dfrac{d}{dx}\bigl(-\log|\cos x|\bigr) = -\dfrac{-\sin x}{\cos x} = \dfrac{\sin x}{\cos x} = \tan x$ となり一致する。）

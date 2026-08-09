@@ -1,0 +1,11 @@
+\diarytitle{0093}{sin^2 x の不定積分}
+
+半角公式 $\sin^{2} x = \dfrac{1-\cos 2x}{2}$ を用いると
+\[
+\int \sin^{2} x \, dx = \int \frac{1-\cos 2x}{2}\, dx = \frac{1}{2}\int dx - \frac{1}{2}\int \cos 2x \, dx = \frac{x}{2} - \frac{1}{2}\cdot\frac{\sin 2x}{2} + C
+\]
+よって
+\[
+\boxed{\; \int \sin^{2} x \, dx = \frac{x}{2} - \frac{\sin 2x}{4} + C \;}
+\]
+（検算: $\dfrac{d}{dx}\left(\dfrac{x}{2} - \dfrac{\sin 2x}{4}\right) = \dfrac{1}{2} - \dfrac{2\cos 2x}{4} = \dfrac{1-\cos 2x}{2} = \sin^{2}x$ となり一致する。）

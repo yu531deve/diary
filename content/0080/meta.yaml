@@ -1,0 +1,10 @@
+id: "0080"
+title: "ケーリー・ハミルトンの定理を用いた行列多項式 A^5-A^2-16A の計算"
+status: draft
+field:
+  major: "線形代数"
+  minor: "固有値と対角化"
+tags: ["ケーリー・ハミルトンの定理"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09

@@ -1,0 +1,20 @@
+\diarytitle{0105}{x arcsin x + sqrt(1-x^2) の導関数}
+
+積の微分法と合成関数の微分法（連鎖律）を用いる。第1項 $x\arcsin x$ は
+\[
+\frac{d}{dx}\bigl(x\arcsin x\bigr) = 1\cdot \arcsin x + x\cdot \frac{1}{\sqrt{1-x^{2}}}
+= \arcsin x + \frac{x}{\sqrt{1-x^{2}}}
+\]
+第2項 $\sqrt{1-x^{2}} = (1-x^{2})^{1/2}$ は
+\[
+\frac{d}{dx}\sqrt{1-x^{2}} = \frac{1}{2}(1-x^{2})^{-1/2}\cdot(-2x) = -\frac{x}{\sqrt{1-x^{2}}}
+\]
+したがって
+\[
+\frac{dy}{dx} = \left(\arcsin x + \frac{x}{\sqrt{1-x^{2}}}\right) + \left(-\frac{x}{\sqrt{1-x^{2}}}\right) = \arcsin x
+\]
+すなわち
+\[
+\boxed{\; \frac{dy}{dx} = \arcsin x \;}
+\]
+（検算: $x=0$ のとき $y(0) = 0\cdot 0 + 1 = 1$、$y'(0) = \arcsin 0 = 0$。実際 $y=x\arcsin x+\sqrt{1-x^{2}}$ は $x=0$ で極値（極小値 $1$）をとる偶関数であり、$y'(0)=0$ と整合する。さらに一般の $x$ で $\dfrac{x}{\sqrt{1-x^2}}$ の項が打ち消し合う構造になっており、計算過程にも矛盾はない。）

@@ -1,0 +1,10 @@
+id: "0083"
+title: "4点データに対する直線の最小二乗フィット"
+status: draft
+field:
+  major: "線形代数"
+  minor: "内積空間・二次形式"
+tags: ["最小二乗法"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09

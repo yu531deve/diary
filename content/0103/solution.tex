@@ -1,0 +1,20 @@
+\diarytitle{0103}{arccos(3x) の導関数}
+
+逆関数の微分法により、$y=\arccos x$（$0<y<\pi$）とおくと $x=\cos y$ から
+\[
+1 = -\sin y \cdot \frac{dy}{dx}
+\quad\Longrightarrow\quad
+\frac{dy}{dx} = -\frac{1}{\sin y} = -\frac{1}{\sqrt{1-x^{2}}}
+\qquad(\because\ 0<y<\pi\ \text{では}\ \sin y>0)
+\]
+すなわち $\dfrac{d}{dx}\arccos x = -\dfrac{1}{\sqrt{1-x^{2}}}$ である。連鎖律よりこれに合成関数の微分公式 $\dfrac{d}{dx}\arccos u = -\dfrac{u'}{\sqrt{1-u^{2}}}$ を適用する。
+
+$u = 3x$ とおくと $y = \arccos u$、$u' = 3$ であるから
+\[
+\frac{dy}{dx} = -\frac{3}{\sqrt{1-(3x)^{2}}}
+\]
+したがって
+\[
+\boxed{\; \frac{dy}{dx} = -\frac{3}{\sqrt{1-9x^{2}}} \quad \left(-\frac{1}{3} < x < \frac{1}{3}\right) \;}
+\]
+（検算: $x=0$ のとき $y=\arccos 0 = \pi/2$。$h$ を微小量として $y(h) = \arccos(3h) \approx \dfrac{\pi}{2} - 3h$（$\because \arccos(\varepsilon)\approx \pi/2-\varepsilon$）であり、傾き $-3$ は上式に $x=0$ を代入した値 $-3/\sqrt{1-0}=-3$ と一致する。）

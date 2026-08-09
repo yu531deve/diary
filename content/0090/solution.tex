@@ -1,0 +1,18 @@
+\diarytitle{0090}{x√(1-x^2) の定積分（置換積分）}
+
+$u = 1 - x^{2}$ とおくと $du = -2x\,dx$、すなわち $x\,dx = -\dfrac{1}{2}\,du$。
+また積分区間は $x: 0\to 1$ に対して $u: 1\to 0$ となるから
+\[
+\int_{0}^{1} x\sqrt{1-x^{2}}\,dx
+= \int_{1}^{0} \sqrt{u}\left(-\frac{1}{2}\right)du
+= \frac{1}{2}\int_{0}^{1} \sqrt{u}\,du
+= \frac{1}{2}\left[\frac{2}{3}u^{3/2}\right]_{0}^{1}
+= \frac{1}{2}\cdot\frac{2}{3}
+\]
+すなわち
+\[
+\boxed{\; \int_{0}^{1} x\sqrt{1-x^{2}}\,dx = \frac{1}{3} \;}
+\]
+（検算: 原始関数は $-\dfrac{1}{3}(1-x^{2})^{3/2}$ であり、微分すると
+$-\dfrac{1}{3}\cdot\dfrac{3}{2}(1-x^{2})^{1/2}\cdot(-2x) = x\sqrt{1-x^{2}}$ となり被積分関数に一致する。
+$x=1$ で $0$、$x=0$ で $-\dfrac13$。差は $0-\left(-\dfrac13\right)=\dfrac13$。）

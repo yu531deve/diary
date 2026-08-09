@@ -1,0 +1,53 @@
+\diarytitle{0082}{ブロック三角行列に対するケーリー・ハミルトンの定理の応用（C^4 の計算）}
+
+一般に、多項式 $p(\lambda)$ を固有多項式 $\varphi(\lambda)$ で割った商を $q(\lambda)$、余りを $r(\lambda)$（$\deg r < \deg \varphi$）とすると
+\[
+p(\lambda) = q(\lambda)\varphi(\lambda) + r(\lambda)
+\]
+であり、ケーリー・ハミルトンの定理 $\varphi(C) = O$ より
+\[
+p(C) = q(C)\varphi(C) + r(C) = r(C)
+\]
+となる。すなわち $p(C)$ は余り $r(\lambda)$ に $C$ を代入するだけで求まる。$3\times3$ 行列であれば余り $r(\lambda)$ は高々 $2$ 次式となるため、$C^{2}$ を直接計算しておけばよい。
+
+$C$ はブロック三角行列であり、固有多項式は $1$ 行目・列のブロック $(2)$ と右下ブロック $\begin{pmatrix}1&1\\-2&4\end{pmatrix}$ の固有多項式の積として求まる。右下ブロックの固有多項式は
+\[
+\lambda^{2} - (1+4)\lambda + (1\cdot4 - 1\cdot(-2)) = \lambda^{2} - 5\lambda + 6 = (\lambda-2)(\lambda-3)
+\]
+であるから、$C$ 全体の固有多項式は
+\[
+\varphi(\lambda) = (\lambda - 2)\cdot(\lambda-2)(\lambda-3) = (\lambda-2)^{2}(\lambda-3) = \lambda^{3} - 7\lambda^{2} + 16\lambda - 12
+\]
+（固有値は $\lambda = 2$（重複度2）, $\lambda = 3$）。ケーリー・ハミルトンの定理より
+\[
+C^{3} - 7C^{2} + 16C - 12I = O
+\]
+
+$\lambda^{4}$ を $\varphi(\lambda) = \lambda^{3} - 7\lambda^{2} + 16\lambda - 12$ で割ると
+\[
+\lambda^{4} = (\lambda + 7)(\lambda^{3} - 7\lambda^{2} + 16\lambda - 12) + (33\lambda^{2} - 100\lambda + 84)
+\]
+であるから
+\[
+C^{4} = 33C^{2} - 100C + 84I
+\]
+
+$C^{2}$ を直接計算すると
+\[
+C^{2} = \begin{pmatrix} 2 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & -2 & 4 \end{pmatrix}^{2} = \begin{pmatrix} 4 & 0 & 0 \\ 0 & -1 & 5 \\ 0 & -10 & 14 \end{pmatrix}
+\]
+（$1$ 行目は $(2\cdot2,\,0,\,0)=(4,0,0)$、$2$ 行目は $(0,\,1\cdot1+1\cdot(-2),\,1\cdot1+1\cdot4)=(0,-1,5)$、$3$ 行目は $(0,\,-2\cdot1+4\cdot(-2),\,-2\cdot1+4\cdot4)=(0,-10,14)$ より）。したがって
+\[
+33C^{2} = \begin{pmatrix} 132 & 0 & 0 \\ 0 & -33 & 165 \\ 0 & -330 & 462 \end{pmatrix}, \quad
+100C = \begin{pmatrix} 200 & 0 & 0 \\ 0 & 100 & 100 \\ 0 & -200 & 400 \end{pmatrix}, \quad
+84I = \begin{pmatrix} 84 & 0 & 0 \\ 0 & 84 & 0 \\ 0 & 0 & 84 \end{pmatrix}
+\]
+より
+\[
+C^{4} = 33C^{2} - 100C + 84I = \begin{pmatrix} 132-200+84 & 0 & 0 \\ 0 & -33-100+84 & 165-100+0 \\ 0 & -330+200+0 & 462-400+84 \end{pmatrix}
+\]
+\[
+\boxed{\; C^{4} = \begin{pmatrix} 16 & 0 & 0 \\ 0 & -49 & 65 \\ 0 & -130 & 146 \end{pmatrix} \;}
+\]
+
+（検算: 固有値 $\lambda=2$ を余りの式に代入すると $2^{4}=16$ に対し $33\cdot2^{2}-100\cdot2+84 = 132-200+84=16$ で一致。固有値 $\lambda=3$ では $3^{4}=81$ に対し $33\cdot9-100\cdot3+84=297-300+84=81$ で一致。さらに $(1,1)$ 成分は $C$ が上三角ブロックのため $2^{4}=16$ に一致しており整合する。）
