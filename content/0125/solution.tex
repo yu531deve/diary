@@ -1,0 +1,33 @@
+\diarytitle{0125}{保存場の判定とポテンシャル関数による線積分の計算}
+
+単連結領域 $D$ 上で定義されたベクトル場 $\bm{F} = (P, Q)$ が、あるスカラー関数 $\phi(x,y)$（ポテンシャル）を用いて $\bm{F} = \nabla \phi$ と表せるとき、$\bm{F}$ を保存場と呼ぶ。$D$ が単連結で $P, Q$ が $C^{1}$ 級のとき、$\bm{F}$ が保存場であるための必要十分条件は $\partial P/\partial y = \partial Q/\partial x$ が $D$ 上で成り立つことである。
+
+\textbf{(1)} $P = 2xy + \cos x$, $Q = x^{2} + 2y$ とおく。
+\[
+\frac{\partial P}{\partial y} = 2x, \qquad \frac{\partial Q}{\partial x} = 2x
+\]
+$xy$ 平面全体（単連結領域）で $\dfrac{\partial P}{\partial y} = \dfrac{\partial Q}{\partial x} = 2x$ が成り立つので、$\bm{F}$ は保存場である。
+
+\textbf{(2)} $\phi_x = P = 2xy + \cos x$ を $x$ について積分すると
+\[
+\phi(x,y) = x^{2}y + \sin x + g(y)
+\]
+（$g$ は $y$ の任意関数）。これを $y$ で偏微分すると $\phi_y = x^{2} + g'(y)$ であり、これが $Q = x^{2} + 2y$ に等しいことから $g'(y) = 2y$、すなわち $g(y) = y^{2} + C_0$（定数 $C_0$ は $0$ としてよい）。したがって
+\[
+\boxed{\; \phi(x,y) = x^{2}y + \sin x + y^{2} \;}
+\]
+（検算: $\phi_x = 2xy + \cos x = P$、$\phi_y = x^{2} + 2y = Q$ となり、確かに $\nabla\phi = \bm{F}$。）
+
+\textbf{(3)} 保存場であり経路によらないから、
+\[
+\int_{C} \bm{F}\cdot d\bm{r} = \phi(1,\pi) - \phi(0,0)
+\]
+\[
+\phi(1,\pi) = 1^{2}\cdot \pi + \sin 1 + \pi^{2} = \pi + \sin 1 + \pi^{2}, \qquad \phi(0,0) = 0
+\]
+したがって
+\[
+\boxed{\; \int_{C} \bm{F}\cdot d\bm{r} = \pi^{2} + \pi + \sin 1 \;}
+\]
+（検算: 例えば直線経路 $x=t$, $y=\pi t$ $(0\le t\le 1)$ に沿って直接計算しても、$dx=dt$, $dy=\pi\,dt$ より
+$\int_0^1 \bigl[(2t\cdot\pi t+\cos t)\cdot 1 + (t^2+2\pi t)\cdot \pi\bigr]dt = \int_0^1 \bigl(3\pi t^2+\cos t+2\pi^2 t\bigr)dt = \pi + \pi^2 + \sin 1$ となり一致する。）

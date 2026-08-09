@@ -1,0 +1,26 @@
+\diarytitle{0124}{グリーンの定理による閉曲線に沿う線積分の計算}
+
+$P = x^{2}y$, $Q = xy^{2} + 2x$ とおくと
+\[
+\frac{\partial Q}{\partial x} = y^{2} + 2, \qquad \frac{\partial P}{\partial y} = x^{2}
+\]
+$P, Q$ は $D$（半径 $2$ の円板）上で $C^{1}$ 級であり、$C$ はこれを正の向き（反時計回り）に囲む単純閉曲線であるから、グリーンの定理より
+\[
+\oint_{C} P\,dx + Q\,dy = \iint_{D} \left( y^{2} + 2 - x^{2} \right) dx\,dy
+\]
+円板 $D$ は $x \leftrightarrow y$ の入れ替えに関して対称であるから
+\[
+\iint_{D} x^{2}\,dA = \iint_{D} y^{2}\,dA
+\]
+となり、$\iint_{D} (y^{2} - x^{2})\,dA = 0$。したがって
+\[
+\iint_{D} \left( y^{2} + 2 - x^{2} \right) dA = 2\iint_{D} dA = 2 \times (\text{面積}) = 2 \times \pi (2)^{2} = 8\pi
+\]
+ゆえに
+\[
+\boxed{\; \oint_{C} \left(x^{2}y\right) dx + \left(xy^{2} + 2x\right) dy = 8\pi \;}
+\]
+（検算: 極座標 $x = r\cos\theta$, $y = r\sin\theta$ で直接計算すると
+$\iint_D (y^2 - x^2 + 2)\,dA = \int_0^{2\pi}\!\!\int_0^{2} (r^2\sin^2\theta - r^2\cos^2\theta + 2)\, r\,dr\,d\theta$。
+$\theta$ について $\sin^2\theta - \cos^2\theta = -\cos 2\theta$ を $0$ から $2\pi$ まで積分すると $0$ になるので、残るのは
+$\int_0^{2\pi}\!\!\int_0^2 2r\,dr\,d\theta$ であり、$\int_0^2 2r\,dr = 4$、これを $\theta$ について $0$ から $2\pi$ まで積分すると $8\pi$ となり一致する。）
