@@ -1,6 +1,6 @@
 id: "0028"
 title: "ラグランジュ方程式の媒介変数表示による一般解と任意定数の決定（$y = 2xy' + (y')^2$）"
-status: draft
+status: published
 field:
   major: "常微分方程式"
   minor: "一階微分方程式"

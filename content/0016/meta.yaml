@@ -1,6 +1,6 @@
 id: "0016"
 title: "置換による変数分離形への帰着と初期値問題（u = x + y）"
-status: draft
+status: published
 field:
   major: "常微分方程式"
   minor: "一階微分方程式"

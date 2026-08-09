@@ -1,6 +1,6 @@
 id: "0072"
 title: "双曲型2階線形偏微分方程式の標準形と一般解（$u_{xx} - 4u_{xy} + 3u_{yy} = 0$）"
-status: draft
+status: published
 field:
   major: "偏微分方程式・積分変換"
   minor: "熱・波動・ラプラス方程式"

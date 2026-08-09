@@ -1,6 +1,6 @@
 id: "0079"
 title: "パラメータを含む3次正方行列が正則でない条件"
-status: draft
+status: published
 field:
   major: "線形代数"
   minor: "行列式"

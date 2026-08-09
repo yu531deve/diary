@@ -1,6 +1,6 @@
 id: "0107"
 title: "極座標変換による $z = x^2 - y^2$ の偏微分計算"
-status: draft
+status: published
 field:
   major: "微分積分学"
   minor: "多変数の微分積分"

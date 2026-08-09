@@ -1,6 +1,6 @@
 id: "0037"
 title: "$y'' - 2y' + y = e^x/x$ の初期値問題（定数変化法）"
-status: draft
+status: published
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"
