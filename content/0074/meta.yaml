@@ -1,6 +1,6 @@
 id: "0074"
 title: "2次対称行列の固有値・固有ベクトルと直交対角化"
-status: draft
+status: published
 field:
   major: "線形代数"
   minor: "固有値と対角化"
