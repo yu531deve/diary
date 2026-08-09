@@ -1,0 +1,29 @@
+\diarytitle{0036}{y'' + y = 1/cos x の一般解（定数変化法）}
+
+右辺 $1/\cos x$ は未定係数法では扱えない形であるため、対応する同次方程式の基本解 $y_{1}, y_{2}$ を用いた定数変化法（ロンスキアンの利用）により特殊解を求める。すなわち、特殊解を $y_{p} = u_{1}(x)y_{1}(x) + u_{2}(x)y_{2}(x)$ の形で探し、補助条件 $u_{1}'y_{1} + u_{2}'y_{2} = 0$ のもとで
+\[
+u_{1}' = -\frac{y_{2}\,f(x)}{W(x)}, \qquad u_{2}' = \frac{y_{1}\,f(x)}{W(x)}, \qquad W(x) = \begin{vmatrix} y_{1} & y_{2} \\ y_{1}' & y_{2}' \end{vmatrix}
+\]
+を積分して $u_{1}, u_{2}$ を定める。
+
+同次方程式の基本解・ロンスキアンは $y_{1}=\cos x,\ y_{2}=\sin x,\ W=1$（前問と共通）。$f(x)=\sec x$ より
+\[
+u_{1}' = -y_{2}\sec x = -\sin x\sec x = -\tan x,
+\qquad
+u_{2}' = y_{1}\sec x = \cos x\sec x = 1
+\]
+積分して
+\[
+u_{1} = \ln|\cos x| = \ln(\cos x), \qquad u_{2} = x
+\]
+（この区間では $\cos x>0$。）特殊解は
+\[
+y_{p} = u_{1}y_{1}+u_{2}y_{2} = \cos x\,\ln(\cos x) + x\sin x
+\]
+したがって一般解は
+\[
+\boxed{\; y = C_{1}\cos x + C_{2}\sin x + \cos x\,\ln(\cos x) + x\sin x \;}
+\qquad (C_{1}, C_{2}\text{ は任意定数})
+\]
+（検算: $y_{p}'=-\sin x\ln(\cos x)+x\cos x$、$y_{p}''=-\cos x\ln(\cos x)+\dfrac{\sin^{2}x}{\cos x}+\cos x-x\sin x$ より
+$y_{p}''+y_{p}=\dfrac{\sin^{2}x+\cos^{2}x}{\cos x}=\dfrac{1}{\cos x}$ が成り立つ。）
