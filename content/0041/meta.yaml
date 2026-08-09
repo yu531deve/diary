@@ -3,7 +3,7 @@ title: "階数低下法による2階微分方程式 xy'' = y' の一般解"
 status: draft
 field:
   major: "常微分方程式"
-  minor: "定数係数線形方程式"
+  minor: "変数係数・非線形の2階方程式"
 tags: ["階数低下法", "変数分離"]
 difficulty: 2
 created: 2026-08-09

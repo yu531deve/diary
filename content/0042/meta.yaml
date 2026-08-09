@@ -3,7 +3,7 @@ title: "階数低下法による初期値問題 yy'' = (y')^2 の求解"
 status: draft
 field:
   major: "常微分方程式"
-  minor: "定数係数線形方程式"
+  minor: "変数係数・非線形の2階方程式"
 tags: ["階数低下法", "変数分離", "初期値問題"]
 difficulty: 3
 created: 2026-08-09
