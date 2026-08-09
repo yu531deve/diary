@@ -657,7 +657,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			<a class="back-link" href={problemHref}>← 問題に戻る</a>
 		</header>
 
-		<div class="solution-grid">
+		<main class="solution-grid">
 			<div class="col-main">
 				<div class="head-block">
 					<span class="eyebrow mono">SOLUTION / {meta.id}</span>
@@ -803,7 +803,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 					誤植・不備を報告する → GitHub Issue
 				</a>
 			</div>
-		</div>
+		</main>
 
 		{/* #149: STEP3 の開示ボタン用の最小限の JS。site/CLAUDE.md が許容する
 		    「解答表示トグル」の JS であり、追加のライブラリ・状態保存は無い。
