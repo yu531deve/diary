@@ -1,0 +1,15 @@
+\diarytitle{0113}{矩形パルス関数のフーリエ変換とsinc関数}
+
+高さ $1$、幅 $2a$ の矩形パルス関数
+\[
+f(x) =
+\begin{cases}
+1 & (|x| \le a) \\
+0 & (|x| > a)
+\end{cases}
+\]
+のフーリエ変換
+\[
+F(k) = \int_{-\infty}^{\infty} f(x)\,e^{-ikx}\,dx
+\]
+を求め、$F(k)$ が $\mathrm{sinc}$ 関数（$\mathrm{sinc}(x) = \dfrac{\sin x}{x}$、$\mathrm{sinc}(0)=1$）を用いて表せることを示せ。また $\displaystyle\lim_{k \to 0} F(k)$ を求めよ。
