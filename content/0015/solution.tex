@@ -1,0 +1,18 @@
+\diarytitle{0015}{変数分離形の一般解（逆正接を用いる形）}
+
+変数分離形 $\dfrac{dy}{dx} = f(x)g(y)$ は $\dfrac{dy}{g(y)} = f(x)\,dx$ として両辺を積分することで解ける。
+
+変数分離して
+\[
+\frac{dy}{1+y^{2}} = \frac{dx}{1+x^{2}}
+\]
+両辺を積分すると
+\[
+\arctan y = \arctan x + C
+\]
+よって
+\[
+\boxed{\; y = \tan(\arctan x + C) \;}
+\qquad (C \text{ は任意定数})
+\]
+（検算: $\arctan y = \arctan x + C$ の両辺を $x$ で微分すると $\dfrac{y'}{1+y^{2}} = \dfrac{1}{1+x^{2}}$、すなわち $y' = \dfrac{1+y^{2}}{1+x^{2}}$ となり元の方程式に一致する。）
