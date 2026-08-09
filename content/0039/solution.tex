@@ -1,0 +1,19 @@
+\diarytitle{0039}{オイラー方程式（コーシー・オイラー方程式）の一般解（共役複素根の場合）}
+
+オイラー方程式（コーシー・オイラー方程式）$x^{2}y'' + axy' + by = f(x)$ は $x = e^{t}$（$x>0$）と置換すると定数係数線形微分方程式に帰着できる。また、同次形 $x^{2}y''+axy'+by=0$ には $y=x^{m}$ を直接代入してもよく、特性方程式 $m(m-1)+am+b=0$ が共役複素根 $m=\alpha\pm i\beta$ をもつ場合、$x^{i\beta}=e^{i\beta\ln x}=\cos(\beta\ln x)+i\sin(\beta\ln x)$ であることから一般解は $y = x^{\alpha}\left(C_{1}\cos(\beta\ln x)+C_{2}\sin(\beta\ln x)\right)$ と表される。
+
+特性方程式は
+\[
+m(m-1) + m + 1 = 0
+\quad\Longrightarrow\quad
+m^{2} + 1 = 0
+\quad\Longrightarrow\quad
+m = \pm i
+\]
+共役複素根 $\alpha = 0,\ \beta = 1$ であるから、一般解は
+\[
+\boxed{\; y = C_{1}\cos(\ln x) + C_{2}\sin(\ln x) \;}
+\qquad (C_{1}, C_{2} \text{ は任意定数})
+\]
+（検算: $y=\cos(\ln x)$ のとき $y' = -\dfrac{\sin(\ln x)}{x}$, $y'' = \dfrac{-\cos(\ln x) + \sin(\ln x)}{x^{2}}$ より
+$x^{2}y''+xy'+y = \left[-\cos(\ln x)+\sin(\ln x)\right] - \sin(\ln x) + \cos(\ln x) = 0$ となり成立。$\sin(\ln x)$ についても同様に成立することが確かめられる。）
