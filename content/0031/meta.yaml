@@ -1,6 +1,6 @@
 id: "0031"
 title: "定数係数二階線形同次微分方程式の初期値問題（共役虚根）"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"

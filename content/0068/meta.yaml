@@ -1,6 +1,6 @@
 id: "0068"
 title: "波動方程式（両端固定）の初期値・境界値問題（初期変位が基本固有関数の場合）"
-status: published
+status: draft
 field:
   major: "偏微分方程式・積分変換"
   minor: "フーリエ級数・フーリエ変換"

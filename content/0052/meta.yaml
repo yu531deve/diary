@@ -1,6 +1,6 @@
 id: "0052"
 title: "エルミート方程式（n=2）の初期値問題の多項式解"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "級数解法"

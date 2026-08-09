@@ -1,6 +1,6 @@
 id: "0062"
 title: "熱伝導方程式の初期値・境界値問題（ディリクレ境界条件、単一固有モード）"
-status: published
+status: draft
 field:
   major: "偏微分方程式・積分変換"
   minor: "熱・波動・ラプラス方程式"

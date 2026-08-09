@@ -1,6 +1,6 @@
 id: "0117"
 title: "極座標変換と球座標変換のヤコビ行列式"
-status: published
+status: draft
 field:
   major: "微分積分学"
   minor: "重積分"

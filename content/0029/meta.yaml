@@ -1,6 +1,6 @@
 id: "0029"
 title: "定数係数二階線形同次微分方程式の一般解（相異なる実根）"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"

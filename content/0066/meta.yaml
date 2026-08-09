@@ -1,6 +1,6 @@
 id: "0066"
 title: "ラプラス方程式の境界値問題（矩形領域、上辺条件が単一のフーリエ正弦項）"
-status: published
+status: draft
 field:
   major: "偏微分方程式・積分変換"
   minor: "熱・波動・ラプラス方程式"

@@ -1,6 +1,6 @@
 id: "0069"
 title: "波動方程式（両端固定）における三角波状初期変位のフーリエ級数解"
-status: published
+status: draft
 field:
   major: "偏微分方程式・積分変換"
   minor: "フーリエ級数・フーリエ変換"

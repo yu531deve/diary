@@ -1,6 +1,6 @@
 id: "0071"
 title: "2階線形偏微分方程式の型判定と領域による型の変化（$y u_{xx} + u_{yy} = 0$）"
-status: published
+status: draft
 field:
   major: "偏微分方程式・積分変換"
   minor: "熱・波動・ラプラス方程式"

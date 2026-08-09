@@ -1,6 +1,6 @@
 id: "0081"
 title: "固有多項式の剰余を利用した行列のべき乗 $B^6$ の計算"
-status: published
+status: draft
 field:
   major: "線形代数"
   minor: "固有値と対角化"

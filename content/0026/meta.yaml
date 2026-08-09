@@ -1,6 +1,6 @@
 id: "0026"
 title: "クレロー方程式の一般解と特異解（$y = xy' + (y')^2$）"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "一階微分方程式"

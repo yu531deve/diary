@@ -1,6 +1,6 @@
 id: "0043"
 title: "既知の1解 y1 = x を用いた階数低下法による第2解の導出"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "変数係数・非線形の2階方程式"

@@ -1,6 +1,6 @@
 id: "0033"
 title: "定数係数2階線形非同次微分方程式の一般解（非同次項が同次解と共鳴する場合）"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"
