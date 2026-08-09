@@ -1,0 +1,22 @@
+\diarytitle{0074}{2次対称行列の固有値・固有ベクトルと直交対角化}
+
+固有方程式は
+\[
+\det(A - \lambda I) = (3-\lambda)^{2} - 1 = \lambda^{2} - 6\lambda + 8 = 0
+\]
+より $\lambda = 4, 2$。
+
+$\lambda = 4$: $A - 4I = \begin{pmatrix} -1 & 1 \\ 1 & -1 \end{pmatrix}$ より $x_1 = x_2$、固有ベクトルは $\bm{p}_1 = \dfrac{1}{\sqrt{2}}\begin{pmatrix}1\\1\end{pmatrix}$（正規化済み）。
+
+$\lambda = 2$: $A - 2I = \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}$ より $x_1 = -x_2$、固有ベクトルは $\bm{p}_2 = \dfrac{1}{\sqrt{2}}\begin{pmatrix}1\\-1\end{pmatrix}$。
+
+$\bm{p}_1 \perp \bm{p}_2$（対称行列の異なる固有値の固有ベクトルは直交する）なので、そのまま直交行列
+\[
+P = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+\]
+が取れ、
+\[
+\boxed{\; P^{\mathrm{T}} A P = \begin{pmatrix} 4 & 0 \\ 0 & 2 \end{pmatrix} \;}
+\]
+
+検算: $AP = \dfrac{1}{\sqrt2}\begin{pmatrix}3+1 & 3-1\\1+3 & 1-3\end{pmatrix} = \dfrac{1}{\sqrt2}\begin{pmatrix}4 & 2\\4 & -2\end{pmatrix}$、一方 $PD = \dfrac{1}{\sqrt2}\begin{pmatrix}1\cdot4 & 1\cdot2\\1\cdot4 & -1\cdot2\end{pmatrix} = \dfrac{1}{\sqrt2}\begin{pmatrix}4&2\\4&-2\end{pmatrix}$ で一致し、また $P^{\mathrm{T}}P = \dfrac12\begin{pmatrix}1+1 & 1-1\\1-1&1+1\end{pmatrix} = I$ も確認できる。

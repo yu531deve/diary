@@ -1,0 +1,30 @@
+\diarytitle{0076}{対角化による行列の n 乗の計算}
+
+固有方程式は
+\[
+(1-\lambda)^{2} - 4 = \lambda^{2} - 2\lambda - 3 = 0 \quad\Longrightarrow\quad \lambda = 3, -1
+\]
+
+$\lambda = 3$: $A - 3I = \begin{pmatrix} -2 & 2 \\ 2 & -2 \end{pmatrix}$ より固有ベクトル $\begin{pmatrix}1\\1\end{pmatrix}$。
+
+$\lambda = -1$: $A + I = \begin{pmatrix} 2 & 2 \\ 2 & 2 \end{pmatrix}$ より固有ベクトル $\begin{pmatrix}1\\-1\end{pmatrix}$。
+
+よって
+\[
+P = \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}, \qquad
+P^{-1} = \frac{1}{2}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}, \qquad
+D = \begin{pmatrix} 3 & 0 \\ 0 & -1 \end{pmatrix}
+\]
+（$P^{-1}$ は $\det P = -2$ と余因子行列から $\dfrac{1}{-2}\begin{pmatrix}-1 & -1\\-1 & 1\end{pmatrix} = \dfrac12\begin{pmatrix}1&1\\1&-1\end{pmatrix}$ として得られる）。$A^{n} = PD^{n}P^{-1}$ を計算すると
+\[
+A^{n} = \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+\begin{pmatrix} 3^{n} & 0 \\ 0 & (-1)^{n} \end{pmatrix}
+\frac{1}{2}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+= \frac{1}{2}\begin{pmatrix} 3^{n} & (-1)^{n} \\ 3^{n} & -(-1)^{n} \end{pmatrix}
+\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+\]
+\[
+\boxed{\; A^{n} = \frac{1}{2}\begin{pmatrix} 3^{n} + (-1)^{n} & 3^{n} - (-1)^{n} \\ 3^{n} - (-1)^{n} & 3^{n} + (-1)^{n} \end{pmatrix} \;}
+\]
+
+検算: $n=1$ とすると $\dfrac12\begin{pmatrix}3-1 & 3+1\\3+1&3-1\end{pmatrix} = \dfrac12\begin{pmatrix}2&4\\4&2\end{pmatrix} = \begin{pmatrix}1&2\\2&1\end{pmatrix} = A$ と一致する。また $n=2$ とすると $\dfrac12\begin{pmatrix}9+1&9-1\\9-1&9+1\end{pmatrix}=\begin{pmatrix}5&4\\4&5\end{pmatrix}$ であり、直接 $A^2=\begin{pmatrix}1&2\\2&1\end{pmatrix}\begin{pmatrix}1&2\\2&1\end{pmatrix}=\begin{pmatrix}5&4\\4&5\end{pmatrix}$ と計算しても一致する。
