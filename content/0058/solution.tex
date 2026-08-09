@@ -1,0 +1,55 @@
+\diarytitle{0058}{ラグランジュの補助方程式と初期条件による1階非線形偏微分方程式の求解（xu_x-yu_y=u^2）}
+
+$P\,u_{x} + Q\,u_{y} = R$ の形の方程式は、ラグランジュの補助方程式
+$\dfrac{dx}{P} = \dfrac{dy}{Q} = \dfrac{du}{R}$ から独立な2つの第一積分
+$\varphi(x,y,u) = c_{1}$, $\psi(x,y,u) = c_{2}$ を求め、一般解を
+$F(\varphi, \psi) = 0$（または $\varphi = f(\psi)$）の形で表したうえで、
+初期条件を代入して任意関数を決定する方針で解く。
+
+補助方程式は
+\[
+\frac{dx}{x} = \frac{dy}{-y} = \frac{du}{u^{2}}
+\]
+最初の2式 $\dfrac{dx}{x} = -\dfrac{dy}{y}$ を積分すると
+\[
+\ln x = -\ln y + c_{1}' \quad\Longrightarrow\quad \varphi = xy = c_{1}
+\]
+次に $\dfrac{dx}{x} = \dfrac{du}{u^{2}}$ を積分すると
+\[
+\ln x = -\frac{1}{u} + c_{2}' \quad\Longrightarrow\quad \psi = \frac{1}{u} + \ln x = c_{2}
+\]
+よって一般解は $\psi = g(\varphi)$、すなわち
+\[
+\frac{1}{u} + \ln x = g(xy)
+\]
+の形になる。初期条件 $u(x,1) = x$（$y=1$）を代入すると、このとき $xy = x$ であり
+\[
+\frac{1}{x} + \ln x = g(x)
+\]
+したがって $g(s) = \dfrac{1}{s} + \ln s$。これを一般解に戻すと（$s = xy$）
+\[
+\frac{1}{u} + \ln x = \frac{1}{xy} + \ln(xy) = \frac{1}{xy} + \ln x + \ln y
+\]
+\[
+\Longrightarrow \quad \frac{1}{u} = \frac{1}{xy} + \ln y
+\]
+よって
+\[
+\boxed{\; u = \frac{xy}{1 + xy\ln y} \;}
+\]
+
+（検算1: 初期条件）$y=1$ とすると $u = \dfrac{x}{1 + x\ln 1} = \dfrac{x}{1+0} = x$ となり、$u(x,1)=x$ を満たす。
+
+（検算2: 方程式）$w = 1/u = \dfrac{1}{xy} + \ln y$ とおくと
+\[
+w_{x} = -\frac{1}{x^{2}y}, \qquad w_{y} = -\frac{1}{xy^{2}} + \frac{1}{y}
+\]
+$w = 1/u$ より $u_{x} = -u^{2} w_{x}$, $u_{y} = -u^{2} w_{y}$ であるから
+\[
+x\,u_{x} - y\,u_{y}
+= -u^{2}\left(x w_{x} - y w_{y}\right)
+= -u^{2}\left(-\frac{1}{xy} - \left(-\frac{1}{xy} + 1\right)\right)
+= -u^{2}\left(-\frac{1}{xy} + \frac{1}{xy} - 1\right)
+= u^{2}
+\]
+となり、方程式 $x u_{x} - y u_{y} = u^{2}$ を満たすことが確認できる。

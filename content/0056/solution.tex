@@ -1,0 +1,37 @@
+\diarytitle{0056}{ラグランジュの補助方程式による1階線形偏微分方程式の一般解（xu_x+yu_y=u）}
+
+$P\,u_{x} + Q\,u_{y} = R$ の形の方程式は、ラグランジュの補助方程式
+$\dfrac{dx}{P} = \dfrac{dy}{Q} = \dfrac{du}{R}$ から独立な2つの第一積分
+$\varphi(x,y,u) = c_{1}$, $\psi(x,y,u) = c_{2}$ を求め、一般解を
+$F(\varphi, \psi) = 0$（または $\varphi = f(\psi)$）の形で表す方針で解く。
+
+補助方程式は
+\[
+\frac{dx}{x} = \frac{dy}{y} = \frac{du}{u}
+\]
+最初の2式 $\dfrac{dx}{x} = \dfrac{dy}{y}$ を積分すると
+\[
+\ln x = \ln y + c_{1}' \quad\Longrightarrow\quad \varphi = \frac{x}{y} = c_{1}
+\]
+次に $\dfrac{dx}{x} = \dfrac{du}{u}$ を積分すると
+\[
+\ln x = \ln u + c_{2}' \quad\Longrightarrow\quad \psi = \frac{x}{u} = c_{2}
+\]
+よって一般解は $\psi = f(\varphi)$、すなわち $\dfrac{x}{u} = f\!\left(\dfrac{x}{y}\right)$ の形になる。これを $u$ について解き、$h(t) = 1/f(1/t)$ とおいて整理すると
+\[
+\boxed{\; u = x\,\varphi_{0}\!\left(\frac{y}{x}\right) \;}
+\qquad (\varphi_{0} \text{ は任意関数})
+\]
+
+（検算）$u = x\,\varphi_{0}(y/x)$ とおくと
+\[
+u_{x} = \varphi_{0}\!\left(\frac{y}{x}\right) - \frac{y}{x}\,\varphi_{0}'\!\left(\frac{y}{x}\right), \qquad
+u_{y} = \varphi_{0}'\!\left(\frac{y}{x}\right)
+\]
+であるから
+\[
+x\,u_{x} + y\,u_{y}
+= x\varphi_{0} - y\varphi_{0}' + y\varphi_{0}'
+= x\varphi_{0}\!\left(\frac{y}{x}\right) = u
+\]
+となり、方程式を満たす。

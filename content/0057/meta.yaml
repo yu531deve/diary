@@ -1,0 +1,10 @@
+id: "0057"
+title: "ラグランジュの補助方程式による1階線形偏微分方程式の一般解（u_x+u_y=u）"
+status: draft
+field:
+  major: "偏微分方程式・積分変換"
+  minor: "熱・波動・ラプラス方程式"
+tags: ["特性曲線法"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09
