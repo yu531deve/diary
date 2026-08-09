@@ -1,0 +1,16 @@
+\diarytitle{0096}{コサインを平方根で割った関数の微分}
+
+$f(x) = \cos x$, $g(x) = \sqrt{x} = x^{1/2}$ とすると $f' = -\sin x$, $g' = \dfrac{1}{2}x^{-1/2}$。商の微分公式より
+\[
+y' = \frac{f'g - fg'}{g^{2}}
+= \frac{-\sin x\cdot x^{1/2} - \cos x\cdot \dfrac{1}{2}x^{-1/2}}{x}
+\]
+分子・分母に $2x^{1/2}$ を掛けて整理すると
+\[
+\boxed{\; y' = -\dfrac{2x\sin x + \cos x}{2x\sqrt{x}} \;}
+\]
+
+（検算: $y=\cos x\,x^{-1/2}$ を直接微分すると
+$y' = -\sin x\,x^{-1/2} + \cos x\cdot\left(-\dfrac{1}{2}\right)x^{-3/2}
+= -\dfrac{\sin x}{\sqrt{x}} - \dfrac{\cos x}{2x\sqrt{x}}
+= -\dfrac{2x\sin x + \cos x}{2x\sqrt{x}}$ となり一致する。）
