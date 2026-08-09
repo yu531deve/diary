@@ -4,7 +4,7 @@ status: draft
 field:
   major: "常微分方程式"
   minor: "一階微分方程式"
-tags: []
+tags: ["ベルヌーイ型", "積分因子"]
 difficulty: 2
 created: 2026-08-08
 updated: 2026-08-08
