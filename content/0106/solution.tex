@@ -1,0 +1,22 @@
+\diarytitle{0106}{合成関数の連鎖律によるdz/dtの計算}
+
+$z = f(x,y)$、$x = x(t)$、$y = y(t)$ のとき、連鎖律（合成関数の微分公式）
+\[
+\frac{dz}{dt} = \frac{\partial z}{\partial x}\frac{dx}{dt} + \frac{\partial z}{\partial y}\frac{dy}{dt}
+\]
+が成り立つ。これを用いる。
+
+$z_{x} = 2xy$、$z_{y} = x^{2} - 3y^{2}$、$\dfrac{dx}{dt} = e^{t}$、$\dfrac{dy}{dt} = -\sin t$ であるから、連鎖律より
+\[
+\frac{dz}{dt} = z_{x}\frac{dx}{dt} + z_{y}\frac{dy}{dt}
+= (2xy)(e^{t}) + (x^{2}-3y^{2})(-\sin t)
+\]
+ここで $x = e^{t}$、$y=\cos t$ を代入すると
+\[
+\frac{dz}{dt} = 2e^{t}\cos t \cdot e^{t} - (e^{2t} - 3\cos^{2}t)\sin t
+\]
+すなわち
+\[
+\boxed{\; \frac{dz}{dt} = 2e^{2t}\cos t - e^{2t}\sin t + 3\sin t\cos^{2}t \;}
+\]
+（検算: $t=0$ のとき $x=1,y=1$、$z_x=2,z_y=-2$、$dx/dt=1,dy/dt=0$ なので $dz/dt=2\cdot1+(-2)\cdot0=2$。上式に $t=0$ を代入すると $2\cdot1\cdot1 - 1\cdot0 + 3\cdot0\cdot1 = 2$ で一致する。）

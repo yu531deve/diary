@@ -1,0 +1,21 @@
+\diarytitle{0107}{極座標変換によるz=x^2-y^2の偏微分計算}
+
+$z=f(x,y)$、$x=x(u,v)$、$y=y(u,v)$ のとき
+\[
+\frac{\partial z}{\partial u} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial u} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial u}, \qquad
+\frac{\partial z}{\partial v} = \frac{\partial z}{\partial x}\frac{\partial x}{\partial v} + \frac{\partial z}{\partial y}\frac{\partial y}{\partial v}
+\]
+が成り立つ。ここでは $(u,v) = (r,\theta)$ として、極座標変換 $x=r\cos\theta$、$y=r\sin\theta$ に適用する。
+
+$z_{x} = 2x$、$z_{y} = -2y$、$x_{r} = \cos\theta$、$y_{r}=\sin\theta$、$x_{\theta} = -r\sin\theta$、$y_{\theta} = r\cos\theta$ であるから
+\[
+\frac{\partial z}{\partial r} = z_{x}x_{r} + z_{y}y_{r} = 2x\cos\theta - 2y\sin\theta = 2r\cos^{2}\theta - 2r\sin^{2}\theta = 2r\cos 2\theta
+\]
+\[
+\frac{\partial z}{\partial \theta} = z_{x}x_{\theta} + z_{y}y_{\theta} = -2xr\sin\theta - 2yr\cos\theta = -2r^{2}\sin\theta\cos\theta - 2r^{2}\sin\theta\cos\theta = -2r^{2}\sin 2\theta
+\]
+したがって
+\[
+\boxed{\; \frac{\partial z}{\partial r} = 2r\cos 2\theta, \qquad \frac{\partial z}{\partial \theta} = -2r^{2}\sin 2\theta \;}
+\]
+（検算: $z = r^{2}\cos^{2}\theta - r^{2}\sin^{2}\theta = r^{2}\cos 2\theta$ と直接 $r,\theta$ の関数として書き直すと、$\partial z/\partial r = 2r\cos2\theta$、$\partial z/\partial \theta = -2r^{2}\sin2\theta$ となり一致する。）
