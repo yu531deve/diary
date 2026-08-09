@@ -1,0 +1,21 @@
+\diarytitle{0016}{置換による変数分離形への帰着と初期値問題（u = x + y）}
+
+$\dfrac{dy}{dx} = F(x+y)$ のように右辺が $x+y$（あるいは $ax+by+c$ 等）のみの関数である場合は、$u = x+y$ とおくと
+\[
+\frac{du}{dx} = 1 + \frac{dy}{dx} = 1 + F(u)
+\]
+となり、$u$ と $x$ の変数分離形に帰着できる。解いた後で $y = u - x$ に戻せばよい。初期条件が与えられている場合は、一般解に代入して任意定数を定める。
+
+$u = x + y$ とおくと $\dfrac{du}{dx} = 1 + \dfrac{dy}{dx} = 1 + u^{2}$ となり、変数分離形に帰着する。
+\[
+\frac{du}{1+u^{2}} = dx
+\quad\Longrightarrow\quad
+\arctan u = x + C_{1}
+\quad\Longrightarrow\quad
+u = \tan(x+C_{1})
+\]
+$u = x+y$ に戻すと $y = \tan(x+C_{1}) - x$。初期条件 $y(0) = 0$ より $\tan C_{1} = 0$ であるから $C_{1} = 0$ ととれる。したがって
+\[
+\boxed{\; y = \tan x - x \;}
+\]
+（検算: $y' = \sec^{2}x - 1 = \tan^{2}x$ であり、$(x+y)^{2} = (\tan x)^{2} = \tan^{2}x$ となって一致する。また $y(0) = \tan 0 - 0 = 0$ で初期条件も満たす。）

@@ -1,0 +1,25 @@
+\diarytitle{0022}{一階線形非同次微分方程式の初期値問題（y'+2y=e^-x）}
+
+一階線形非同次方程式 $y' + P(x)\,y = Q(x)$ は、積分因子 $\mu(x) = \exp\left(\int P(x)\,dx\right)$ を両辺に掛けて $(\mu y)' = \mu Q$ の形に直し、積分することで解ける。
+
+$P(x) = 2$ であるから、積分因子は
+\[
+\mu(x) = \exp\left(\int 2\,dx\right) = e^{2x}
+\]
+両辺に $\mu(x) = e^{2x}$ を掛けると
+\[
+e^{2x}\frac{dy}{dx} + 2e^{2x}y = e^{2x}e^{-x} = e^{x}
+\quad\Longleftrightarrow\quad
+\frac{d}{dx}\bigl(e^{2x}y\bigr) = e^{x}
+\]
+両辺を積分して
+\[
+e^{2x}y = e^{x} + C
+\quad\Longrightarrow\quad
+y = e^{-x} + Ce^{-2x}
+\]
+初期条件 $y(0) = 3$ より $1 + C = 3$、すなわち $C = 2$。したがって
+\[
+\boxed{\; y = e^{-x} + 2e^{-2x} \;}
+\]
+（検算: $y' = -e^{-x} - 4e^{-2x}$ であり、$2y = 2e^{-x} + 4e^{-2x}$ であるから、$y' + 2y = (-e^{-x}-4e^{-2x}) + (2e^{-x}+4e^{-2x}) = e^{-x}$ が成り立つ。また $y(0) = 1 + 2 = 3$ も満たす。）

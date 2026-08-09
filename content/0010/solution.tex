@@ -1,0 +1,15 @@
+\diarytitle{0010}{一次同次線形微分方程式の初期値問題（tan x の係数）}
+
+一次同次線形微分方程式 $y' + P(x)\,y = 0$ は変数分離により $y = C\exp\left(-\displaystyle\int P(x)\,dx\right)$ と解ける。
+
+変数分離して
+\[
+\frac{dy}{y} = \tan x\,dx
+\quad\Longrightarrow\quad
+\ln|y| = -\ln|\cos x| + C_{1}
+\]
+よって一般解は $y = \dfrac{C}{\cos x}$。初期条件 $y(0) = 2$ より $C = 2$。したがって
+\[
+\boxed{\; y = \frac{2}{\cos x} \;}
+\qquad \left(-\frac{\pi}{2} < x < \frac{\pi}{2}\right)
+\]
