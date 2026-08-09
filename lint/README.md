@@ -12,11 +12,30 @@ Diary の linter 一式。実行言語は Node.js（devcontainer に同梱のも
 コメント行（`%` 以降。ただし `\%` はエスケープなので対象外）は検出対象外。
 
 ```sh
-# リポジトリルートから
-make lint
-
 # 直接実行（fixtures など任意のファイルを指定する場合）
 node lint/check-forbidden-commands.js lint/fixtures/ok.tex
+```
+
+## メタデータ・タグ辞書チェック
+
+`content/**/meta.yaml` を走査し、必須キーの存在・`id` の形式とディレクトリ名との
+一致・`status` / `difficulty` / 日付の形式に加えて、`field.major` / `field.minor`
+が `fields.yaml` に、`tags` の各要素が `tags.yaml` に存在することを検証する。
+違反があれば stderr に `ファイル: 内容` を1行1違反で出力し exit 1、
+無ければ検証件数を1行出力して exit 0。
+
+```sh
+# 直接実行（任意の meta.yaml を指定する場合）
+node lint/check-meta.js lint/fixtures/meta/ok/0001/meta.yaml
+```
+
+## まとめて実行
+
+`make lint` が上記2つを順に実行する。
+
+```sh
+# リポジトリルートから
+make lint
 ```
 
 禁止コマンドの定義は `forbidden-commands.yaml` にある。緩和・追加が必要な

@@ -255,7 +255,12 @@ function run(args) {
     process.stderr.write(`${e}\n`);
   }
 
-  return allErrors.length > 0 ? 1 : 0;
+  if (allErrors.length > 0) {
+    return 1;
+  }
+
+  process.stdout.write(`check-meta: ${targets.length} 件の meta.yaml を検証 (OK)\n`);
+  return 0;
 }
 
 if (require.main === module) {
