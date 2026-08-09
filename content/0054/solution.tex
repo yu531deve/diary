@@ -1,0 +1,55 @@
+\diarytitle{0054}{スツルム・リウヴィル型境界値問題（ノイマン境界条件）の固有値・固有関数}
+
+方針: $\lambda$ の符号（$\lambda < 0$, $\lambda = 0$, $\lambda > 0$）によって特性方程式の解の形が変わるため、場合分けして各場合に境界条件を課し、自明でない解が存在するかを調べる。
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解とその導関数は
+\[
+y = A\cosh(\mu x) + B\sinh(\mu x), \qquad
+y' = A\mu\sinh(\mu x) + B\mu\cosh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y'(0) &= B\mu = 0 \\
+y'(L) &= A\mu\sinh(\mu L) = 0
+\end{align*}
+$\mu > 0$ より $B = 0$、$\sinh(\mu L)\neq 0$ より $A=0$。
+自明解のみで、固有値は存在しない。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解とその導関数は
+\[
+y = A + Bx, \qquad y' = B
+\]
+境界条件を課すと
+\begin{align*}
+y'(0) &= B = 0 \\
+y'(L) &= B = 0
+\end{align*}
+$B = 0$ とすれば両条件が満たされ、$A$ は任意でよい。$y = A$（定数）は自明でない解を与える。
+したがって $\lambda_{0} = 0$ は固有値であり、対応する固有関数は定数関数 $y_{0}(x) = 1$。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解とその導関数は
+\[
+y = A\cos(\mu x) + B\sin(\mu x), \qquad
+y' = -A\mu\sin(\mu x) + B\mu\cos(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+y'(0) &= B\mu = 0 \\
+y'(L) &= -A\mu\sin(\mu L) = 0
+\end{align*}
+$\mu > 0$ より $B = 0$。自明でない解（$A \neq 0$）が存在するためには
+\[
+\sin(\mu L) = 0 \quad\Longrightarrow\quad \mu_{n} = \frac{n\pi}{L} \quad (n = 1, 2, 3, \dots)
+\]
+よって $\lambda_{n} = \left(\dfrac{n\pi}{L}\right)^{2}$、固有関数は $y_{n}(x) = \cos\!\left(\dfrac{n\pi x}{L}\right)$。
+
+（検算: $y_n' = -\frac{n\pi}{L}\sin\left(\frac{n\pi x}{L}\right)$ より $y_n'(0) = 0$、$y_n'(L) = -\frac{n\pi}{L}\sin(n\pi) = 0$ を満たす。$y_n'' + \lambda_n y_n = -\left(\frac{n\pi}{L}\right)^2\cos\left(\frac{n\pi x}{L}\right) + \left(\frac{n\pi}{L}\right)^2\cos\left(\frac{n\pi x}{L}\right) = 0$ も成立。）
+
+$n=0$（$\lambda_0=0$, $y_0=1$）の場合も同じ式 $y_n(x)=\cos\left(\frac{n\pi x}{L}\right)$ に含まれるので、まとめて記す。
+
+\[
+\boxed{\; \lambda_{n} = \left(\frac{n\pi}{L}\right)^{2}, \quad y_{n}(x) = \cos\!\left(\frac{n\pi x}{L}\right) \qquad (n = 0, 1, 2, \dots) \;}
+\]
