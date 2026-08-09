@@ -1,0 +1,10 @@
+id: "0078"
+title: "行列方程式 AX=B の解（逆行列を用いた解法）"
+status: draft
+field:
+  major: "線形代数"
+  minor: "行列と連立一次方程式"
+tags: ["余因子展開"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09

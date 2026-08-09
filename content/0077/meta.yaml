@@ -1,0 +1,10 @@
+id: "0077"
+title: "3次正方行列の行列式と逆行列（余因子展開）"
+status: draft
+field:
+  major: "線形代数"
+  minor: "行列式"
+tags: ["余因子展開"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09
