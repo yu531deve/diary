@@ -1,0 +1,10 @@
+id: "0105"
+title: "x arcsin x + sqrt(1-x^2) の導関数"
+status: draft
+field:
+  major: "微分積分学"
+  minor: "一変数の微分積分"
+tags: ["逆三角関数", "連鎖律"]
+difficulty: 2
+created: 2026-08-09
+updated: 2026-08-09

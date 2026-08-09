@@ -1,0 +1,11 @@
+\diarytitle{0101}{arcsin x の逆関数の微分法による導関数の導出}
+
+$x = \sin y$（$-\dfrac{\pi}{2} < y < \dfrac{\pi}{2}$）とおいて両辺を $x$ で微分すると
+\[
+1 = \cos y \cdot \frac{dy}{dx}
+\]
+この範囲で $\cos y > 0$ なので $\cos y = \sqrt{1-\sin^{2}y} = \sqrt{1-x^{2}}$。したがって
+\[
+\boxed{\; \frac{dy}{dx} = \frac{1}{\sqrt{1-x^{2}}} \;}
+\]
+（検算: $x=0$ のとき $y=0$ で $\dfrac{dy}{dx} = \dfrac{1}{\sqrt{1-0}} = 1$。実際 $y=\arcsin x$ は原点付近で $y \approx x$ なので傾き $1$ と整合する。）
