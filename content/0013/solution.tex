@@ -1,0 +1,22 @@
+\diarytitle{0013}{一次同次線形偏微分方程式の初期値問題（u_x + 2x u_y = 0, u(0,y) = sin y）}
+
+$P(x,y)\,\dfrac{\partial u}{\partial x} + Q(x,y)\,\dfrac{\partial u}{\partial y} = 0$ の一般解は、特性方程式 $\dfrac{dx}{P} = \dfrac{dy}{Q}$ の解 $\varphi(x,y) = C$ を用いて $u = F(\varphi(x,y))$（$F$ は任意関数）と表せる。
+
+特性方程式は
+\[
+\frac{dx}{1} = \frac{dy}{2x}
+\quad\Longleftrightarrow\quad
+\frac{dy}{dx} = 2x
+\]
+積分して $y = x^{2} + C$、すなわち
+\[
+y - x^{2} = C
+\]
+が特性曲線である。したがって一般解は、任意関数 $F$ を用いて
+\[
+u(x,y) = F(y - x^{2})
+\]
+条件 $u(0,y) = \sin y$ を課すと $F(y) = \sin y$ と定まるから、求める解は
+\[
+\boxed{\; u(x,y) = \sin\left(y - x^{2}\right) \;}
+\]
