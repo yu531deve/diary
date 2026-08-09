@@ -1,6 +1,6 @@
 id: "0070"
 title: "波動方程式（両端固定）における単一モードの初期速度に対する解"
-status: draft
+status: published
 field:
   major: "偏微分方程式・積分変換"
   minor: "フーリエ級数・フーリエ変換"

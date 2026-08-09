@@ -1,6 +1,6 @@
 id: "0073"
 title: "放物型2階線形偏微分方程式の標準形と初期値問題（$u_{xx} - 2u_{xy} + u_{yy} = 0$）"
-status: draft
+status: published
 field:
   major: "偏微分方程式・積分変換"
   minor: "熱・波動・ラプラス方程式"

@@ -1,6 +1,6 @@
 id: "0078"
 title: "行列方程式 AX=B の解（逆行列を用いた解法）"
-status: draft
+status: published
 field:
   major: "線形代数"
   minor: "行列と連立一次方程式"

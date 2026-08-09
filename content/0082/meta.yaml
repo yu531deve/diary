@@ -1,6 +1,6 @@
 id: "0082"
 title: "ブロック三角行列に対するケーリー・ハミルトンの定理の応用（$C^4$ の計算）"
-status: draft
+status: published
 field:
   major: "線形代数"
   minor: "固有値と対角化"
