@@ -674,21 +674,24 @@ const issueHref =
 	</head>
 	<body>
 		<LoadingCurtain />
-		<nav class="site-nav">
-			<div class="brand">
-				<strong>Diary</strong>
-				<span>SELF-MADE MATHEMATICS</span>
-			</div>
-			<div class="links">
-				<a href="/fields/">分野</a>
-				<a href="#new">新着</a>
-				<a href="/about/">About</a>
-				<span class="kbd" data-search-open>検索<span>⌘K</span></span>
-			</div>
-		</nav>
+		<header>
+			<nav class="site-nav">
+				<div class="brand">
+					<strong>Diary</strong>
+					<span>SELF-MADE MATHEMATICS</span>
+				</div>
+				<div class="links">
+					<a href="/fields/">分野</a>
+					<a href="#new">新着</a>
+					<a href="/about/">About</a>
+					<span class="kbd" data-search-open>検索<span>⌘K</span></span>
+				</div>
+			</nav>
+		</header>
 
 		<SearchModal />
 
+		<main>
 		<div id="cur" aria-hidden="true"></div>
 		<div id="curdot" aria-hidden="true"></div>
 
@@ -783,12 +786,13 @@ const issueHref =
 					}
 				</div>
 			</section>
-
-			<footer class="site-footer">
-				<span>© 2026 DIARY — PERSONAL USE ONLY</span>
-				<a href={issueHref} target="_blank" rel="noopener noreferrer">誤植報告 → GITHUB ISSUE</a>
-			</footer>
 		</div>
+		</main>
+
+		<footer class="site-footer">
+			<span>© 2026 DIARY — PERSONAL USE ONLY</span>
+			<a href={issueHref} target="_blank" rel="noopener noreferrer">誤植報告 → GITHUB ISSUE</a>
+		</footer>
 
 		<BottomTabNav active="home" />
 
