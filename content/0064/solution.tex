@@ -1,0 +1,57 @@
+\diarytitle{0064}{熱伝導方程式の初期値・境界値問題（ノイマン境界条件、断熱棒）}
+
+\textbf{手順1: 変数分離。}\ $u = X(x)T(t)$ とおくと
+\[
+X'' + \lambda X = 0, \qquad T' + k\lambda T = 0
+\]
+に分離される。今回はノイマン境界条件なので、$u_x(0,t) = X'(0)T(t) = 0$ より $X'(0) = 0$、同様に $X'(L) = 0$ が $X$ に課される。
+
+\textbf{手順2: 固有値問題を解く（$\lambda$ の場合分け）。}
+
+\textbf{(i) $\lambda < 0$（$\lambda = -\mu^{2}$, $\mu>0$）のとき。}\\
+一般解とその導関数は
+\[
+X = A\cosh(\mu x) + B\sinh(\mu x), \qquad
+X' = A\mu\sinh(\mu x) + B\mu\cosh(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+X'(0) &= B\mu = 0 \\
+X'(L) &= A\mu\sinh(\mu L) = 0
+\end{align*}
+$\mu > 0$ より $B = 0$、$\sinh(\mu L) \neq 0$ より $A = 0$。自明解のみ。
+
+\textbf{(ii) $\lambda = 0$ のとき。}\\
+一般解とその導関数は $X = A + Bx$、$X' = B$。$X'(0) = X'(L) = B = 0$ とすれば $A$ は任意でよく、\textbf{定数解 $X_0 = 1$ が自明でない解として生き残る}（ディリクレの場合との最大の違い）。$\lambda_0 = 0$ は固有値である。
+
+\textbf{(iii) $\lambda > 0$（$\lambda = \mu^{2}$, $\mu>0$）のとき。}\\
+一般解とその導関数は
+\[
+X = A\cos(\mu x) + B\sin(\mu x), \qquad
+X' = -A\mu\sin(\mu x) + B\mu\cos(\mu x)
+\]
+境界条件を課すと
+\begin{align*}
+X'(0) &= B\mu = 0 \\
+X'(L) &= -A\mu\sin(\mu L) = 0
+\end{align*}
+$B = 0$、そして自明でない解（$A \neq 0$）のためには $\sin(\mu L) = 0$、すなわち
+\[
+\mu_n = \frac{n\pi}{L}, \qquad \lambda_n = \left(\frac{n\pi}{L}\right)^{2}, \qquad X_n(x) = \cos\frac{n\pi x}{L} \qquad (n = 1, 2, 3, \dots)
+\]
+
+\textbf{手順3: 時間成分と重ね合わせ。}\ $T_n(t) = e^{-k\lambda_n t}$（$\lambda_n=(n\pi/L)^2$ に対する時間成分）。$n=0$ のモードは $\lambda_0 = 0$ なので $T_0(t) = e^{0} = 1$、つまり\textbf{減衰せずに残る}。重ね合わせて一般解は
+\[
+u(x,t) = c_0 + \sum_{n=1}^{\infty} c_n \cos\frac{n\pi x}{L}\,e^{-k(n\pi/L)^2 t}
+\]
+
+\textbf{手順4: 初期条件。}\ $t=0$ とおくと
+\[
+c_0 + \sum_{n=1}^{\infty} c_n \cos\frac{n\pi x}{L} = u_0 + \cos\frac{\pi x}{L}
+\]
+右辺はすでに $n=0$ の定数モードと $n=1$ の固有関数の和なので、係数比較により $c_0 = u_0$、$c_1 = 1$、他の $c_n = 0$。よって
+\[
+\boxed{\; u(x,t) = u_0 + \cos\frac{\pi x}{L}\,\exp\!\left(-k\left(\frac{\pi}{L}\right)^{2} t\right) \;}
+\]
+
+（検算: $u_t = -k(\pi/L)^2\cos\frac{\pi x}{L}e^{-k(\pi/L)^2t}$、$u_{xx} = -(\pi/L)^2\cos\frac{\pi x}{L}e^{-k(\pi/L)^2t}$ より $u_t = k u_{xx}$。$u_x(x,t) = -\frac{\pi}{L}\sin\frac{\pi x}{L}e^{-k(\pi/L)^2t}$ は $x=0,L$ で $\sin 0 = \sin\pi = 0$ となり $u_x(0,t)=u_x(L,t)=0$ を満たす。初期条件も $t=0$ で一致。また $t\to\infty$ で $u \to u_0$ となり、断熱系ではエネルギー（区間平均温度）が保存され定常状態が初期の平均値 $u_0$ に一致することとも整合する。）
