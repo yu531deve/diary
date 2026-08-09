@@ -1,5 +1,5 @@
 id: "0021"
-title: "一階線形非同次微分方程式の一般解（exp(x^2) 型）"
+title: "一階線形非同次微分方程式の一般解（$e^{x^2}$ 型）"
 status: draft
 field:
   major: "常微分方程式"

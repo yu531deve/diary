@@ -1,5 +1,5 @@
 id: "0042"
-title: "階数低下法による初期値問題 yy'' = (y')^2 の求解"
+title: "階数低下法による初期値問題 $yy'' = (y')^2$ の求解"
 status: draft
 field:
   major: "常微分方程式"

@@ -1,5 +1,5 @@
 id: "0012"
-title: "一次同次線形偏微分方程式の一般解（y u_x + x u_y = 0）"
+title: "一次同次線形偏微分方程式の一般解（$y u_x + x u_y = 0$）"
 status: draft
 field:
   major: "偏微分方程式・積分変換"

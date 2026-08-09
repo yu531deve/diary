@@ -1,5 +1,5 @@
 id: "0022"
-title: "一階線形非同次微分方程式の初期値問題（y'+2y=e^-x）"
+title: "一階線形非同次微分方程式の初期値問題（$y' + 2y = e^{-x}$）"
 status: draft
 field:
   major: "常微分方程式"
