@@ -1,6 +1,6 @@
 id: "0049"
 title: "ヘヴィサイド関数を外力とする初期値問題のラプラス変換による解法"
-status: published
+status: draft
 field:
   major: "偏微分方程式・積分変換"
   minor: "ラプラス変換"

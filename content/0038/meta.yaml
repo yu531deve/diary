@@ -1,6 +1,6 @@
 id: "0038"
 title: "オイラー方程式（コーシー・オイラー方程式）の一般解（異なる実根の場合）"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "変数係数・非線形の2階方程式"

@@ -1,6 +1,6 @@
 id: "0051"
 title: "ルジャンドル方程式（$n=2$）の多項式解とルジャンドル多項式 $P_2(x)$"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "級数解法"

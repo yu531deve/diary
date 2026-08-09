@@ -1,6 +1,6 @@
 id: "0055"
 title: "スツルム・リウヴィル型境界値問題（混合境界条件）の固有値・固有関数"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "定数係数線形方程式"

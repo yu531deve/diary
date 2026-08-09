@@ -1,6 +1,6 @@
 id: "0041"
 title: "階数低下法による2階微分方程式 xy'' = y' の一般解"
-status: published
+status: draft
 field:
   major: "常微分方程式"
   minor: "変数係数・非線形の2階方程式"

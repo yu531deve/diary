@@ -1,6 +1,6 @@
 id: "0121"
 title: '極座標変換による扇形領域上の $\sqrt{x^2+y^2}$ の重積分'
-status: published
+status: draft
 field:
   major: "微分積分学"
   minor: "重積分"

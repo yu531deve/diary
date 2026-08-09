@@ -1,6 +1,6 @@
 id: "0109"
 title: "u,v変換による偏微分の連鎖律表示とxyの具体計算"
-status: published
+status: draft
 field:
   major: "微分積分学"
   minor: "多変数の微分積分"

@@ -1,6 +1,6 @@
 id: "0123"
 title: "パラメータ表示された曲線に沿う線積分"
-status: published
+status: draft
 field:
   major: "ベクトル解析"
   minor: "線積分・面積分"

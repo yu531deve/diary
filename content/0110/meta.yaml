@@ -1,6 +1,6 @@
 id: "0110"
 title: "極座標変換によるラプラシアンの極座標表示の導出"
-status: published
+status: draft
 field:
   major: "微分積分学"
   minor: "多変数の微分積分"
