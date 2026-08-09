@@ -1,0 +1,24 @@
+\diarytitle{0115}{ガウス型積分の奇関数・偶関数モーメント（パラメータ微分）}
+
+(2) は $\displaystyle\int_{-\infty}^{\infty} e^{-a x^{2}}\, dx$ を $a$ の関数とみて、$a$ で微分することで求められる。
+
+\textbf{(1)} $u = a x^{2}$ とおくと $du = 2ax\, dx$ より
+\[
+\int_{0}^{\infty} x\, e^{-a x^{2}}\, dx = \frac{1}{2a}\int_{0}^{\infty} e^{-u}\, du = \frac{1}{2a}\Bigl[-e^{-u}\Bigr]_{0}^{\infty} = \boxed{\; \frac{1}{2a} \;}
+\]
+検算: $a=1$ のとき値は $1/2$。数値積分の値と一致することが知られている。
+
+\smallskip
+\textbf{(2)} $\displaystyle F(a) = \int_{-\infty}^{\infty} e^{-a x^{2}}\, dx = \sqrt{\pi}\, a^{-1/2}$ を $a$ で微分すると（被積分関数が十分滑らかで積分と微分の順序交換が正当化できる）
+\[
+F'(a) = -\int_{-\infty}^{\infty} x^{2} e^{-a x^{2}}\, dx
+\]
+一方
+\[
+F'(a) = \sqrt{\pi} \cdot \left(-\frac{1}{2}\right) a^{-3/2} = -\frac{\sqrt{\pi}}{2}a^{-3/2}
+\]
+両辺を比較して
+\[
+\int_{-\infty}^{\infty} x^{2} e^{-a x^{2}}\, dx = \boxed{\; \frac{\sqrt{\pi}}{2\, a^{3/2}} \;}
+\]
+検算: $a=1$ のとき、部分積分により $\displaystyle\int_{-\infty}^{\infty} x^{2}e^{-x^{2}}dx = \left[-\frac{1}{2}x e^{-x^{2}}\right]_{-\infty}^{\infty} + \frac{1}{2}\int_{-\infty}^{\infty} e^{-x^{2}}dx = 0 + \frac{\sqrt{\pi}}{2}$ となり、公式に $a=1$ を代入した値と一致する。

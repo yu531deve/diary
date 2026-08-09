@@ -1,0 +1,18 @@
+\diarytitle{0116}{平方完成によるガウス型積分の一般化（1次項付き）}
+
+指数部を平方完成すると
+\[
+-a x^{2} + b x = -a\left(x^{2} - \frac{b}{a}x\right)
+= -a\left(x - \frac{b}{2a}\right)^{2} + \frac{b^{2}}{4a}
+\]
+よって $t = x - \dfrac{b}{2a}$ とおくと（$dt = dx$、積分域は不変）
+\[
+\int_{-\infty}^{\infty} e^{-a x^{2}+bx}\, dx
+= e^{\frac{b^{2}}{4a}} \int_{-\infty}^{\infty} e^{-a t^{2}}\, dt
+= \boxed{\; \sqrt{\dfrac{\pi}{a}}\; e^{\frac{b^{2}}{4a}} \;}
+\]
+$a = 1,\ b = 2$ の場合はこの公式に代入して
+\[
+\int_{-\infty}^{\infty} e^{-x^{2}+2x}\, dx = \sqrt{\pi}\, e^{\frac{4}{4}} = \boxed{\; \sqrt{\pi}\, e \;}
+\]
+検算: $-x^2+2x = -(x-1)^2+1$ であるから、$t=x-1$ とおくと $\int_{-\infty}^{\infty}e^{-(x-1)^2+1}dx = e\int_{-\infty}^{\infty}e^{-t^2}dt = e\sqrt{\pi}$ となり一致する。
