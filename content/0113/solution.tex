@@ -1,0 +1,32 @@
+\diarytitle{0113}{矩形パルス関数のフーリエ変換とsinc関数}
+
+オイラーの公式 $e^{i\theta} = \cos\theta + i\sin\theta$ を用いて複素指数関数の積分を計算し、実部・虚部を比較することで実積分の値を求める。
+
+$f(x)$ は $|x|\le a$ でのみ $1$、それ以外で $0$ であるから
+\[
+F(k) = \int_{-\infty}^{\infty} f(x)\,e^{-ikx}\,dx = \int_{-a}^{a} e^{-ikx}\,dx
+\]
+被積分関数は $[-a,a]$ の外では恒等的に $0$ なので、この積分は広義積分としても自明に（絶対）収束し、有限区間上の積分に帰着する。
+
+$k \neq 0$ のとき
+\[
+\int_{-a}^{a} e^{-ikx}\,dx = \left[\frac{e^{-ikx}}{-ik}\right]_{-a}^{a} = \frac{e^{-ika}-e^{ika}}{-ik} = \frac{2\sin(ka)}{k} = 2a\,\mathrm{sinc}(ka)
+\]
+$k=0$ のときは
+\[
+F(0) = \int_{-a}^{a} 1\,dx = 2a
+\]
+であり、$\mathrm{sinc}(0)=1$ の定義とも整合するので、上式は $k=0$ を含めて全ての実数 $k$ で成り立つ。したがって
+\[
+\boxed{\; F(k) = 2a\,\mathrm{sinc}(ka) \;}
+\]
+また、$\mathrm{sinc}$ の極限 $\displaystyle\lim_{t\to 0}\frac{\sin t}{t} = 1$（またはロピタルの定理）を用いれば
+\[
+\lim_{k\to 0} F(k) = \lim_{k\to 0} 2a\,\mathrm{sinc}(ka) = 2a\cdot 1 = 2a
+\]
+すなわち
+\[
+\boxed{\; \lim_{k\to 0} F(k) = 2a \;}
+\]
+
+（検算: これは $F(0) = \int_{-\infty}^{\infty} f(x)\,dx = 2a$、すなわちパルスの「面積」と一致しており、フーリエ変換の定義から直接計算した値と極限操作による値が矛盾なく一致することが確認できる。）
