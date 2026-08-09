@@ -1,0 +1,35 @@
+\diarytitle{0057}{ラグランジュの補助方程式による1階線形偏微分方程式の一般解（u_x+u_y=u）}
+
+$P\,u_{x} + Q\,u_{y} = R$ の形の方程式は、ラグランジュの補助方程式
+$\dfrac{dx}{P} = \dfrac{dy}{Q} = \dfrac{du}{R}$ から独立な2つの第一積分
+$\varphi(x,y,u) = c_{1}$, $\psi(x,y,u) = c_{2}$ を求め、一般解を
+$F(\varphi, \psi) = 0$（または $\varphi = f(\psi)$）の形で表す方針で解く。
+
+補助方程式は
+\[
+\frac{dx}{1} = \frac{dy}{1} = \frac{du}{u}
+\]
+最初の2式 $dx = dy$ を積分すると
+\[
+\varphi = x - y = c_{1}
+\]
+次に $dx = \dfrac{du}{u}$ を積分すると
+\[
+x = \ln u + c_{2}' \quad\Longrightarrow\quad \psi = u\,e^{-x} = c_{2}
+\]
+よって一般解は $\psi = f(\varphi)$、すなわち
+\[
+\boxed{\; u = e^{x}\,f(x - y) \;}
+\qquad (f \text{ は任意関数})
+\]
+
+（検算）$u = e^{x} f(x-y)$ とおくと
+\[
+u_{x} = e^{x} f(x-y) + e^{x} f'(x-y), \qquad
+u_{y} = -e^{x} f'(x-y)
+\]
+であるから
+\[
+u_{x} + u_{y} = e^{x} f(x-y) + e^{x} f'(x-y) - e^{x} f'(x-y) = e^{x} f(x-y) = u
+\]
+となり、方程式を満たす。
