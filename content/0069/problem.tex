@@ -1,0 +1,21 @@
+\diarytitle{0069}{波動方程式（両端固定）における三角波状初期変位のフーリエ級数解}
+
+次の波動方程式の初期値・境界値問題を解け。導出過程を示すこと。
+\[
+\frac{\partial^{2} u}{\partial t^{2}} = c^{2}\frac{\partial^{2} u}{\partial x^{2}} \qquad (0 < x < L,\ t > 0)
+\]
+\[
+u(0,t) = 0,\quad u(L,t) = 0 \qquad (t > 0)
+\]
+\[
+u(x,0) = f(x), \qquad \frac{\partial u}{\partial t}(x,0) = 0 \qquad (0 \le x \le L)
+\]
+ただし初期変位は
+\[
+f(x) =
+\begin{cases}
+\dfrac{2h}{L}\,x & \left(0 \le x \le \dfrac{L}{2}\right) \\[2mm]
+\dfrac{2h}{L}\,(L-x) & \left(\dfrac{L}{2} \le x \le L\right)
+\end{cases}
+\]
+（弦の中点を高さ $h$ だけ持ち上げて静かに放した状態）で与えられるとする。フーリエ正弦級数の係数 $b_{n}$ を求め、解 $u(x,t)$ を級数の形で表せ。
