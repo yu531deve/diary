@@ -1,0 +1,26 @@
+\diarytitle{0066}{ラプラス方程式の境界値問題（矩形領域、上辺条件が単一のフーリエ正弦項）}
+
+ラプラス方程式 $u_{xx} + u_{yy} = 0$ は、直交座標では $u = X(x)Y(y)$ の積の形を仮定すると常微分方程式に帰着でき、変数分離法で解ける。
+
+前問（0065）と同じ設定（$0 < x < \pi$、3辺で斉次条件 $u(0,y)=u(\pi,y)=u(x,0)=0$）なので、変数分離から一般解の構成までは共通であり
+\[
+X_n(x) = \sin(nx), \qquad Y_n(y) = A_n\sinh(ny) \qquad (n = 1, 2, 3, \dots)
+\]
+より、重ね合わせた一般解は
+\[
+u(x,y) = \sum_{n=1}^{\infty} A_n \sinh(ny)\sin(nx)
+\]
+である。$y = 2$ を代入して境界条件と比べると
+\[
+\sum_{n=1}^{\infty} \bigl(A_n \sinh 2n\bigr)\sin(nx) = 5\sin 3x
+\]
+右辺はすでに固有関数 $\sin 3x$（$n=3$）の1項なので、フーリエ積分を計算するまでもなく係数比較（固有関数系 $\{\sin nx\}$ の直交性により係数は一意に定まる）で
+\[
+A_3 \sinh 6 = 5, \qquad A_n = 0\ (n \neq 3)
+\]
+すなわち $A_3 = \dfrac{5}{\sinh 6}$。したがって
+\[
+\boxed{\; u(x,y) = \frac{5\sinh(3y)}{\sinh 6}\sin(3x) \;}
+\]
+
+\textbf{検算。}\ $u_x = \dfrac{15\sinh(3y)}{\sinh 6}\cos(3x)$, $u_{xx} = -\dfrac{45\sinh(3y)}{\sinh 6}\sin(3x)$。$u_y = \dfrac{15\cosh(3y)}{\sinh 6}\sin(3x)$, $u_{yy} = \dfrac{45\sinh(3y)}{\sinh 6}\sin(3x)$。ゆえに $u_{xx}+u_{yy}=0$ であり調和関数である。また $y=0$ で $\sinh 0=0$ より $u=0$、$x=0,\pi$ で $\sin(3x)=0$ より $u=0$、$y=2$ で $u = \dfrac{5\sinh 6}{\sinh 6}\sin 3x = 5\sin 3x$ となり、境界条件をすべて満たす。
