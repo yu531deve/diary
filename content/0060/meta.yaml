@@ -1,0 +1,10 @@
+id: "0060"
+title: "初期変位のみを持つ波動方程式のダランベールの公式による解"
+status: draft
+field:
+  major: "偏微分方程式・積分変換"
+  minor: "熱・波動・ラプラス方程式"
+tags: ["ダランベールの公式", "初期値問題"]
+difficulty: 3
+created: 2026-08-09
+updated: 2026-08-09

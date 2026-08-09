@@ -1,0 +1,23 @@
+\diarytitle{0060}{初期変位のみを持つ波動方程式のダランベールの公式による解}
+
+方針: 波動方程式 $u_{tt}=c^2u_{xx}$ の一般解 $u(x,t)=f(x-ct)+g(x+ct)$ に初期条件 $u(x,0)=\varphi(x)$, $u_t(x,0)=\psi(x)$ を課すと、$f,g$ が $\varphi,\psi$ で定まり
+\[
+u(x,t) = \frac{\varphi(x-ct) + \varphi(x+ct)}{2} + \frac{1}{2c}\int_{x-ct}^{x+ct} \psi(s)\,ds
+\]
+（ダランベールの公式）を得る。本問では $\psi \equiv 0$ の場合を扱う。
+
+ダランベールの公式
+\[
+u(x,t) = \frac{\varphi(x-ct) + \varphi(x+ct)}{2} + \frac{1}{2c}\int_{x-ct}^{x+ct} \psi(s)\,ds
+\]
+において $\psi \equiv 0$ とすると積分項が消え
+\[
+\boxed{\; u(x,t) = \frac{\varphi(x-ct) + \varphi(x+ct)}{2} \;}
+\]
+$\varphi(x) = e^{-x^{2}}$, $c = 2$ を代入すると
+\[
+\boxed{\; u(x,t) = \frac{1}{2}\left(e^{-(x-2t)^{2}} + e^{-(x+2t)^{2}}\right) \;}
+\]
+検算: $t=0$ のとき $u(x,0) = \dfrac{1}{2}(e^{-x^2}+e^{-x^2}) = e^{-x^2} = \varphi(x)$ を満たす。
+$u_t = \dfrac{1}{2}\left(4(x-2t)e^{-(x-2t)^2} - 4(x+2t)e^{-(x+2t)^2}\right)$ より $u_t(x,0) = \dfrac{1}{2}(4xe^{-x^2}-4xe^{-x^2}) = 0$ を満たす。
+また、各項は $x\mp 2t$ のみの関数であり、$u=f(x-ct)+g(x+ct)$ の形に含まれるので、$c=2$ に対し波動方程式 $u_{tt}=4u_{xx}$ を自動的に満たす。

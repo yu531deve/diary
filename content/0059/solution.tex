@@ -1,0 +1,31 @@
+\diarytitle{0059}{波動方程式の一般解（ダランベールの解の導出）}
+
+方針: 特性変数 $\xi = x-ct$, $\eta = x+ct$ への変数変換で連鎖律を用いて $u_{tt}, u_{xx}$ を書き換えると、波動方程式が $u_{\xi\eta}=0$ という簡単な形に帰着する。これを逐次積分すれば一般解が得られる。
+
+$\xi = x-ct$, $\eta = x+ct$ とおくと、連鎖律より
+\[
+\frac{\partial}{\partial x} = \frac{\partial}{\partial \xi} + \frac{\partial}{\partial \eta}, \qquad
+\frac{\partial}{\partial t} = -c\frac{\partial}{\partial \xi} + c\frac{\partial}{\partial \eta}
+\]
+であるから
+\[
+\frac{\partial^{2} u}{\partial x^{2}} = u_{\xi\xi} + 2u_{\xi\eta} + u_{\eta\eta}, \qquad
+\frac{\partial^{2} u}{\partial t^{2}} = c^{2}\left(u_{\xi\xi} - 2u_{\xi\eta} + u_{\eta\eta}\right)
+\]
+これらを $u_{tt} = c^{2}u_{xx}$ に代入すると
+\[
+c^{2}\left(u_{\xi\xi} - 2u_{\xi\eta} + u_{\eta\eta}\right) = c^{2}\left(u_{\xi\xi} + 2u_{\xi\eta} + u_{\eta\eta}\right)
+\quad\Longrightarrow\quad
+-4c^{2}u_{\xi\eta} = 0
+\quad\Longrightarrow\quad
+u_{\xi\eta} = 0
+\]
+（$c \neq 0$ より）。$u_{\xi\eta} = \dfrac{\partial}{\partial \eta}\left(\dfrac{\partial u}{\partial \xi}\right) = 0$ を $\eta$ について積分すると、$\dfrac{\partial u}{\partial \xi}$ は $\eta$ に依存しない、すなわち $\xi$ のみの関数 $F(\xi)$ に等しい。さらに $\xi$ について積分すると
+\[
+u(\xi,\eta) = \int F(\xi)\,d\xi + g(\eta) =: f(\xi) + g(\eta)
+\]
+（$f$, $g$ は任意の $C^{2}$ 級関数）。元の変数 $x, t$ に戻すと
+\[
+\boxed{\; u(x,t) = f(x-ct) + g(x+ct) \;}
+\]
+検算: $u_x = f' + g'$, $u_{xx} = f'' + g''$。$u_t = -cf' + cg'$, $u_{tt} = c^{2}f'' + c^{2}g'' = c^{2}u_{xx}$ となり、確かに波動方程式を満たす。
