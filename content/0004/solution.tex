@@ -1,0 +1,24 @@
+\diarytitle{0004}{初期条件付きベルヌーイ型微分方程式}
+
+この方程式は $y' + P(x)y = Q(x)y^{n}$ の形（ベルヌーイ型）であり、$u = y^{1-n}$ の置換により線形方程式に帰着できる。
+
+$n = 2$ のベルヌーイ型。両辺を $y^{2}$ で割り、$u = y^{-1}$（$\dfrac{du}{dx} = -y^{-2}\dfrac{dy}{dx}$）とおくと
+\[
+-\frac{du}{dx} + 2xu = x
+\quad\Longleftrightarrow\quad
+\frac{du}{dx} - 2xu = -x
+\]
+積分因子は $\mu = e^{-x^{2}}$ であるから
+\[
+\frac{d}{dx}\left(u\,e^{-x^{2}}\right) = -x\,e^{-x^{2}}
+\quad\Longrightarrow\quad
+u\,e^{-x^{2}} = \frac{1}{2}e^{-x^{2}} + C
+\quad\Longrightarrow\quad
+u = \frac{1}{2} + Ce^{x^{2}}
+\]
+初期条件 $y(0) = 1$ より $u(0) = 1$ であるから $C = \dfrac{1}{2}$。よって
+\[
+u = \frac{1 + e^{x^{2}}}{2}
+\quad\Longrightarrow\quad
+\boxed{\; y = \frac{2}{1 + e^{x^{2}}} \;}
+\]
