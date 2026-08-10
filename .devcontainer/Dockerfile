@@ -28,10 +28,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # nodejs.org のアーカイブ名の arch 表記(x64/arm64)にマッピングする。
 ARG NODE_VERSION=22.12.0
 ARG TARGETARCH
-RUN case "${TARGETARCH}" in \
+# TARGETARCH は buildx / BuildKit が自動設定するが、レガシービルダー
+# (DOCKER_BUILDKIT=0)では空になる。#175 の案内どおり手元で
+# `docker build -t diary-devcontainer .devcontainer` を叩いたときに
+# 「unsupported TARGETARCH: 」で落ちると原因が分かりにくいため、
+# 空のときはビルドしている環境自身のアーキテクチャで補う。
+RUN arch="${TARGETARCH:-$(dpkg --print-architecture)}" \
+    && case "${arch}" in \
       amd64) NODE_ARCH=x64 ;; \
       arm64) NODE_ARCH=arm64 ;; \
-      *) echo "unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+      *) echo "unsupported architecture: ${arch}" >&2; exit 1 ;; \
     esac \
     && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" \
     && tar -xJf "node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -C /usr/local --strip-components=1 \
