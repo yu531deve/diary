@@ -15,6 +15,7 @@ import { computeFieldIndex, computeSiteStats } from "../../lib/site-data";
 import { listPublishedProblems } from "../../lib/dist-content";
 import SearchModal from "../../components/SearchModal.astro";
 import BottomTabNav from "../../components/BottomTabNav.astro";
+import SiteHead from "../../components/SiteHead.astro";
 
 const fieldIndex = computeFieldIndex();
 const stats = computeSiteStats();
@@ -53,18 +54,9 @@ const fieldsForClient = fieldIndex.map((f) => ({
 
 <html lang="ja">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>分野から探す — Diary</title>
-		<meta
-			name="description"
-			content="理工系大学院入試の自作数学問題を大分野・中分野から探せます。"
-		/>
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap"
+		<SiteHead
+			title="分野から探す — Diary"
+			description="理工系大学院入試の自作数学問題を大分野・中分野から探せます。"
 		/>
 		<style>
 			:root {

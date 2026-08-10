@@ -76,6 +76,7 @@ import {
   type ProblemMeta,
 } from "../../../lib/dist-content";
 import { formatMathTitle } from "../../../lib/title";
+import SiteHead from "../../../components/SiteHead.astro";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
@@ -138,15 +139,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 
 <html lang="ja">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>解答 | {meta.id} {displayTitle} | Diary</title>
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap"
-		/>
+		<SiteHead title={`解答 | ${meta.id} ${displayTitle} | Diary`} />
 		<style>
 			:root {
 				color-scheme: dark;
