@@ -200,6 +200,18 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			.back-link:hover {
 				color: #52e0f5;
 			}
+			.header-links {
+				display: flex;
+				align-items: center;
+				gap: 24px;
+			}
+			.header-links a {
+				font-size: 13px;
+				color: #aeb6c2;
+			}
+			.header-links a:hover {
+				color: #52e0f5;
+			}
 
 			/* 本体グリッド */
 			.solution-grid {
@@ -660,7 +672,10 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				<strong>Diary</strong>
 				<span>SELF-MADE MATHEMATICS</span>
 			</a>
-			<a class="back-link" href={problemHref}>← 問題に戻る</a>
+			<div class="header-links">
+				<a href="/archive/">アーカイブ</a>
+				<a class="back-link" href={problemHref}>← 問題に戻る</a>
+			</div>
 		</header>
 
 		<main class="solution-grid">
