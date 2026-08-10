@@ -4,15 +4,50 @@ name: image
 # build.yml 側は毎回 docker build する代わりにこのイメージを pull するだけにし、
 # CI 所要時間を texlive-full のビルド時間から解放する。
 #
-# トリガー:
-#   - .devcontainer/** の変更が main に push された時(イメージ内容が変わった時のみ再ビルド)
-#   - workflow_dispatch(手動実行。初回・任意タイミングでの再ビルド用)
+# #77: arm64 Mac から `make check`(#171)で GHCR イメージを pull すると
+# 「no matching manifest for linux/arm64/v8」で失敗し、ホスト環境への
+# フォールバックに落ちてしまっていた。amd64 のみしか push していなかったため。
+# これを解消するため、amd64 と arm64 の両方を native ランナーでビルドし、
+# 1 つの manifest list(`latest` / ハッシュタグ)にまとめて push する。
+#
+# 採った方針(根拠は下記):
+#   - QEMU エミュレーションで arm64 をビルドしない
+#     (texlive-full の apt install がエミュレーション下では実用にならない
+#      ほど遅くなるリスクが高いため。#77 issue 本文の懸念のとおり)
+#   - 代わりに GitHub が public リポジトリ向けに提供する arm64 ネイティブ
+#     ランナー(`ubuntu-24.04-arm`)を使い、amd64/arm64 それぞれを
+#     ネイティブ速度でビルドするジョブに分ける
+#     (公式ドキュメント: https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+#      に Linux ARM64 ランナーが public リポジトリ無料枠に含まれる旨の記載がある)
+#   - アーキテクチャごとに digest だけ push し、最後の merge ジョブで
+#     `docker buildx imagetools create` で 1 つの manifest list に束ねる
+#     (Docker 公式ドキュメントが推奨する "multi-platform build with
+#      separate jobs" パターン:
+#      https://docs.docker.com/build/ci/github-actions/multi-platform/)
+#
+# ビルド時間の見積もり:
+#   - amd64: 既存の image.yml 実測(2026-08-07, run 31143635258)で
+#     Build and push ステップが 73 秒(GHA レイヤキャッシュ命中時)。
+#     キャッシュが完全に無い初回相当でも texlive-full の apt install は
+#     ネイティブ amd64 ランナーなら数分〜10分程度に収まる想定。
+#   - arm64: ubuntu-24.04-arm もネイティブ実行のため、パッケージ取得・
+#     展開速度は amd64 と同程度のオーダーになる想定(apt のミラーが
+#     arm64 バイナリを別途提供しているため、追加のコンパイルは発生しない)。
+#     ただし arm64 での実測はこの PR ではまだ無い(初回の image.yml 実行
+#     でのみ確認できる)ため、「amd64 と大きくは変わらない」という見積もりに
+#     留め、実測値は次回の .devcontainer/** 変更時の実行結果で検証する。
+#   - 2 ジョブは並列実行されるため、合計の壁時計時間は「遅い方の 1 ジョブ
+#     + merge ジョブの数秒」で収まり、直列にビルドする場合よりは短くなる。
 #
 # タグ:
 #   - latest: 常に最新
 #   - Dockerfile の内容ハッシュ(sha256 の先頭 12 文字): 特定バージョンを固定して
 #     参照したい場合や、どの Dockerfile 由来かを追跡したい場合に使う。
 #     build.yml は latest を pull する(固定運用は今後の課題)。
+#
+# トリガー:
+#   - .devcontainer/** の変更が main に push された時(イメージ内容が変わった時のみ再ビルド)
+#   - workflow_dispatch(手動実行。初回・任意タイミングでの再ビルド用)
 
 on:
   push:
@@ -25,19 +60,44 @@ permissions:
   contents: read
   packages: write
 
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/diary-devcontainer
+
 jobs:
-  build-and-push:
+  # Dockerfile の内容ハッシュを一度だけ計算し、build/merge 両方のジョブから
+  # 同じ値を参照する(ジョブをまたぐと `steps.xxx.outputs` が使えないため)。
+  hash:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    outputs:
+      hash: ${{ steps.hash.outputs.hash }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Compute Dockerfile content hash
         id: hash
         run: |
           HASH=$(sha256sum .devcontainer/Dockerfile | cut -c1-12)
           echo "hash=${HASH}" >> "$GITHUB_OUTPUT"
+
+  # amd64 / arm64 をそれぞれネイティブランナーでビルドし、タグなしで
+  # digest のみ push する(1 つの参照可能な manifest list は merge ジョブで作る)。
+  build:
+    needs: hash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            arch: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -49,17 +109,66 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push devcontainer image
+      - name: Build and push devcontainer image (by digest)
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .devcontainer
           file: .devcontainer/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/diary-devcontainer:latest
-            ghcr.io/${{ github.repository_owner }}/diary-devcontainer:${{ steps.hash.outputs.hash }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.arch }}
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # 各アーキテクチャの digest を 1 つの manifest list(latest / ハッシュタグ)に束ねる。
+  # https://docs.docker.com/build/ci/github-actions/multi-platform/ の
+  # "Distribute build across multiple runners" パターンに準拠。
+  merge:
+    needs: [hash, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -t ${{ env.IMAGE_NAME }}:${{ needs.hash.outputs.hash }} \
+            $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:latest
 
       - name: Job summary
         if: always()
@@ -67,7 +176,8 @@ jobs:
           {
             echo "## image ジョブサマリ"
             echo ""
-            echo "- push 先: \`ghcr.io/${{ github.repository_owner }}/diary-devcontainer\`"
-            echo "- タグ: \`latest\`, \`${{ steps.hash.outputs.hash }}\`"
+            echo "- push 先: \`${{ env.IMAGE_NAME }}\`"
+            echo "- タグ: \`latest\`, \`${{ needs.hash.outputs.hash }}\`"
+            echo "- プラットフォーム: \`linux/amd64\`, \`linux/arm64\`(ネイティブランナーでビルド。QEMU エミュレーションは使用していない)"
             echo "- 実行時刻: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           } >> "$GITHUB_STEP_SUMMARY"
