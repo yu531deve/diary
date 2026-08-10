@@ -183,10 +183,10 @@ const issueHref =
 			#track {
 				position: relative;
 				/* シーン数 7（数式図形 4 シーン化）に合わせて延長 */
-				height: 920vh;
+				height: 1250vh;
 				/* iOS Safari 等でアドレスバーの伸縮により 100vh がずれるため、
 				   対応ブラウザでは svh を優先する（未対応時は上の vh 指定が残る）。 */
-				height: 920svh;
+				height: 1250svh;
 			}
 			#stage {
 				position: sticky;
@@ -863,20 +863,23 @@ const issueHref =
 				//   06 1000+ → 07 上方拡散 + CTA
 				// セット番号: 0 scatter / 1 Diary / 2 green / 3 gauss / 4 clt / 5 det
 				//             / 6 1000+ / 7 up
+				// #248: スクロールに対して進みが速すぎたため、静止(0.09)を遷移(0.06)
+				// より長くし、#track も 920vh → 1250vh に伸ばした。
+				// 1 図形あたりの静止は 64vh → 113vh（1.76 倍）、遷移は 64vh → 75vh。
 				const SEGMENTS: SegmentTable = [
-					[0, 0.06, 1, 1],
-					[0.06, 0.12, 1, 0],
-					[0.12, 0.2, 0, 2],
-					[0.2, 0.27, 2, 2],
-					[0.27, 0.34, 2, 3],
-					[0.34, 0.41, 3, 3],
-					[0.41, 0.48, 3, 4],
-					[0.48, 0.55, 4, 4],
-					[0.55, 0.62, 4, 5],
-					[0.62, 0.69, 5, 5],
-					[0.69, 0.76, 5, 6],
-					[0.76, 0.84, 6, 6],
-					[0.84, 1.001, 6, 7],
+					[0, 0.07, 1, 1],
+					[0.07, 0.12, 1, 0],
+					[0.12, 0.19, 0, 2],
+					[0.19, 0.28, 2, 2],
+					[0.28, 0.34, 2, 3],
+					[0.34, 0.43, 3, 3],
+					[0.43, 0.49, 3, 4],
+					[0.49, 0.58, 4, 4],
+					[0.58, 0.64, 4, 5],
+					[0.64, 0.73, 5, 5],
+					[0.73, 0.79, 5, 6],
+					[0.79, 0.86, 6, 6],
+					[0.86, 1.001, 6, 7],
 				];
 
 				// 図形セット番号 → 塗り描画関数（extraDraw から重み付きで呼ぶ）
@@ -1143,8 +1146,11 @@ const issueHref =
 				let cy = 0;
 
 				function fade(p: number, a: number, b: number): number {
-					const fi = Math.min(Math.max((p - a) / 0.05, 0), 1);
-					const fo = Math.min(Math.max((b - p) / 0.05, 0), 1);
+					// #248: ランプ幅は進捗 p の割合で効くため、#track を伸ばすと
+					// 実スクロール距離でフェードが間延びする。#63 当時の約 28vh に
+					// 近づけるため 0.05 → 0.028（1250vh で約 35vh）に詰める。
+					const fi = Math.min(Math.max((p - a) / 0.028, 0), 1);
+					const fo = Math.min(Math.max((b - p) / 0.028, 0), 1);
 					return Math.min(fi, fo);
 				}
 
@@ -1195,27 +1201,28 @@ const issueHref =
 							}
 						}
 
-						applyCaption(c1, fade(currentP, -1, 0.07));
-						applyCaption(c2, fade(currentP, 0.17, 0.3));
-						applyCaption(c3, fade(currentP, 0.31, 0.44));
-						applyCaption(c4, fade(currentP, 0.45, 0.58));
-						applyCaption(c5, fade(currentP, 0.59, 0.72));
-						applyCaption(c6, fade(currentP, 0.74, 0.86));
-						applyCaption(c7, currentP > 0.89 ? Math.min((currentP - 0.89) / 0.05, 1) : 0);
+						// #248: 各図形の静止区間の中心で全不透明になるように合わせる。
+						applyCaption(c1, fade(currentP, -1, 0.075));
+						applyCaption(c2, fade(currentP, 0.165, 0.3));
+						applyCaption(c3, fade(currentP, 0.315, 0.45));
+						applyCaption(c4, fade(currentP, 0.465, 0.6));
+						applyCaption(c5, fade(currentP, 0.615, 0.75));
+						applyCaption(c6, fade(currentP, 0.765, 0.878));
+						applyCaption(c7, currentP > 0.895 ? Math.min((currentP - 0.895) / 0.035, 1) : 0);
 
 						if (scn) {
 							const n =
 								currentP < 0.12
 									? 1
-									: currentP < 0.27
+									: currentP < 0.28
 										? 2
-										: currentP < 0.41
+										: currentP < 0.43
 											? 3
-											: currentP < 0.55
+											: currentP < 0.58
 												? 4
-												: currentP < 0.69
+												: currentP < 0.73
 													? 5
-													: currentP < 0.84
+													: currentP < 0.86
 														? 6
 														: 7;
 							const txt = `0${n} / 07`;
