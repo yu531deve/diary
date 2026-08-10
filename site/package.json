@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && rm -rf dist/dev",
+    "build": "astro build && rm -rf dist/dev && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@types/node": "^26.2.0",
+    "pagefind": "^1.4.0",
     "typescript": "^6.0.3"
   }
 }

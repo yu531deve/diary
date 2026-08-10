@@ -3,15 +3,27 @@
 //
 // issue #70: ⌘K 検索モーダル（design/README.md D. ⌘K 検索・絞り込み /
 // design/02_desktop_screens.dc.html の検索画面相当）。
+// issue #71: 検索エンジンを自前の軽量 JSON（id/title/field/sub/tags/difficulty
+// のみで地の文が対象外だった）から Pagefind に差し替えた。UI（本ファイルの
+// マークアップ・キーボード操作・フィルタ・結果行の見た目）は #70 のものを
+// そのまま維持し、データ取得部分だけを Pagefind の JS ランタイムに置き換える。
 //
-// - データは #61 が生成する /search-index.json（id/title/field/sub/tags/difficulty
-//   のみ。地の文・数式は含まない。数式検索は仕様外）を初回オープン時に fetch する。
-// - 検索対象は `id + title + field + sub + tags` の連結文字列に対する部分一致。
-//   フィルタチップは分野（field）の完全一致（design 通り ALL は無効化）。
+// - Pagefind の索引はビルド後段（`npm run build` → `pagefind --site dist`）
+//   で `/pagefind/` 配下に生成される。索引対象は
+//   `site/src/pages/problems/[id]/index.astro` の `<main data-pagefind-body>`
+//   のみ（タイトル・タグ・地の文）。data-pagefind-body をサイト内のどこかに
+//   一つでも置くと、Pagefind はこの属性を持たないページ・要素を丸ごと索引から
+//   除外する仕様を利用し、解答ページ（base64 埋め込みで元々見えない）・
+//   トップ・分野一覧・/dev/ 配下などは何もしなくても索引対象外になる
+//   （詳細は problems/[id]/index.astro のコメントおよび PR 本文）。数式
+//   （`<math>`）は同ページ側で `data-pagefind-ignore="all"` を付与して除外。
+// - `/pagefind/pagefind.js` は初回オープン時に動的 import で読み込む
+//   （クライアント JS は最小限、の方針に合わせ即時ロードしない）。
+// - フィルタチップは Pagefind の `data-pagefind-filter="field:..."` から
+//   構築する（旧実装同様、分野の完全一致。ALL は無効化）。
 // - 1000 問規模を想定し、DOM に描画する結果は上位 MAX_RESULTS 件のみに絞る
 //   （仮想化はしない。件数はフッターに全マッチ数を出すので取りこぼしが
 //   分かるようにしてある。#70 補足事項の指示どおり理由をここと PR に明記）。
-// - ライブラリ追加はしない（素の DOM API のみ）。
 // - JS 無効時はこのモーダルは開けない（トリガーはただの装飾テキストのまま）。
 //   モーダル自体は `hidden` 属性で最初から非表示にしてあるので、JS が
 //   動かない環境では常に非表示のままになる。
@@ -295,43 +307,42 @@ const MAX_RESULTS = 50;
 		const countEl = document.getElementById("search-modal-count");
 		if (!root || !input || !filtersEl || !resultsEl || !countEl) return;
 
-		/** @type {{id:string,title:string,field:string,sub:string,tags:string[],difficulty:string}[] | null} */
-		let index = null;
-		let indexPromise = null;
+		/** @type {any} Pagefind の JS ランタイム（/pagefind/pagefind.js）。init 済み */
+		let pagefind = null;
+		let pagefindPromise = null;
 		let filter = "ALL";
 		let query = "";
 		let activeIndex = 0;
-		/** @type {{id:string,title:string,field:string,sub:string,tags:string[],difficulty:string}[]} */
+		/** @type {{id:string,title:string,field:string,sub:string,difficulty:string,url:string}[]} */
 		let visible = [];
 		let lastFocused = null;
+		// render() は Pagefind の検索が非同期なため、入力のたびに発行される
+		// リクエストのうち最後のものだけを描画に反映する（古い結果が後から
+		// 返ってきて新しい入力を上書きしないようにするための世代カウンタ）。
+		let renderToken = 0;
 
-		function loadIndex() {
-			if (indexPromise) return indexPromise;
+		function loadPagefind() {
+			if (pagefindPromise) return pagefindPromise;
 			resultsEl.innerHTML = '<div class="search-modal-loading">読み込み中…</div>';
-			indexPromise = fetch("/search-index.json")
-				.then((res) => {
-					if (!res.ok) throw new Error(String(res.status));
-					return res.json();
-				})
-				.then((data) => {
-					index = Array.isArray(data) ? data : [];
-					buildFilters();
-					render();
+			pagefindPromise = import(/* @vite-ignore */ "/pagefind/pagefind.js")
+				.then(async (mod) => {
+					await mod.init();
+					pagefind = mod;
+					await buildFilters();
+					await render();
 				})
 				.catch(() => {
-					index = [];
+					pagefind = null;
 					resultsEl.innerHTML =
 						'<div class="search-modal-empty">検索データを読み込めませんでした。</div>';
 				});
-			return indexPromise;
+			return pagefindPromise;
 		}
 
-		function buildFilters() {
-			if (!index) return;
-			const majors = [];
-			for (const entry of index) {
-				if (entry.field && !majors.includes(entry.field)) majors.push(entry.field);
-			}
+		async function buildFilters() {
+			if (!pagefind) return;
+			const filters = await pagefind.filters();
+			const majors = Object.keys(filters.field || {});
 			filtersEl.innerHTML = "";
 			const allBtn = document.createElement("button");
 			allBtn.type = "button";
@@ -358,31 +369,49 @@ const MAX_RESULTS = 50;
 			render();
 		}
 
-		function haystack(entry) {
-			return [entry.id, entry.title, entry.field, entry.sub, ...(entry.tags || [])]
-				.join(" ")
-				.toLowerCase();
-		}
-
 		function starRating(difficulty) {
 			const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
 			return "★".repeat(n) + "☆".repeat(5 - n);
 		}
 
-		function matched() {
-			if (!index) return [];
-			const q = query.trim().toLowerCase();
-			return index.filter((entry) => {
-				if (filter !== "ALL" && entry.field !== filter) return false;
-				if (!q) return true;
-				return haystack(entry).includes(q);
-			});
+		// Pagefind で検索し、結果行の描画に必要な最小限のフィールド
+		// （id/title/field/sub/difficulty/url）だけを組み立てて返す。
+		// クエリが空のときも pagefind.search("") で全件（フィルタのみ適用）を
+		// 取得できる（Pagefind は空語を「全ページにマッチ」として扱う）。
+		async function matched() {
+			if (!pagefind) return { total: 0, entries: [] };
+			const q = query.trim();
+			const options =
+				filter !== "ALL" ? { filters: { field: filter } } : undefined;
+			// クエリが空のときは検索語 null（Pagefind の「フィルタのみで絞り込み、
+			// 全件を返す」モード）を渡す。空文字 "" を渡すと 0 件になってしまい
+			// （実測で確認済み）、開いた瞬間に全問題が一覧表示される旧実装の
+			// 挙動が壊れるため。
+			const search = await pagefind.search(q === "" ? null : q, options);
+			const top = search.results.slice(0, MAX_RESULTS);
+			const entries = await Promise.all(
+				top.map(async (r) => {
+					const data = await r.data();
+					const id = data.meta?.id ?? "";
+					return {
+						id,
+						title: data.meta?.title ?? "",
+						field: data.meta?.field ?? "",
+						sub: data.meta?.sub ?? "",
+						difficulty: data.meta?.difficulty ?? "",
+						url: data.url || `/problems/${id}/`,
+					};
+				})
+			);
+			return { total: search.results.length, entries };
 		}
 
-		function render() {
-			const all = matched();
-			countEl.textContent = `${String(all.length).padStart(2, "0")} RESULTS`;
-			visible = all.slice(0, MAX_RESULTS);
+		async function render() {
+			const token = ++renderToken;
+			const { total, entries: all } = await matched();
+			if (token !== renderToken) return; // 新しい検索が既に走っている
+			countEl.textContent = `${String(total).padStart(2, "0")} RESULTS`;
+			visible = all;
 			if (activeIndex >= visible.length) activeIndex = Math.max(0, visible.length - 1);
 
 			if (visible.length === 0) {
@@ -395,7 +424,7 @@ const MAX_RESULTS = 50;
 			resultsEl.innerHTML = "";
 			visible.forEach((entry, i) => {
 				const row = document.createElement("a");
-				row.href = `/problems/${entry.id}/`;
+				row.href = entry.url;
 				row.id = `search-result-option-${i}`;
 				row.setAttribute("role", "option");
 				row.setAttribute("aria-selected", i === activeIndex ? "true" : "false");
@@ -431,10 +460,10 @@ const MAX_RESULTS = 50;
 				resultsEl.appendChild(row);
 			});
 
-			if (all.length > MAX_RESULTS) {
+			if (total > MAX_RESULTS) {
 				const note = document.createElement("div");
 				note.className = "search-modal-empty";
-				note.textContent = `他 ${all.length - MAX_RESULTS} 件（上位 ${MAX_RESULTS} 件のみ表示）`;
+				note.textContent = `他 ${total - MAX_RESULTS} 件（上位 ${MAX_RESULTS} 件のみ表示）`;
 				resultsEl.appendChild(note);
 			}
 
@@ -464,7 +493,7 @@ const MAX_RESULTS = 50;
 			lastFocused = document.activeElement;
 			root.hidden = false;
 			document.body.style.overflow = "hidden";
-			loadIndex();
+			loadPagefind();
 			window.setTimeout(() => input.focus(), 0);
 		}
 
@@ -529,7 +558,7 @@ const MAX_RESULTS = 50;
 		input.addEventListener("input", () => {
 			query = input.value;
 			activeIndex = 0;
-			if (index) render();
+			if (pagefind) render();
 		});
 
 		overlay?.addEventListener("click", close);
@@ -565,7 +594,7 @@ const MAX_RESULTS = 50;
 				const target = visible[activeIndex];
 				if (target) {
 					e.preventDefault();
-					window.location.href = `/problems/${target.id}/`;
+					window.location.href = target.url;
 				}
 			}
 		});
