@@ -112,34 +112,6 @@ import SearchModal from "../../components/SearchModal.astro";
 				display: flex;
 				flex-direction: column;
 			}
-			.save-row {
-				display: flex;
-				align-items: center;
-				gap: 20px;
-				padding: 20px 0;
-				border-top: 1px solid rgba(255, 255, 255, 0.09);
-			}
-			.save-list a.save-row:last-child {
-				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-			}
-			.save-row:hover {
-				background: rgba(82, 224, 245, 0.04);
-			}
-			.save-row .id {
-				font: 500 13px "IBM Plex Mono", monospace;
-				color: #52e0f5;
-				flex-shrink: 0;
-			}
-			.save-row .title {
-				flex: 1;
-				font-size: 16px;
-				font-weight: 500;
-			}
-			.save-row .meta {
-				font: 400 11px "IBM Plex Mono", monospace;
-				color: #7d8794;
-				flex-shrink: 0;
-			}
 			.empty-state,
 			.unavailable-state {
 				padding: 40px 48px 0;
@@ -166,6 +138,44 @@ import SearchModal from "../../components/SearchModal.astro";
 				.page {
 					padding-bottom: 96px;
 				}
+			}
+		</style>
+		<style is:global>
+			/*
+			 * #250: .save-row とその子孫は一覧描画スクリプト（下部の <script>）が
+			 * document.createElement で実行時に生成するため、Astro のスコープ付き
+			 * CSS（data-astro-cid-*）が当たらない。生成された要素にはその属性が
+			 * 付かないため、通常の <style> に書くとルールが 1 つも効かない。
+			 * ここだけ is:global にして、.save-list（テンプレートに存在する）配下に
+			 * 限定したセレクタで動的行にもスタイルを適用する。
+			 */
+			.save-list .save-row {
+				display: flex;
+				align-items: center;
+				gap: 20px;
+				padding: 20px 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.save-list a.save-row:last-child {
+				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+			}
+			.save-list .save-row:hover {
+				background: rgba(82, 224, 245, 0.04);
+			}
+			.save-list .save-row .id {
+				font: 500 13px "IBM Plex Mono", monospace;
+				color: #52e0f5;
+				flex-shrink: 0;
+			}
+			.save-list .save-row .title {
+				flex: 1;
+				font-size: 16px;
+				font-weight: 500;
+			}
+			.save-list .save-row .meta {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				flex-shrink: 0;
 			}
 		</style>
 	</head>
