@@ -156,6 +156,8 @@ const typoIssueHref =
 
 			/* 3 カラム / 2 カラム 共通 */
 			.section-no {
+				display: block;
+				margin: 0;
 				font: 500 11px "IBM Plex Mono", monospace;
 				letter-spacing: 0.22em;
 				color: #52e0f5;
@@ -420,7 +422,7 @@ const typoIssueHref =
 
 			<div class="cols-3">
 				<div>
-					<span class="section-no">01 — 作問方針</span>
+					<h2 class="section-no">01 — 作問方針</h2>
 					<p class="col-body">
 						計算量で殴らせない。手が止まる場所が一箇所だけある問題を目指しています。設定は短く、聞くことは明確に。誘導は最小限に留め、(1)
 						が (2) の伏線になる構成を基本形にしています。
@@ -428,7 +430,7 @@ const typoIssueHref =
 					<span class="tentative">※ 仮文面（Yu が加筆・修正予定）</span>
 				</div>
 				<div>
-					<span class="section-no">02 — 難易度の定義</span>
+					<h2 class="section-no">02 — 難易度の定義</h2>
 					<div class="diff-list">
 						{
 							difficultyLevels.map((d) => (
@@ -445,7 +447,7 @@ const typoIssueHref =
 					</div>
 				</div>
 				<div>
-					<span class="section-no">03 — PDF の使い方</span>
+					<h2 class="section-no">03 — PDF の使い方</h2>
 					<p class="col-body">
 						各問題ページから「問題（印刷用）」と「解答（印刷用）」の 2 種類の PDF
 						をダウンロードできます。すべての PDF に個人利用限定のライセンス表記を焼き込んでおり、印刷して書き込みながら解ける紙面設計です。
@@ -461,14 +463,14 @@ const typoIssueHref =
 
 			<div class="cols-2">
 				<div>
-					<span class="section-no">04 — ライセンス</span>
+					<h2 class="section-no">04 — ライセンス</h2>
 					<p class="col-body">
 						問題・解答・解説とそこから生成される PDF・HTML・SVG
 						等の成果物は、個人の学習・演習を目的とした閲覧・ダウンロード・印刷のみ許可しています。再配布、商用利用、学校・塾・予備校等の教育機関での配布、改変物の公開はいずれも禁止です。
 					</p>
 				</div>
 				<div>
-					<span class="section-no">05 — 誤植・不備の報告</span>
+					<h2 class="section-no">05 — 誤植・不備の報告</h2>
 					<p class="col-body">
 						問題文の誤り、解答の不備を見つけたら GitHub Issue でお知らせください。問題番号を添えていただけると助かります。
 					</p>
