@@ -182,10 +182,11 @@ const issueHref =
 			/* ---------- スクロール演出トラック ---------- */
 			#track {
 				position: relative;
-				height: 560vh;
+				/* シーン数 7（数式図形 4 シーン化）に合わせて延長 */
+				height: 920vh;
 				/* iOS Safari 等でアドレスバーの伸縮により 100vh がずれるため、
 				   対応ブラウザでは svh を優先する（未対応時は上の vh 指定が残る）。 */
-				height: 560svh;
+				height: 920svh;
 			}
 			#stage {
 				position: sticky;
@@ -246,7 +247,8 @@ const issueHref =
 				background: linear-gradient(180deg, #52e0f5, transparent);
 				animation: scrollpulse 2s ease-in-out infinite;
 			}
-			#c2 {
+			/* 数式シーン共通キャプション（c2〜c5）。全シーン左側固定（旧 #c2 と同位置） */
+			.fcap {
 				left: 48px;
 				top: 0;
 				height: 100vh;
@@ -257,29 +259,29 @@ const issueHref =
 				gap: 20px;
 				max-width: 440px;
 			}
-			#c2 .eyebrow {
+			.fcap .eyebrow {
 				font: 500 11px "IBM Plex Mono", monospace;
 				letter-spacing: 0.24em;
 				color: #52e0f5;
 			}
-			#c2 h2 {
+			.fcap h2 {
 				margin: 0;
 				font-size: 40px;
 				font-weight: 900;
 				line-height: 1.35;
 				text-wrap: pretty;
 			}
-			#c2 .formula {
+			.fcap .formula {
 				font: italic 400 21px "STIX Two Text", serif;
 				color: #aab6d4;
 			}
-			#c2 p {
+			.fcap p {
 				margin: 0;
 				font-size: 14px;
 				line-height: 1.9;
 				color: #7d8794;
 			}
-			#c3 {
+			#c6 {
 				left: 0;
 				right: 0;
 				top: 66vh;
@@ -288,18 +290,18 @@ const issueHref =
 				align-items: center;
 				gap: 12px;
 			}
-			#c3 .eyebrow {
+			#c6 .eyebrow {
 				font: 500 11px "IBM Plex Mono", monospace;
 				letter-spacing: 0.3em;
 				color: #52e0f5;
 			}
-			#c3 p {
+			#c6 p {
 				margin: 0;
 				font-size: 19px;
 				font-weight: 500;
 				color: #c3ccd8;
 			}
-			#c4 {
+			#c7 {
 				left: 0;
 				right: 0;
 				top: 0;
@@ -312,7 +314,7 @@ const issueHref =
 				gap: 26px;
 				pointer-events: none;
 			}
-			#c4 h2 {
+			#c7 h2 {
 				margin: 0;
 				font-size: 56px;
 				font-weight: 900;
@@ -320,11 +322,11 @@ const issueHref =
 				text-align: center;
 				text-wrap: pretty;
 			}
-			#c4 .cta {
+			#c7 .cta {
 				display: flex;
 				gap: 14px;
 			}
-			#c4 .cta a.primary {
+			#c7 .cta a.primary {
 				padding: 15px 32px;
 				background: #52e0f5;
 				color: #06232a;
@@ -332,7 +334,7 @@ const issueHref =
 				font-size: 14px;
 				border-radius: 2px;
 			}
-			#c4 .cta a.secondary {
+			#c7 .cta a.secondary {
 				padding: 15px 32px;
 				border: 1px solid rgba(255, 255, 255, 0.25);
 				color: #dfe6ee;
@@ -570,35 +572,35 @@ const issueHref =
 					font-size: 15px;
 					padding: 0 24px;
 				}
-				#c2 {
+				.fcap {
 					left: 24px;
 					right: 24px;
 					max-width: none;
 				}
-				#c2 h2 {
+				.fcap h2 {
 					font-size: 26px;
 				}
-				#c2 .formula {
+				.fcap .formula {
 					font-size: 15px;
 				}
-				#c2 p {
+				.fcap p {
 					font-size: 13px;
 				}
-				#c3 p {
+				#c6 p {
 					font-size: 15px;
 					padding: 0 24px;
 					text-align: center;
 				}
-				#c4 h2 {
+				#c7 h2 {
 					font-size: 30px;
 					padding: 0 24px;
 				}
-				#c4 .cta {
+				#c7 .cta {
 					flex-direction: column;
 					width: 100%;
 					padding: 0 24px;
 				}
-				#c4 .cta a {
+				#c7 .cta a {
 					text-align: center;
 				}
 				.scene-indicator {
@@ -653,9 +655,9 @@ const issueHref =
 				#stage {
 					position: relative;
 				}
-				#c2,
-				#c3,
-				#c4 {
+				.fcap,
+				#c6,
+				#c7 {
 					display: none;
 				}
 				#c1 {
@@ -709,19 +711,40 @@ const issueHref =
 					</div>
 				</div>
 
-				<div id="c2" class="caption">
-					<div class="eyebrow">PROBLEM 0001</div>
-					<h2>放物線と直線で<br />囲まれた面積</h2>
-					<div class="formula">{"∫₋₁² {(x+2) − x²} dx = 9/2"}</div>
-					<p>すべての問題は完全自作。<br />ブラウザで読んで、PDF で解く。</p>
+				<div id="c2" class="caption fcap">
+					<div class="eyebrow">VECTOR ANALYSIS — ベクトル解析</div>
+					<h2>閉曲線が<br />囲む面積</h2>
+					<div class="formula">{"∮C (x dy − y dx) = 2S"}</div>
+					<p>グリーンの定理。<br />境界を一周すれば、内部が分かる。</p>
 				</div>
 
-				<div id="c3" class="caption">
+				<div id="c3" class="caption fcap">
+					<div class="eyebrow">CALCULUS — 微分積分学</div>
+					<h2>釣鐘の下に<br />隠れた円周率</h2>
+					<div class="formula">{"∫₋∞^∞ e^(−x²) dx = √π"}</div>
+					<p>ガウス積分。<br />一次元では解けず、二次元で解ける。</p>
+				</div>
+
+				<div id="c4" class="caption fcap">
+					<div class="eyebrow">STATISTICS — 統計学</div>
+					<h2>足し合わせは<br />正規分布へ</h2>
+					<div class="formula">{"(X̄ − μ)/(σ/√n) → N(0, 1)"}</div>
+					<p>中心極限定理。<br />どんな分布も、平均は釣鐘に収束する。</p>
+				</div>
+
+				<div id="c5" class="caption fcap">
+					<div class="eyebrow">LINEAR ALGEBRA — 線形代数</div>
+					<h2>行列式は<br />面積の倍率</h2>
+					<div class="formula">{"det A = 3 — 面積は 3 倍に"}</div>
+					<p>線形写像は円を楕円へうつす。<br />その面積比が行列式。</p>
+				</div>
+
+				<div id="c6" class="caption">
 					<div class="eyebrow">GOAL</div>
 					<p>1000問を目指して、毎日つくる。</p>
 				</div>
 
-				<div id="c4" class="caption">
+				<div id="c7" class="caption">
 					<h2>解く価値のある、一問を。</h2>
 					<div class="cta">
 						<a href="/fields/" class="primary">分野から探す</a>
@@ -730,7 +753,7 @@ const issueHref =
 				</div>
 
 				<div class="scene-indicator">
-					<span id="scn" class="num">01 / 04</span>
+					<span id="scn" class="num">01 / 07</span>
 					<span class="bar"><i id="prog"></i></span>
 				</div>
 
@@ -831,25 +854,49 @@ const issueHref =
 			const PARTICLE_COUNT = isMobile ? 900 : 2000;
 
 			if (canvas && track) {
-				// Yu 指示(2026-08-08): 冒頭は「Diary 静止 → 散らばり」の順に変更
-				// (ローディング演出が Diary 収束で終わるため、地続きに見せる)。
-				// 以降(グラフ → 1000+ → 上方拡散)は design/README.md のまま。
+				// シーン構成（#figure: 数式図形 4 シーン化）:
+				//   01 Diary 静止 → 散らばり（ローディング演出と地続き。Yu 指示 2026-08-08）
+				//   02 ベクトル解析 — グリーンの定理（入れ子の閉曲線、内部を塗る）
+				//   03 微分積分学 — ガウス積分（釣鐘、下を塗る）
+				//   04 統計学     — 中心極限定理（ヒストグラム + 曲線）
+				//   05 線形代数   — det A = 3（円 → 楕円、楕円を塗る）
+				//   06 1000+ → 07 上方拡散 + CTA
+				// セット番号: 0 scatter / 1 Diary / 2 green / 3 gauss / 4 clt / 5 det
+				//             / 6 1000+ / 7 up
 				const SEGMENTS: SegmentTable = [
-					[0, 0.14, 1, 1],
-					[0.14, 0.26, 1, 0],
-					[0.26, 0.42, 0, 2],
-					[0.42, 0.56, 2, 2],
-					[0.56, 0.7, 2, 3],
-					[0.7, 0.8, 3, 3],
-					[0.8, 1.001, 3, 4],
+					[0, 0.06, 1, 1],
+					[0.06, 0.12, 1, 0],
+					[0.12, 0.2, 0, 2],
+					[0.2, 0.27, 2, 2],
+					[0.27, 0.34, 2, 3],
+					[0.34, 0.41, 3, 3],
+					[0.41, 0.48, 3, 4],
+					[0.48, 0.55, 4, 4],
+					[0.55, 0.62, 4, 5],
+					[0.62, 0.69, 5, 5],
+					[0.69, 0.76, 5, 6],
+					[0.76, 0.84, 6, 6],
+					[0.84, 1.001, 6, 7],
 				];
 
+				// 図形セット番号 → 塗り描画関数（extraDraw から重み付きで呼ぶ）
+				type FillFn = (ctx: CanvasRenderingContext2D, alpha: number) => void;
+
 				let sets: ReturnType<typeof alignSets>;
-				let sx: (u: number) => number;
-				let sy: (v: number) => number;
+				let fills: Map<number, FillFn>;
 				let builtKey = "";
 
 				function buildSets(w: number, h: number) {
+					const TAU = Math.PI * 2;
+					// 図形は画面短辺比でスケール。キャプションと反対側に寄せる
+					// （モバイルはキャプションを下寄せにするため中央）。
+					const narrow = w <= 860;
+					const S = Math.min(w, h);
+					// 曲線サンプリングの間引き係数。モバイルは点数を約半分にして
+					// パーティクル総数を抑える（#118 の軽量化方針を曲線セットにも適用）。
+					const k = isMobile ? 2 : 1;
+					fills = new Map();
+
 					const scatter = randomScatter(PARTICLE_COUNT, w, h);
 					const diary = textShape("Diary", {
 						width: w,
@@ -857,20 +904,200 @@ const issueHref =
 						fontPx: Math.min(w * 0.24, 340),
 						centerY: h * 0.42,
 					});
-					// problem 0001 のグラフ: u ∈ [-2.2, 3.2], v ∈ [-1.5, 5.5]
-					// design の pw/L/R 計算を画面幅に対する比で単純化して踏襲する。
-					const L = w > 900 ? w * 0.46 : w * 0.08;
-					const R = w > 900 ? w * 0.98 : w * 0.92;
-					const T = h * 0.16;
-					const B = h * 0.86;
-					sx = (u: number) => L + ((u + 2.2) / 5.4) * (R - L);
-					sy = (v: number) => B - ((v + 1.5) / 7) * (B - T);
-					const graph = curvePoints([
-						{ from: -2.2, to: 3.2, step: 0.018, fn: (u) => ({ x: sx(u), y: sy(u * u) }) },
-						{ from: -2.2, to: 3.2, step: 0.026, fn: (u) => ({ x: sx(u), y: sy(u + 2) }) },
-						{ from: -1.5, to: 5.5, step: 0.09, fn: (v) => ({ x: sx(0), y: sy(v) }) },
-						{ from: -2.2, to: 3.2, step: 0.07, fn: (u) => ({ x: sx(u), y: sy(0) }) },
+
+					// --- 02 グリーンの定理: 有機的な閉曲線 + 入れ子の輪 --------------
+					// r(θ) = R(1 + 0.2cos3θ + 0.05sin7θ) の花弁状閉曲線を 3 重に。
+					// 図形は全シーン右側（旧・放物線グラフと同じ側。左のキャプションを避ける）
+					const figX = narrow ? w * 0.5 : w * 0.71;
+					const gcx = figX;
+					const gcy = narrow ? h * 0.4 : h * 0.48;
+					const gR = S * (narrow ? 0.3 : 0.33);
+					const blob = (t: number, s: number) => {
+						const r = gR * s * (1 + 0.2 * Math.cos(3 * t) + 0.05 * Math.sin(7 * t));
+						return { x: gcx + r * Math.cos(t), y: gcy + r * Math.sin(t) * 0.92 };
+					};
+					const green = curvePoints([
+						{ from: 0, to: TAU, step: 0.008 * k, fn: (t) => blob(t, 1) },
+						{ from: 0, to: TAU, step: 0.013 * k, fn: (t) => blob(t, 0.66) },
+						{ from: 0, to: TAU, step: 0.022 * k, fn: (t) => blob(t, 0.36) },
+						// 周回方向を示す接線チック（外周 12 箇所の短い斜め線）
+						...Array.from({ length: 12 }, (_, k) => ({
+							from: 0,
+							to: 1,
+							step: 0.2 * k,
+							fn: (s: number) => {
+								const t = (k / 12) * TAU;
+								const p0 = blob(t, 1.1);
+								const p1 = blob(t + 0.09, 1.14);
+								return {
+									x: p0.x + (p1.x - p0.x) * s,
+									y: p0.y + (p1.y - p0.y) * s,
+								};
+							},
+						})),
 					]);
+					fills.set(2, (ctx, alpha) => {
+						// 中心が淡く光る放射グラデーションで、入れ子の輪ごとに重ね塗り
+						const grad = ctx.createRadialGradient(gcx, gcy, gR * 0.05, gcx, gcy, gR * 1.25);
+						grad.addColorStop(0, "rgba(82,224,245,0.2)");
+						grad.addColorStop(0.55, "rgba(82,224,245,0.08)");
+						grad.addColorStop(1, "rgba(82,224,245,0)");
+						ctx.fillStyle = grad;
+						for (const s of [1, 0.66, 0.36]) {
+							ctx.globalAlpha = alpha * 0.55;
+							ctx.beginPath();
+							for (let t = 0; t <= TAU + 1e-6; t += 0.03) {
+								const p = blob(t, s);
+								t === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+							}
+							ctx.closePath();
+							ctx.fill();
+						}
+					});
+
+					// --- 03 ガウス積分: 左右対称の釣鐘 + 軸 + ±1 の目印 --------------
+					const bcx = figX;
+					const bBase = narrow ? h * 0.62 : h * 0.74;
+					const bxs = (u: number) => bcx + (u / 2.7) * S * (narrow ? 0.42 : 0.36);
+					const bys = (v: number) => bBase - v * S * (narrow ? 0.4 : 0.46);
+					const bell = (u: number) => Math.exp(-u * u);
+					const gauss = curvePoints([
+						// 釣鐘本体（密）と、その相似形（e^{-x²/2}、淡い残像として疎に）
+						{ from: -2.7, to: 2.7, step: 0.008 * k, fn: (u) => ({ x: bxs(u), y: bys(bell(u)) }) },
+						{
+							from: -2.7,
+							to: 2.7,
+							step: 0.05 * k,
+							fn: (u) => ({ x: bxs(u), y: bys(Math.exp((-u * u) / 2) * 0.55) }),
+						},
+						// x 軸・対称軸
+						{ from: -2.7, to: 2.7, step: 0.045 * k, fn: (u) => ({ x: bxs(u), y: bys(0) }) },
+						{ from: 0, to: 1.06, step: 0.045 * k, fn: (v) => ({ x: bxs(0), y: bys(v) }) },
+						// x = ±1 の縦の目印（点線状に疎らに）
+						{ from: 0, to: bell(1), step: 0.06 * k, fn: (v) => ({ x: bxs(1), y: bys(v) }) },
+						{ from: 0, to: bell(1), step: 0.06 * k, fn: (v) => ({ x: bxs(-1), y: bys(v) }) },
+					]);
+					fills.set(3, (ctx, alpha) => {
+						// 頂点から x 軸へ落ちる縦グラデーション（裾ほど薄い）
+						const grad = ctx.createLinearGradient(0, bys(1.06), 0, bys(0));
+						grad.addColorStop(0, "rgba(82,224,245,0.22)");
+						grad.addColorStop(1, "rgba(82,224,245,0.03)");
+						ctx.globalAlpha = alpha * 0.9;
+						ctx.beginPath();
+						ctx.moveTo(bxs(-2.7), bys(0));
+						for (let u = -2.7; u <= 2.701; u += 0.04) ctx.lineTo(bxs(u), bys(bell(u)));
+						ctx.lineTo(bxs(2.7), bys(0));
+						ctx.closePath();
+						ctx.fillStyle = grad;
+						ctx.fill();
+					});
+
+					// --- 04 中心極限定理: ヒストグラム + 正規曲線（唯一の離散） ------
+					const ccx = figX;
+					const cBase = narrow ? h * 0.62 : h * 0.76;
+					const cxs = (u: number) => ccx + (u / 2.5) * S * (narrow ? 0.42 : 0.34);
+					const cys = (v: number) => cBase - v * S * (narrow ? 0.38 : 0.44);
+					const norm = (u: number) => Math.exp((-u * u) / 2);
+					// 棒の高さは正規分布に決定的な凸凹を乗せる（乱数だと resize で変わる）
+					const BAR_W = 0.46;
+					const bars = Array.from({ length: 9 }, (_, k) => {
+						const u = -2 + k * 0.5;
+						return { u, hgt: Math.max(0.05, norm(u) * (1 + 0.16 * Math.sin(k * 2.9))) };
+					});
+					const cltSegs = bars.flatMap(({ u, hgt }) => [
+						// 左辺・右辺・上辺で棒の輪郭を描く
+						{ from: 0, to: hgt, step: 0.055 * k, fn: (v: number) => ({ x: cxs(u - BAR_W / 2), y: cys(v) }) },
+						{ from: 0, to: hgt, step: 0.055 * k, fn: (v: number) => ({ x: cxs(u + BAR_W / 2), y: cys(v) }) },
+						{
+							from: -BAR_W / 2,
+							to: BAR_W / 2,
+							step: 0.075 * k,
+							fn: (du: number) => ({ x: cxs(u + du), y: cys(hgt) }),
+						},
+					]);
+					const clt = curvePoints([
+						...cltSegs,
+						// なめらかな正規曲線を重ねる（密）
+						{ from: -2.6, to: 2.6, step: 0.012 * k, fn: (u) => ({ x: cxs(u), y: cys(norm(u) * 1.06) }) },
+						// x 軸
+						{ from: -2.6, to: 2.6, step: 0.05 * k, fn: (u) => ({ x: cxs(u), y: cys(0) }) },
+					]);
+					fills.set(4, (ctx, alpha) => {
+						// 棒ごとに上端が明るい縦グラデーション
+						ctx.globalAlpha = alpha * 0.9;
+						for (const { u, hgt } of bars) {
+							const x0 = cxs(u - BAR_W / 2);
+							const yTop = cys(hgt);
+							const grad = ctx.createLinearGradient(0, yTop, 0, cys(0));
+							grad.addColorStop(0, "rgba(82,224,245,0.2)");
+							grad.addColorStop(1, "rgba(82,224,245,0.02)");
+							ctx.fillStyle = grad;
+							ctx.fillRect(x0, yTop, cxs(u + BAR_W / 2) - x0, cys(0) - yTop);
+						}
+					});
+
+					// --- 05 det A = 3: 単位円 → 楕円（面積 3 倍）+ 対応スポーク ------
+					const dcx = figX;
+					const dcy = narrow ? h * 0.4 : h * 0.5;
+					const dr = S * (narrow ? 0.16 : 0.18);
+					// 面積比 3: 半軸 2.1r × (3/2.1)r を -20° 回転
+					const da = 2.1;
+					const db = 3 / 2.1;
+					const rot = -0.35;
+					const circPt = (t: number) => ({
+						x: dcx + dr * Math.cos(t),
+						y: dcy + dr * Math.sin(t),
+					});
+					const ellPt = (t: number) => {
+						const ex = da * dr * Math.cos(t);
+						const ey = db * dr * Math.sin(t);
+						return {
+							x: dcx + ex * Math.cos(rot) - ey * Math.sin(rot),
+							y: dcy + ex * Math.sin(rot) + ey * Math.cos(rot),
+						};
+					};
+					const det = curvePoints([
+						{ from: 0, to: TAU, step: 0.02 * k, fn: circPt },
+						{ from: 0, to: TAU, step: 0.01 * k, fn: ellPt },
+						// 対応する 12 方位を円周から楕円周へ結ぶスポーク（写像の可視化）
+						...Array.from({ length: 12 }, (_, k) => ({
+							from: 0,
+							to: 1,
+							step: 0.14 * k,
+							fn: (s: number) => {
+								const t = (k / 12) * TAU;
+								const p0 = circPt(t);
+								const p1 = ellPt(t);
+								return {
+									x: p0.x + (p1.x - p0.x) * s,
+									y: p0.y + (p1.y - p0.y) * s,
+								};
+							},
+						})),
+					]);
+					fills.set(5, (ctx, alpha) => {
+						// 楕円は中心から放射状に減衰するグラデーションで塗る
+						const grad = ctx.createRadialGradient(dcx, dcy, dr * 0.1, dcx, dcy, dr * da * 1.05);
+						grad.addColorStop(0, "rgba(82,224,245,0.18)");
+						grad.addColorStop(1, "rgba(82,224,245,0.02)");
+						ctx.globalAlpha = alpha * 0.9;
+						ctx.beginPath();
+						for (let t = 0; t <= TAU + 1e-6; t += 0.04) {
+							const p = ellPt(t);
+							t === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+						}
+						ctx.closePath();
+						ctx.fillStyle = grad;
+						ctx.fill();
+						// 元の円は薄い輪郭線で残す（倍率の比較対象）
+						ctx.globalAlpha = alpha * 0.5;
+						ctx.beginPath();
+						ctx.arc(dcx, dcy, dr, 0, TAU);
+						ctx.strokeStyle = "rgba(238,242,246,0.25)";
+						ctx.lineWidth = 1;
+						ctx.stroke();
+					});
+
 					const thousand = textShape("1000+", {
 						width: w,
 						height: h,
@@ -878,7 +1105,7 @@ const issueHref =
 						centerY: h * 0.44,
 					});
 					const up = upwardScatter(PARTICLE_COUNT, w, h);
-					return alignSets([scatter, diary, graph, thousand, up]);
+					return alignSets([scatter, diary, green, gauss, clt, det, thousand, up]);
 				}
 
 				function ensureSets() {
@@ -905,6 +1132,9 @@ const issueHref =
 				const c2 = document.getElementById("c2");
 				const c3 = document.getElementById("c3");
 				const c4 = document.getElementById("c4");
+				const c5 = document.getElementById("c5");
+				const c6 = document.getElementById("c6");
+				const c7 = document.getElementById("c7");
 				const scn = document.getElementById("scn");
 				const prog = document.getElementById("prog");
 				const cur = document.getElementById("cur");
@@ -922,7 +1152,7 @@ const issueHref =
 					if (!el) return;
 					el.style.opacity = String(opacity);
 					el.style.transform = `translateY(${(1 - opacity) * 26}px)`;
-					if (el.id === "c4") el.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
+					if (el.id === "c7") el.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
 				}
 
 				let currentP = 0;
@@ -951,34 +1181,44 @@ const issueHref =
 						currentP = getScrollProgress();
 						const { from, to, t } = segmentProgress(currentP, SEGMENTS);
 
-						// グラフ（セット 2）が支配的な間だけ、放物線と直線が囲む領域を塗る。
-						let weight = 0;
-						if (from === 2 && to === 2) weight = 1;
-						else if (to === 2) weight = t;
-						else if (from === 2) weight = 1 - t;
-						if (weight > 0.02 && sx && sy) {
-							const ctx = frame.ctx;
-							ctx.save();
-							ctx.globalAlpha = weight * 0.9;
-							ctx.beginPath();
-							ctx.moveTo(sx(-1), sy(1));
-							for (let u = -1; u <= 2.001; u += 0.05) ctx.lineTo(sx(u), sy(u + 2));
-							for (let u = 2; u >= -1.001; u -= 0.05) ctx.lineTo(sx(u), sy(u * u));
-							ctx.closePath();
-							ctx.fillStyle = "rgba(82,224,245,0.13)";
-							ctx.fill();
-							ctx.restore();
+						// 各図形セットが支配的な間だけ、その塗り（fills）を重ねる。
+						for (const [setIdx, fill] of fills) {
+							let weight = 0;
+							if (from === setIdx && to === setIdx) weight = 1;
+							else if (to === setIdx) weight = t;
+							else if (from === setIdx) weight = 1 - t;
+							if (weight > 0.02) {
+								const ctx = frame.ctx;
+								ctx.save();
+								fill(ctx, weight);
+								ctx.restore();
+							}
 						}
 
-						applyCaption(c1, fade(currentP, -1, 0.13));
-						applyCaption(c2, fade(currentP, 0.3, 0.58));
-						applyCaption(c3, fade(currentP, 0.6, 0.82));
-						applyCaption(c4, currentP > 0.86 ? Math.min((currentP - 0.86) / 0.05, 1) : 0);
+						applyCaption(c1, fade(currentP, -1, 0.07));
+						applyCaption(c2, fade(currentP, 0.17, 0.3));
+						applyCaption(c3, fade(currentP, 0.31, 0.44));
+						applyCaption(c4, fade(currentP, 0.45, 0.58));
+						applyCaption(c5, fade(currentP, 0.59, 0.72));
+						applyCaption(c6, fade(currentP, 0.74, 0.86));
+						applyCaption(c7, currentP > 0.89 ? Math.min((currentP - 0.89) / 0.05, 1) : 0);
 
 						if (scn) {
 							const n =
-								currentP < 0.26 ? 1 : currentP < 0.56 ? 2 : currentP < 0.8 ? 3 : 4;
-							const txt = `0${n} / 04`;
+								currentP < 0.12
+									? 1
+									: currentP < 0.27
+										? 2
+										: currentP < 0.41
+											? 3
+											: currentP < 0.55
+												? 4
+												: currentP < 0.69
+													? 5
+													: currentP < 0.84
+														? 6
+														: 7;
+							const txt = `0${n} / 07`;
 							if (scn.textContent !== txt) scn.textContent = txt;
 						}
 						if (prog) prog.style.transform = `scaleY(${currentP})`;
