@@ -199,6 +199,22 @@ import SiteHead from "../../components/SiteHead.astro";
 
 			<div id="save-list" class="save-list"></div>
 			<p id="save-empty" class="empty-state" hidden>まだ保存した問題がありません。問題ページの ☆ ボタンから保存できます。</p>
+			<!--
+				#save-load-error と #save-unavailable の役割分担（issue #253）:
+				- #save-unavailable: localStorage 自体が使えない環境（設定で無効化・
+				  一部ブラウザの制限等）。isStorageAvailable() が false を返す時点で
+				  確定し、以降の処理は行わない。
+				- #save-load-error: localStorage 自体は使え、保存 ID も取得できたが
+				  （＝保存されているはず）、一覧の組み立てに失敗した場合。保存データの
+				  破損・容量超過・プライベートブラウジングでの挙動など、ブラウザ側の
+				  一時的な問題が原因になりうる（通信の問題ではない。保存は localStorage
+				  のみを使い、ネットワーク通信を伴わないため）。
+				どちらも hidden で初期化し、render() 内で条件に応じて片方だけを
+				表示する（同時に出ることはない）。
+			-->
+			<p id="save-load-error" class="empty-state" hidden>
+				保存した問題の読み込みに失敗しました。保存データの破損や、ブラウザの制限（プライベートブラウジングモードでの動作や保存容量の超過など）が原因である可能性があります。再読み込みすると解決する場合があります。
+			</p>
 			<p id="save-unavailable" class="unavailable-state" hidden>
 				この端末・ブラウザでは保存機能を利用できません（localStorage が無効になっています）。
 			</p>
@@ -213,8 +229,9 @@ import SiteHead from "../../components/SiteHead.astro";
 			async function render() {
 				const listEl = document.getElementById("save-list");
 				const emptyEl = document.getElementById("save-empty");
+				const loadErrorEl = document.getElementById("save-load-error");
 				const unavailableEl = document.getElementById("save-unavailable");
-				if (!listEl || !emptyEl || !unavailableEl) return;
+				if (!listEl || !emptyEl || !loadErrorEl || !unavailableEl) return;
 
 				if (!isStorageAvailable()) {
 					unavailableEl.hidden = false;
@@ -254,7 +271,12 @@ import SiteHead from "../../components/SiteHead.astro";
 						listEl.appendChild(row);
 					}
 				} catch {
-					emptyEl.hidden = false;
+					// 保存 ID 自体は取得できているため「保存した問題はありません」
+					// (emptyEl) ではなく、読み込みに失敗したことが分かる専用の
+					// メッセージ(loadErrorEl)を出す。途中まで行が追加されている
+					// 場合に備え、表示は一覧をクリアしてから切り替える。
+					listEl.innerHTML = "";
+					loadErrorEl.hidden = false;
 				}
 			}
 
