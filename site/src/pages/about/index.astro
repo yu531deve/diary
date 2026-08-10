@@ -19,6 +19,7 @@
 import { computeSiteStats } from "../../lib/site-data";
 import SearchModal from "../../components/SearchModal.astro";
 import BottomTabNav from "../../components/BottomTabNav.astro";
+import SiteHead from "../../components/SiteHead.astro";
 
 const stats = computeSiteStats();
 const problemsPadded = String(stats.problemCount).padStart(4, "0");
@@ -39,18 +40,9 @@ const typoIssueHref =
 
 <html lang="ja">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>About — Diary</title>
-		<meta
-			name="description"
-			content="Diary について。作問方針・難易度の定義・PDF の使い方・ライセンス・誤植報告の案内です。"
-		/>
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap"
+		<SiteHead
+			title="About — Diary"
+			description="Diary について。作問方針・難易度の定義・PDF の使い方・ライセンス・誤植報告の案内です。"
 		/>
 		<style>
 			:root {

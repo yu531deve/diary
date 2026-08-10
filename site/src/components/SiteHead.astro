@@ -1,0 +1,59 @@
+---
+// 共通 <head> フラグメント（#121）。
+//
+// このリポジトリには共有レイアウトが無く（#144 で判明）、各ページが
+// 個別に <html><head> を書く構成になっている。全ページを共有レイアウトへ
+// 載せ替える改修は影響範囲が広く事故のもとになるため、まずは各ページの
+// <head> の中で重複していた「charset / favicon / viewport / generator /
+// title / description / canonical / フォント読み込み」だけを、この
+// コンポーネントに切り出す（各ページの <html><head>...</head><body> の
+// 構造・<style> 内の見た目は一切変更しない）。
+//
+// canonical URL は astro.config.mjs の `site`（本番 URL）+
+// Astro.url.pathname から組み立てる。URL を他所にハードコードしない
+// 方針は sitemap.xml.ts / robots.txt.ts と揃えている。
+//
+// 404 ページの扱い（#121 受け入れ条件）:
+// 404 は `status: published` の実在するページではないので canonical の
+// 対象として本来は不要という考え方もあるが、ここでは他ページと同様に
+// 自己参照の canonical を入れる。理由は次の 2 点:
+//   - noindex を付けているため、canonical の有無に関わらずインデックスは
+//     されない（canonical を入れても実害がない）
+//   - 「全ページに canonical が入っている」という一貫した状態にした方が、
+//     後から見て「なぜここだけ無いのか」を調べ直すコストが無い
+export interface Props {
+	/** <title> の中身。ページごとに既存のものをそのまま渡す */
+	title: string;
+	/** <meta name="description"> の中身。省略時は description を出力しない
+	 * （既存ページで description が無かったものを新設しない） */
+	description?: string;
+	/** true のとき <meta name="robots" content="noindex" /> を追加する（404 用） */
+	noindex?: boolean;
+	/** Google Fonts の <link rel="stylesheet"> href。ページごとに読み込む
+	 * ウェイトが異なるため上書きできるようにしてある（既定値は多数派のもの） */
+	fonts?: string;
+}
+
+const DEFAULT_FONTS =
+	"https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap";
+
+const { title, description, noindex = false, fonts = DEFAULT_FONTS } = Astro.props;
+
+if (!Astro.site) {
+	throw new Error(
+		"astro.config.mjs の site が未設定です。SiteHead は canonical の絶対 URL 生成に site を必要とします。"
+	);
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+<title>{title}</title>
+{description && <meta name="description" content={description} />}
+{noindex && <meta name="robots" content="noindex" />}
+<link rel="canonical" href={canonicalURL} />
+<link rel="stylesheet" href={fonts} />

@@ -17,6 +17,7 @@ import LoadingCurtain from "../components/LoadingCurtain.astro";
 import SearchModal from "../components/SearchModal.astro";
 import BottomTabNav from "../components/BottomTabNav.astro";
 import { formatMathTitle } from "../lib/title";
+import SiteHead from "../components/SiteHead.astro";
 
 const stats = computeSiteStats();
 
@@ -48,18 +49,9 @@ const issueHref =
 <!doctype html>
 <html lang="ja">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<meta
-			name="description"
-			content="理工系大学院入試の自作数学問題を公開しています。解く価値のある一問を、1000問へ。"
-		/>
-		<title>Diary — 理工系院試数学 自作問題集</title>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap"
-			rel="stylesheet"
+		<SiteHead
+			title="Diary — 理工系院試数学 自作問題集"
+			description="理工系大学院入試の自作数学問題を公開しています。解く価値のある一問を、1000問へ。"
 		/>
 		<style>
 			:root {
