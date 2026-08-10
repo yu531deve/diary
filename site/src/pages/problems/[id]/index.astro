@@ -97,6 +97,17 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 const difficultyNum = Number(meta.difficulty) || 0;
 const difficultyDots = Array.from({ length: 5 }, (_, i) => i < difficultyNum);
 
+// #71: Pagefind の全文検索対象は「地の文」のみで、数式は仕様外
+// （site/CLAUDE.md「検索対象への数式の追加」禁止）。LaTeXML の出力は
+// MathML（<math>...</math>、annotation として元の LaTeX ソースも
+// 埋め込まれている。#150）なので、Pagefind の索引対象から丸ごと外すため
+// data-pagefind-ignore="all" を各 <math> 要素に付与してから
+// set:html する。属性の追加だけで表示（見た目）には影響しない。
+const searchableBodyHtml = problemHtml.bodyHtml.replace(
+  /<math\b/g,
+  '<math data-pagefind-ignore="all"'
+);
+
 // LaTeXML 出力（problem.tex 内の figure）は本文に <img> をそのまま含む。
 // design/02-B の図パネルは dist/html/{id}/fig-*.svg を独立表示する仕様の
 // ため、本文側の重複表示を避けたい。ただし figureFiles が空の問題では
@@ -725,24 +736,44 @@ const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} 
 			<span class="current">{meta.id}</span>
 		</nav>
 
-		<main>
+		<!--
+			#71: ⌘K 検索(Pagefind)の索引対象をこの <main> 配下だけに絞る。
+			data-pagefind-body はサイト内のどこか 1 箇所にでも付けると、
+			Pagefind はこの属性を持つページ・要素以外を丸ごと索引から除外する
+			仕様（ヘッダー・ナビ等の定型文の重複ヒットを避けつつ、解答ページ
+			・トップ・分野一覧・/dev/ 配下などは data-pagefind-body を
+			一切付けていないためこの実装だけで自動的に索引対象外になる）。
+			id / タイトル / タグ / 地の文が対象で、数式は searchableBodyHtml
+			側で data-pagefind-ignore="all" により除外している。
+		-->
+		<main data-pagefind-body>
 		<div class="problem-grid">
 			<div class="col-main">
 				<div>
 					<div class="id-line">
-						<span class="problem-id">{meta.id}</span>
-						<span class="difficulty">
+						<span class="problem-id" data-pagefind-meta={`id:${meta.id}`}>{meta.id}</span>
+						<span class="difficulty" data-pagefind-meta={`difficulty:${meta.difficulty}`}>
 							{difficultyDots.map((on) => <span class={`dot${on ? " on" : ""}`} />)}
 							<span class="label">難易度 {difficultyNum || "—"} / 5</span>
 						</span>
 					</div>
-					<h1 class="title-heading">{displayTitle}</h1>
+					<h1 class="title-heading" data-pagefind-meta="title">{displayTitle}</h1>
 				</div>
 
 				<div class="tag-row">
-					<span class="tag-pill">{meta.field.major}</span>
-					<span class="tag-pill">{meta.field.minor}</span>
-					{meta.tags.map((t) => <span class="tag-pill">{t}</span>)}
+					<span
+						class="tag-pill"
+						data-pagefind-filter={`field:${meta.field.major}`}
+						data-pagefind-meta={`field:${meta.field.major}`}
+					>
+						{meta.field.major}
+					</span>
+					<span class="tag-pill" data-pagefind-meta={`sub:${meta.field.minor}`}>
+						{meta.field.minor}
+					</span>
+					{meta.tags.map((t) => (
+						<span class="tag-pill" data-pagefind-filter={`tag:${t}`}>{t}</span>
+					))}
 				</div>
 
 				<div class="rule" />
@@ -764,7 +795,7 @@ const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} 
 							<p>PDF も見つかりませんでした。ビルドを確認してください。</p>
 						)
 					) : (
-						<div class="problem-body" set:html={problemHtml.bodyHtml} />
+						<div class="problem-body" set:html={searchableBodyHtml} />
 					)
 				}
 
