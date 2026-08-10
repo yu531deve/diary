@@ -115,6 +115,11 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
   `誤植報告: ${meta.id} ${displayTitle}（解答）`
 )}`;
 
+// #122: og:description（および新設の meta description）。分野・難易度を
+// 含める（problems/[id]/index.astro と同方針）。
+const difficultyNum = Number(meta.difficulty) || 0;
+const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} — ${meta.id} ${displayTitle} の解答。理工系大学院入試の自作数学問題。`;
+
 const bodyHtml = solutionHtml.isFallback ? "" : markFinalAnswerEquations(solutionHtml.bodyHtml);
 // ANSWER カードから本文の答えブロックへ飛ぶためのアンカー ID。
 const answerAnchorId = `answer-body-${meta.id}`;
@@ -139,7 +144,11 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 
 <html lang="ja">
 	<head>
-		<SiteHead title={`解答 | ${meta.id} ${displayTitle} | Diary`} />
+		<SiteHead
+			title={`解答 | ${meta.id} ${displayTitle} | Diary`}
+			description={ogDescription}
+			ogType="article"
+		/>
 		<style>
 			:root {
 				color-scheme: dark;

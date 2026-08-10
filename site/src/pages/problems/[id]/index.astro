@@ -105,11 +105,20 @@ const firstFigure = problemHtml.figureFiles[0] ?? null;
 const figHref = firstFigure ? `/problems/${meta.id}/${firstFigure.replace(/\.svg$/i, "")}.svg` : null;
 
 const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
+
+// #122: og:description（および新設の meta description）。分野・難易度を
+// 含める（#106 子issue の元 issue 本文の指示）。displayTitle は既に
+// formatMathTitle 済みなので $ 等は出ない。
+const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} — ${meta.id} ${displayTitle}。理工系大学院入試の自作数学問題。`;
 ---
 
 <html lang="ja">
 	<head>
-		<SiteHead title={`${meta.id} ${displayTitle} | Diary`} />
+		<SiteHead
+			title={`${meta.id} ${displayTitle} | Diary`}
+			description={ogDescription}
+			ogType="article"
+		/>
 		<style>
 			:root {
 				color-scheme: dark;
