@@ -66,10 +66,19 @@ build: lint pdf html
 #       気づけない。
 #
 #       docker を経由せず「今動いている node コマンド」を直接見ることで、
-#       ホスト実行・devcontainer 内実行のどちらでも、かつ docker が
-#       使えない環境でも同じロジックで検出できる。Dockerfile 自体（CI が
-#       使う唯一の真実）から期待値を毎回読み取るので、Node のバージョンを
-#       上げた際もこのチェック側は変更不要。
+#       devcontainer 内実行でも、docker が使えない環境でも同じロジックで
+#       検出できる。Dockerfile 自体（CI が使う唯一の真実）から期待値を
+#       毎回読み取るので、Node のバージョンを上げた際もこのチェック側は
+#       変更不要。
+#
+#       重要: これは「devcontainer の中に入って作業しているのに、その
+#       コンテナが古い」ことを検出するためのものであり、ホストの Node
+#       バージョンとは無関係（ホストは開発機なので Node 22 とは限らない。
+#       `make check` はどのみち GHCR から正しいイメージを pull してその
+#       中で make build するため、ホストの Node は結果に影響しない）。
+#       そのため /.dockerenv の有無でコンテナ内かどうかを判定し、
+#       コンテナ内でのみ食い違いを致命的エラーとして扱う。ホストでは
+#       警告のみに留め、`make check` を止めない。
 #
 #       texlive-full 内の lualatex/latexml/dvisvgm は Dockerfile 側で
 #       バージョンを固定していない（apt のバージョンに追従）ため、
@@ -85,20 +94,27 @@ check-node-drift:
 		exit 0; \
 	fi; \
 	actual=$$(node --version | sed -E 's/^v([0-9]+).*/\1/'); \
-	if [ "$$actual" != "$$expected" ]; then \
-		echo "ERROR: 今の環境の Node メジャーバージョンが .devcontainer/Dockerfile と食い違っています。"; \
-		echo "       今の環境: Node $$(node --version)"; \
-		echo "       Dockerfile が指定: Node $$expected.x (.devcontainer/Dockerfile の ARG NODE_VERSION)"; \
-		echo ""; \
-		echo "       ローカルにキャッシュされた devcontainer イメージが古い可能性があります。"; \
-		echo "       再ビルドしてください:"; \
-		echo "         VS Code Dev Containers 拡張を使っている場合:"; \
-		echo "           コマンドパレット → 'Dev Containers: Rebuild Container'"; \
-		echo "         手動で docker build している場合:"; \
-		echo "           docker build --no-cache -t diary-devcontainer .devcontainer"; \
-		exit 1; \
+	if [ "$$actual" = "$$expected" ]; then \
+		echo "OK: Node $$(node --version) は .devcontainer/Dockerfile の指定(v$$expected.x)と一致しています。"; \
+		exit 0; \
 	fi; \
-	echo "OK: Node $$(node --version) は .devcontainer/Dockerfile の指定(v$$expected.x)と一致しています。"
+	msg="今の環境の Node メジャーバージョンが .devcontainer/Dockerfile と食い違っています。\n\
+       今の環境: Node $$(node --version)\n\
+       Dockerfile が指定: Node $$expected.x (.devcontainer/Dockerfile の ARG NODE_VERSION)\n\
+\n\
+       ローカルにキャッシュされた devcontainer イメージが古い可能性があります。\n\
+       再ビルドしてください:\n\
+         VS Code Dev Containers 拡張を使っている場合:\n\
+           コマンドパレット → 'Dev Containers: Rebuild Container'\n\
+         手動で docker build している場合:\n\
+           docker build --no-cache -t diary-devcontainer .devcontainer"; \
+	if [ -f /.dockerenv ]; then \
+		echo "ERROR: $$msg"; \
+		exit 1; \
+	else \
+		echo "WARNING(ホストのため非致命的。devcontainer 内でこの食い違いが出ている場合のみ要対応): $$msg"; \
+		exit 0; \
+	fi
 
 # check: 手元で CI(.github/workflows/build.yml)と同じ検証を回す(#171)。
 #        build.yml は GHCR の devcontainer イメージを pull し、その中で
@@ -113,8 +129,9 @@ check-node-drift:
 #        気づけるようにする。
 #
 #        まず check-node-drift で「今の実行環境」自体が Dockerfile と
-#        食い違っていないかを確認する（#175）。ここで検出できれば、
-#        以降の docker pull 待ちを待たずに済む。
+#        食い違っていないかを確認する（#175）。ホストでは警告のみ
+#        （exit 0）で、devcontainer 内で食い違っている場合のみ
+#        致命的エラーとしてここで止まる。
 check: check-node-drift
 	@echo "=== ホスト環境のツールバージョン ==="
 	-@lualatex --version 2>/dev/null | head -1 || echo "lualatex: not found on host"
