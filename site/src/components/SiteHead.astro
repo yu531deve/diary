@@ -32,12 +32,16 @@ export interface Props {
 	/** Google Fonts の <link rel="stylesheet"> href。ページごとに読み込む
 	 * ウェイトが異なるため上書きできるようにしてある（既定値は多数派のもの） */
 	fonts?: string;
+	/** og:type。個々の問題・解答ページのような「一つのコンテンツ」を指す
+	 * ページでは "article" を渡す。既定は "website"（索引・トップ等）。
+	 * （#122） */
+	ogType?: "website" | "article";
 }
 
 const DEFAULT_FONTS =
 	"https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap";
 
-const { title, description, noindex = false, fonts = DEFAULT_FONTS } = Astro.props;
+const { title, description, noindex = false, fonts = DEFAULT_FONTS, ogType = "website" } = Astro.props;
 
 if (!Astro.site) {
 	throw new Error(
@@ -45,7 +49,19 @@ if (!Astro.site) {
 	);
 }
 
+// #122: og:url は canonical と同じ組み立て（Astro.site + pathname）を
+// 使い回す。URL を別途ハードコードしない（#103 で確定した本番 URL
+// https://diary-bo1.pages.dev は astro.config.mjs の site 側にのみ書く）。
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
+
+// og:title / twitter:title は既存の <title> をそのまま使う。呼び出し側は
+// 既に formatMathTitle() を通した平文タイトルを渡しているため（#227
+// と同じ理由。数式が `$...$` のまま入っている問題タイトルが 41 問あり、
+// これを SNS カードにそのまま出すと読めない）、ここで再変換する必要はない。
+const ogTitle = title;
+// og:description は description を流用する。description が無いページ
+// （og:description 用に新設する動機が無いページ）では出力しない。
+const ogDescription = description;
 ---
 
 <meta charset="utf-8" />
@@ -57,3 +73,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
 {noindex && <meta name="robots" content="noindex" />}
 <link rel="canonical" href={canonicalURL} />
 <link rel="stylesheet" href={fonts} />
+
+<!-- OGP / Twitter Card（#122）。og:image は #123（OG 画像生成）待ちのため
+     ここでは出力しない。プレースホルダ画像を仮で指すと、ロゴだけの
+     汎用画像がすべての問題ページで同じカードに出る状態になり、後で
+     #123 が入るまで「画像入りだが無意味な OGP」を晒し続けることになる。
+     og:image 抜きでも Slack/X 等は他のメタタグからテキストカードを
+     表示できるため、実害は小さいと判断した。 -->
+<meta property="og:site_name" content="Diary" />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={ogTitle} />
+{ogDescription && <meta property="og:description" content={ogDescription} />}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={ogTitle} />
+{ogDescription && <meta name="twitter:description" content={ogDescription} />}
