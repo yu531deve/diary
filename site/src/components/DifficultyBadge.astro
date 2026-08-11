@@ -1,0 +1,102 @@
+---
+// 難易度バッジの共通コンポーネント（#131、親 #107）。
+//
+// 段階数・ラベルは site/src/lib/difficulty.ts（唯一の参照元。docs/difficulty.md
+// v2.0 と対応）から取得する。このファイル自体には段階数・ラベルをハードコード
+// しない。基準が改定されても difficulty.ts だけ直せば全ページに反映される。
+//
+// クライアント JS で実行時に DOM を生成するページ（⌘K 検索モーダル・/save/）は
+// Astro コンポーネントを直接使えないため、difficulty.ts の
+// createDifficultyBadgeElement() で同じクラス名・構造の要素を組み立てている。
+// 見た目を変える場合は両方を揃えて直すこと。
+import {
+	DIFFICULTY_MAX,
+	difficultyDots,
+	difficultyNum,
+	difficultyDescription,
+	DIFFICULTY_LEGEND_HREF,
+} from "../lib/difficulty";
+
+type Props = {
+	/** meta.yaml の difficulty（文字列）または数値。 */
+	difficulty: string | number;
+	/** 一覧行内など、小さく出す場合に付ける。 */
+	compact?: boolean;
+	/** true の場合、バッジ自体を About の難易度基準セクションへのリンクにする。
+	 * 既に行全体が /problems/{id}/ 等へのリンクになっている文脈（一覧行）では
+	 * リンクのネストになるため使わないこと（既定 false）。 */
+	linkToLegend?: boolean;
+	/** Pagefind の索引にメタデータとして持たせたい場合（問題ページのみ）。 */
+	pagefindMeta?: boolean;
+	class?: string;
+};
+
+const {
+	difficulty,
+	compact = false,
+	linkToLegend = false,
+	pagefindMeta = false,
+	class: className,
+} = Astro.props;
+
+const n = difficultyNum(difficulty);
+const desc = difficultyDescription(difficulty);
+const dots = difficultyDots(difficulty);
+const Tag = linkToLegend ? "a" : "span";
+---
+
+<Tag
+	class:list={["difficulty-badge", { compact }, className]}
+	href={linkToLegend ? DIFFICULTY_LEGEND_HREF : undefined}
+	title={desc}
+	aria-label={desc}
+	data-pagefind-meta={pagefindMeta ? `difficulty:${difficulty}` : undefined}
+>
+	<span class="dots" aria-hidden="true">
+		{dots.map((on) => <span class:list={[{ on }]} />)}
+	</span>
+	<span class="num">{n || "—"}<span class="max">/{DIFFICULTY_MAX}</span></span>
+</Tag>
+
+<style>
+	.difficulty-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: inherit;
+		text-decoration: none;
+	}
+	a.difficulty-badge:hover {
+		color: #52e0f5;
+	}
+	a.difficulty-badge:hover .num {
+		color: #52e0f5;
+	}
+	.difficulty-badge .dots {
+		display: flex;
+		gap: 3px;
+	}
+	.difficulty-badge .dots span {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #2a3340;
+	}
+	.difficulty-badge .dots span.on {
+		background: #52e0f5;
+	}
+	.difficulty-badge.compact .dots span {
+		width: 5px;
+		height: 5px;
+	}
+	.difficulty-badge .num {
+		font: 400 11px "IBM Plex Mono", monospace;
+		color: #7d8794;
+		letter-spacing: 0.04em;
+		white-space: nowrap;
+	}
+	.difficulty-badge .num .max {
+		color: #4a5361;
+		margin-left: 1px;
+	}
+</style>

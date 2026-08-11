@@ -76,7 +76,9 @@ import {
   type ProblemMeta,
 } from "../../../lib/dist-content";
 import { formatMathTitle } from "../../../lib/title";
+import { difficultyNum as toDifficultyNum } from "../../../lib/difficulty";
 import SiteHead from "../../../components/SiteHead.astro";
+import DifficultyBadge from "../../../components/DifficultyBadge.astro";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
@@ -117,8 +119,7 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
 
 // #122: og:description（および新設の meta description）。分野・難易度を
 // 含める（problems/[id]/index.astro と同方針）。
-const difficultyNum = Number(meta.difficulty) || 0;
-const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} — ${meta.id} ${displayTitle} の解答。理工系大学院入試の自作数学問題。`;
+const ogDescription = `${meta.field.major} / 難易度${toDifficultyNum(meta.difficulty) || "—"} — ${meta.id} ${displayTitle} の解答。理工系大学院入試の自作数学問題。`;
 
 const bodyHtml = solutionHtml.isFallback ? "" : markFinalAnswerEquations(solutionHtml.bodyHtml);
 // ANSWER カードから本文の答えブロックへ飛ぶためのアンカー ID。
@@ -683,6 +684,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 				<div class="head-block">
 					<span class="eyebrow mono">SOLUTION / {meta.id}</span>
 					<h1 class="title-heading">{displayTitle}</h1>
+					<DifficultyBadge difficulty={meta.difficulty} linkToLegend />
 					<p class="lede">まず自分で解いてから。必要な分だけ開いてください。</p>
 				</div>
 

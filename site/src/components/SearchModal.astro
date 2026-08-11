@@ -32,6 +32,13 @@
 // `data-search-open` を付ける」の 2 点のみ（index.astro / fields/index.astro /
 // about/index.astro）。
 
+// #131: 結果行の難易度表示は他ページと同じドットバッジに揃える。段階数・
+// ラベルは site/src/lib/difficulty.ts が唯一の参照元（docs/difficulty.md 対応）。
+// このスクリプトは define:vars を使うため import できず、値だけを
+// define:vars 経由でビルド時に埋め込む（DIFFICULTY_MAX・DIFFICULTY_LEVELS を
+// 直接ハードコードしないため）。
+import { DIFFICULTY_MAX, DIFFICULTY_LEVELS } from "../lib/difficulty";
+
 const MAX_RESULTS = 50;
 ---
 
@@ -71,6 +78,7 @@ const MAX_RESULTS = 50;
 		></div>
 		<div class="search-modal-footer">
 			<span>↑↓ 移動 · ↵ 開く</span>
+			<a href="/about/#difficulty" class="difficulty-legend-link">難易度基準について</a>
 			<span id="search-modal-count">00 RESULTS</span>
 		</div>
 	</div>
@@ -250,11 +258,29 @@ const MAX_RESULTS = 50;
 		color: #7d8794;
 		letter-spacing: 0.04em;
 	}
-	.search-modal-results :global(.search-result-row .stars) {
+	.search-modal-results :global(.search-result-row .difficulty-badge) {
 		flex-shrink: 0;
-		font: 400 13px "IBM Plex Mono", monospace;
-		color: #52e0f5;
-		letter-spacing: 0.06em;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.search-modal-results :global(.search-result-row .difficulty-badge .dots) {
+		display: flex;
+		gap: 3px;
+	}
+	.search-modal-results :global(.search-result-row .difficulty-badge .dots span) {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: #2a3340;
+	}
+	.search-modal-results :global(.search-result-row .difficulty-badge .dots span.on) {
+		background: #52e0f5;
+	}
+	.search-modal-results :global(.search-result-row .difficulty-badge .num) {
+		font: 400 11px "IBM Plex Mono", monospace;
+		color: #7d8794;
+		letter-spacing: 0.04em;
 	}
 	.search-modal-results :global(.search-modal-empty),
 	.search-modal-results :global(.search-modal-loading) {
@@ -265,6 +291,9 @@ const MAX_RESULTS = 50;
 	}
 	.search-modal-footer {
 		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px 16px;
 		justify-content: space-between;
 		padding: 14px 26px;
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -272,6 +301,13 @@ const MAX_RESULTS = 50;
 		color: #768190;
 		letter-spacing: 0.06em;
 		flex-shrink: 0;
+	}
+	.search-modal-footer .difficulty-legend-link {
+		color: #768190;
+		text-decoration: none;
+	}
+	.search-modal-footer .difficulty-legend-link:hover {
+		color: #52e0f5;
 	}
 
 	@media (max-width: 640px) {
@@ -297,7 +333,7 @@ const MAX_RESULTS = 50;
 	}
 </style>
 
-<script define:vars={{ MAX_RESULTS }}>
+<script define:vars={{ MAX_RESULTS, DIFFICULTY_MAX, DIFFICULTY_LEVELS }}>
 	(function () {
 		const root = document.getElementById("search-modal-root");
 		const overlay = root?.querySelector("[data-search-close]");
@@ -369,9 +405,33 @@ const MAX_RESULTS = 50;
 			render();
 		}
 
-		function starRating(difficulty) {
-			const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
-			return "★".repeat(n) + "☆".repeat(5 - n);
+		function difficultyBadge(difficulty) {
+			const n = Math.max(0, Math.min(DIFFICULTY_MAX, parseInt(difficulty, 10) || 0));
+			const level = DIFFICULTY_LEVELS.find((d) => d.n === n);
+			const desc = level
+				? `難易度 ${n} / ${DIFFICULTY_MAX}: ${level.label}`
+				: `難易度 ${n || "—"} / ${DIFFICULTY_MAX}`;
+
+			const el = document.createElement("span");
+			el.className = "difficulty-badge compact";
+			el.title = desc;
+			el.setAttribute("aria-label", desc);
+
+			const dots = document.createElement("span");
+			dots.className = "dots";
+			dots.setAttribute("aria-hidden", "true");
+			for (let i = 0; i < DIFFICULTY_MAX; i++) {
+				const dot = document.createElement("span");
+				if (i < n) dot.className = "on";
+				dots.appendChild(dot);
+			}
+
+			const num = document.createElement("span");
+			num.className = "num";
+			num.textContent = String(n || "—");
+
+			el.append(dots, num);
+			return el;
 		}
 
 		// Pagefind で検索し、結果行の描画に必要な最小限のフィールド
@@ -446,13 +506,11 @@ const MAX_RESULTS = 50;
 				body.appendChild(title);
 				body.appendChild(meta);
 
-				const stars = document.createElement("span");
-				stars.className = "stars";
-				stars.textContent = starRating(entry.difficulty);
+				const badge = difficultyBadge(entry.difficulty);
 
 				row.appendChild(no);
 				row.appendChild(body);
-				row.appendChild(stars);
+				row.appendChild(badge);
 				row.addEventListener("mouseenter", () => {
 					activeIndex = i;
 					updateActiveRow();

@@ -20,6 +20,7 @@ import type { ProblemMeta } from "../../../lib/dist-content";
 import SearchModal from "../../../components/SearchModal.astro";
 import BottomTabNav from "../../../components/BottomTabNav.astro";
 import SiteHead from "../../../components/SiteHead.astro";
+import DifficultyBadge from "../../../components/DifficultyBadge.astro";
 
 export async function getStaticPaths() {
   const tree = parseFieldsTree();
@@ -62,11 +63,6 @@ for (const p of sorted) {
   minorCounts.set(p.field.minor, (minorCounts.get(p.field.minor) ?? 0) + 1);
 }
 const minorsWithProblems = entry.minors.filter((m) => minorCounts.has(m));
-
-function difficultyDots(difficulty: string): boolean[] {
-  const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
-  return Array.from({ length: 5 }, (_, i) => i < n);
-}
 
 function formatDate(d: string): string {
   return d ? d.replaceAll("-", ".") : "日付未設定";
@@ -218,6 +214,13 @@ function formatDate(d: string): string {
 				color: #dfe6ee;
 				font-weight: 500;
 			}
+			.hero-stats .difficulty-legend-link {
+				color: #768190;
+				text-decoration: none;
+			}
+			.hero-stats .difficulty-legend-link:hover {
+				color: #52e0f5;
+			}
 
 			/* 中分野フィルタ */
 			.minor-filter {
@@ -299,20 +302,6 @@ function formatDate(d: string): string {
 				padding: 4px 10px;
 				white-space: nowrap;
 				flex-shrink: 0;
-			}
-			.problem-row .dots {
-				display: flex;
-				gap: 3px;
-				flex-shrink: 0;
-			}
-			.problem-row .dots span {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-				background: #2a3340;
-			}
-			.problem-row .dots span.on {
-				background: #52e0f5;
 			}
 			.problem-row .date {
 				font: 400 11px "IBM Plex Mono", monospace;
@@ -418,6 +407,7 @@ function formatDate(d: string): string {
 				</div>
 				<div class="hero-stats">
 					<span>PROBLEMS <strong>{String(sorted.length).padStart(4, "0")}</strong></span>
+					<a href="/about/#difficulty" class="difficulty-legend-link">難易度基準 →</a>
 				</div>
 			</section>
 
@@ -447,11 +437,7 @@ function formatDate(d: string): string {
 								<span class="id">{p.id}</span>
 								<span class="title">{formatMathTitle(p.title)}</span>
 								<span class="pill">{p.field.minor}</span>
-								<span class="dots">
-									{difficultyDots(p.difficulty).map((on) => (
-										<span class:list={[{ on }]} />
-									))}
-								</span>
+								<DifficultyBadge difficulty={p.difficulty} compact />
 								<span class="date">{formatDate(p.created)}</span>
 							</a>
 						))}

@@ -18,6 +18,7 @@ import SearchModal from "../components/SearchModal.astro";
 import BottomTabNav from "../components/BottomTabNav.astro";
 import { formatMathTitle } from "../lib/title";
 import SiteHead from "../components/SiteHead.astro";
+import DifficultyBadge from "../components/DifficultyBadge.astro";
 
 const stats = computeSiteStats();
 
@@ -28,11 +29,6 @@ const fieldRows = stats.byField.map((f, i) => ({
 }));
 
 const recent = stats.recent;
-
-function difficultyDots(difficulty: string): boolean[] {
-	const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
-	return Array.from({ length: 5 }, (_, i) => i < n);
-}
 
 function formatDate(d: string): string {
 	return d ? d.replaceAll("-", ".") : "";
@@ -419,11 +415,27 @@ const issueHref =
 				font: 400 11px "IBM Plex Mono", monospace;
 				color: #52e0f5;
 			}
-			.new-section > h2 {
-				margin: 0 0 24px;
+			.new-section-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 16px;
+				margin-bottom: 24px;
+			}
+			.new-section-head h2 {
+				margin: 0;
 				font: 500 12px "IBM Plex Mono", monospace;
 				letter-spacing: 0.3em;
 				color: #7d8794;
+			}
+			.new-section-head .difficulty-legend-link {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #768190;
+				text-decoration: none;
+				white-space: nowrap;
+			}
+			.new-section-head .difficulty-legend-link:hover {
+				color: #52e0f5;
 			}
 
 			.field-list,
@@ -498,20 +510,6 @@ const issueHref =
 				border: 1px solid rgba(255, 255, 255, 0.12);
 				border-radius: 999px;
 				white-space: nowrap;
-			}
-			.new-row .dots {
-				display: flex;
-				gap: 4px;
-				flex-shrink: 0;
-			}
-			.new-row .dots span {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-				background: #2a3340;
-			}
-			.new-row .dots span.on {
-				background: #52e0f5;
 			}
 			.new-row .date {
 				font: 400 11px "IBM Plex Mono", monospace;
@@ -779,7 +777,10 @@ const issueHref =
 			</section>
 
 			<section id="new" class="new-section">
-				<h2>LATEST — 新着問題</h2>
+				<div class="new-section-head">
+					<h2>LATEST — 新着問題</h2>
+					<a href="/about/#difficulty" class="difficulty-legend-link">難易度基準 →</a>
+				</div>
 				<div class="new-list">
 					{
 						recent.length === 0 ? (
@@ -792,11 +793,7 @@ const issueHref =
 									<span class="pill">
 										{p.field.major} / {p.field.minor}
 									</span>
-									<span class="dots">
-										{difficultyDots(p.difficulty).map((on) => (
-											<span class:list={[{ on }]} />
-										))}
-									</span>
+									<DifficultyBadge difficulty={p.difficulty} compact />
 									<span class="date">{formatDate(p.updated)}</span>
 								</a>
 							))

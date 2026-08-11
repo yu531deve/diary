@@ -102,6 +102,10 @@ import SiteHead from "../../components/SiteHead.astro";
 				color: #7d8794;
 				max-width: 560px;
 			}
+			.hero p a {
+				color: #52e0f5;
+				text-decoration: underline;
+			}
 			.save-list {
 				padding: 0 48px;
 				display: flex;
@@ -172,6 +176,38 @@ import SiteHead from "../../components/SiteHead.astro";
 				color: #7d8794;
 				flex-shrink: 0;
 			}
+			/*
+			 * #131: 難易度バッジも .save-row と同じ理由（実行時生成、#250 参照）で
+			 * is:global + .save-list 配下限定のセレクタが必要。クラス名・構造は
+			 * DifficultyBadge.astro（Astro テンプレートで描画するページ用）と揃えて
+			 * ある（.difficulty-badge > .dots + .num）。値は
+			 * site/src/lib/difficulty.ts の createDifficultyBadgeElement() が
+			 * 唯一の参照元で、この CSS は見た目だけを合わせている。
+			 */
+			.save-list .save-row .difficulty-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				flex-shrink: 0;
+			}
+			.save-list .save-row .difficulty-badge .dots {
+				display: flex;
+				gap: 3px;
+			}
+			.save-list .save-row .difficulty-badge .dots span {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: #2a3340;
+			}
+			.save-list .save-row .difficulty-badge .dots span.on {
+				background: #52e0f5;
+			}
+			.save-list .save-row .difficulty-badge .num {
+				font: 400 11px "IBM Plex Mono", monospace;
+				color: #7d8794;
+				letter-spacing: 0.04em;
+			}
 		</style>
 	</head>
 	<body>
@@ -195,7 +231,10 @@ import SiteHead from "../../components/SiteHead.astro";
 			<section class="hero">
 				<span class="label">SAVED</span>
 				<h1>保存した問題</h1>
-				<p>この端末のブラウザ内(localStorage)にのみ保存されます。他の端末とは共有されません。</p>
+				<p>
+					この端末のブラウザ内(localStorage)にのみ保存されます。他の端末とは共有されません。
+					難易度バッジの基準は<a href="/about/#difficulty">こちら</a>。
+				</p>
 			</section>
 
 			<div id="save-list" class="save-list"></div>
@@ -226,6 +265,7 @@ import SiteHead from "../../components/SiteHead.astro";
 
 		<script>
 			import { isStorageAvailable, listSaved } from "../../lib/save-store";
+			import { createDifficultyBadgeElement } from "../../lib/difficulty";
 
 			async function render() {
 				const listEl = document.getElementById("save-list");
@@ -248,7 +288,8 @@ import SiteHead from "../../components/SiteHead.astro";
 				try {
 					const res = await fetch("/search-index.json");
 					if (!res.ok) throw new Error(String(res.status));
-					const index: { id: string; title: string; field: string; sub: string }[] = await res.json();
+					const index: { id: string; title: string; field: string; sub: string; difficulty: string }[] =
+						await res.json();
 					const byId = new Map(index.map((e) => [e.id, e]));
 					const entries = ids.map((id) => byId.get(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
 					if (entries.length === 0) {
@@ -268,7 +309,8 @@ import SiteHead from "../../components/SiteHead.astro";
 						const meta = document.createElement("span");
 						meta.className = "meta";
 						meta.textContent = [entry.field, entry.sub].filter(Boolean).join(" / ");
-						row.append(no, title, meta);
+						const badge = createDifficultyBadgeElement(entry.difficulty);
+						row.append(no, title, meta, badge);
 						listEl.appendChild(row);
 					}
 				} catch {
