@@ -29,10 +29,11 @@ make lint      # linter 一式
 make pdf       # 変更のあった問題の PDF を差分ビルド
 make html      # tex → HTML 変換（失敗時フォールバック確認込み）
 make build     # 上記すべて + サイトビルド
+make check     # CI と同じ devcontainer イメージで make build を実行し検証
 make preview   # ローカルプレビュー
 ```
 
-PR を出す前に `make build` がローカル（devcontainer 内）で通ることを必ず確認する。
+PR を出す前に `make check` が通ることを必ず確認する。
 「たぶん通る」での PR 提出は禁止。
 
 ## Definition of Done
