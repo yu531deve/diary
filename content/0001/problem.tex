@@ -1,23 +1,27 @@
-\diarytitle{0001}{放物線と直線で囲まれた面積}
+\diarytitle{0001}{実対称行列の直交対角化と二次形式・行列べき乗}
 
-座標平面上に放物線 $C: y = x^2$ と直線 $\ell: y = x + 2$ がある。
+実対称行列
+\[
+  A =
+  \begin{pmatrix}
+    2 & 1 & 1 \\
+    1 & 2 & 1 \\
+    1 & 1 & 2
+  \end{pmatrix}
+\]
+を考える。
 
 \begin{enumerate}
-  \item $C$ と $\ell$ の共有点の座標をすべて求めよ。
-  \item $C$ と $\ell$ で囲まれた図形の面積 $S$ を求めよ。
-\end{enumerate}
+  \item $A$ の固有値をすべて求めよ。また、各固有値に対応する固有空間の
+    正規直交基底を 1 組求めよ。
 
-\begin{center}
-\begin{tikzpicture}[domain=-2.5:2.5, scale=0.9]
-  \draw[->] (-2.5,0) -- (2.5,0) node[right] {$x$};
-  \draw[->] (0,-1) -- (0,5) node[above] {$y$};
-  \draw[thick] plot (\x, {\x*\x}) node[right] {$y=x^2$};
-  \draw[thick] plot (\x, {\x+2}) node[above right] {$y=x+2$};
-  \coordinate (P1) at (-1,1);
-  \coordinate (P2) at (2,4);
-  \fill[red] (P1) circle (2pt) node[left] {$(-1,1)$};
-  \fill[red] (P2) circle (2pt) node[above] {$(2,4)$};
-  \draw[dashed] (P1) -- ($(P1)+(0,-1)$);
-  \draw[dashed] (P2) -- ($(P2)+(0,-4)$);
-\end{tikzpicture}
-\end{center}
+  \item 前問の結果を用いて、直交行列 $P$ と対角行列 $D$ で
+    $P^{\top} A P = D$ を満たすものを 1 組構成せよ。
+
+  \item $\bm{x} \in \mathbb{R}^3$ が $\|\bm{x}\| = 1$ を満たしながら動くとき、
+    二次形式 $\bm{x}^{\top} A \bm{x}$ の最大値と最小値を求めよ。また、
+    それぞれの値を実現する $\bm{x}$ をすべて求めよ。
+
+  \item 正の整数 $n$ に対して、$A^n$ の $(1,1)$ 成分と $(1,2)$ 成分を
+    $n$ の式として求めよ。
+\end{enumerate}
