@@ -17,6 +17,7 @@
 //   ページ内に閉じた実装にしている（#67 と並行作業中のため）。
 //   ただし ⌘K 検索モーダル（#70）のみ共有コンポーネントとして差し込む。
 import { computeSiteStats } from "../../lib/site-data";
+import { DIFFICULTY_MAX, DIFFICULTY_LEVELS as difficultyLevels } from "../../lib/difficulty";
 import SearchModal from "../../components/SearchModal.astro";
 import BottomTabNav from "../../components/BottomTabNav.astro";
 import SiteHead from "../../components/SiteHead.astro";
@@ -24,14 +25,6 @@ import SiteHead from "../../components/SiteHead.astro";
 const stats = computeSiteStats();
 const problemsPadded = String(stats.problemCount).padStart(4, "0");
 const fieldsPadded = String(stats.fieldCount);
-
-const difficultyLevels = [
-	{ n: 1, label: "学部教養の定義・定理をそのまま当てはめれば解ける" },
-	{ n: 2, label: "学部教養〜専門科目の定石を 1〜2 個、素直に適用すれば解ける" },
-	{ n: 3, label: "標準的な院試の専門科目。複数の定石を自分で組み立てる必要がある" },
-	{ n: 4, label: "発展的・複数分野にまたがる内容。非自明な着眼が要る。上位層でも部分点どまり" },
-	{ n: 5, label: "最難関の院試レベル。複数の非自明な着眼が要る。捨て問判断も戦略のうち" },
-];
 
 const typoIssueHref =
 	"https://github.com/yu531deve/diary/issues/new?labels=typo&title=" +
@@ -430,14 +423,14 @@ const typoIssueHref =
 					</p>
 					<span class="tentative">※ 仮文面（Yu が加筆・修正予定）</span>
 				</div>
-				<div>
+				<div id="difficulty">
 					<h2 class="section-no">02 — 難易度の定義</h2>
 					<div class="diff-list">
 						{
 							difficultyLevels.map((d) => (
 								<div class="diff-row">
 									<span class="diff-dots">
-										{Array.from({ length: 5 }, (_, i) => (
+										{Array.from({ length: DIFFICULTY_MAX }, (_, i) => (
 											<span class:list={[{ on: i < d.n }]} />
 										))}
 									</span>

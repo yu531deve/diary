@@ -36,7 +36,9 @@ import {
   type RelatedProblem,
 } from "../../../lib/site-data";
 import { formatMathTitle } from "../../../lib/title";
+import { difficultyNum as toDifficultyNum } from "../../../lib/difficulty";
 import SiteHead from "../../../components/SiteHead.astro";
+import DifficultyBadge from "../../../components/DifficultyBadge.astro";
 
 export async function getStaticPaths() {
   const problems = listPublishedProblems();
@@ -92,11 +94,6 @@ const issueHref = `https://github.com/yu531deve/diary/issues/new?title=${encodeU
   `誤植報告: ${meta.id} ${displayTitle}`
 )}`;
 
-// docs/difficulty.md の 5 段階（数値のみが仕様。文言ラベルは定義されて
-// いないため、実データの数値をそのまま出す）。
-const difficultyNum = Number(meta.difficulty) || 0;
-const difficultyDots = Array.from({ length: 5 }, (_, i) => i < difficultyNum);
-
 // #71: Pagefind の全文検索対象は「地の文」のみで、数式は仕様外
 // （site/CLAUDE.md「検索対象への数式の追加」禁止）。LaTeXML の出力は
 // MathML（<math>...</math>、annotation として元の LaTeX ソースも
@@ -120,7 +117,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 // #122: og:description（および新設の meta description）。分野・難易度を
 // 含める（#106 子issue の元 issue 本文の指示）。displayTitle は既に
 // formatMathTitle 済みなので $ 等は出ない。
-const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} — ${meta.id} ${displayTitle}。理工系大学院入試の自作数学問題。`;
+const ogDescription = `${meta.field.major} / 難易度${toDifficultyNum(meta.difficulty) || "—"} — ${meta.id} ${displayTitle}。理工系大学院入試の自作数学問題。`;
 ---
 
 <html lang="ja">
@@ -230,26 +227,6 @@ const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} 
 				font: 500 34px "IBM Plex Mono", monospace;
 				color: #52e0f5;
 				letter-spacing: 0.02em;
-			}
-			.difficulty {
-				display: flex;
-				gap: 5px;
-				align-items: center;
-			}
-			.difficulty .dot {
-				width: 7px;
-				height: 7px;
-				border-radius: 50%;
-				background: #2a3340;
-			}
-			.difficulty .dot.on {
-				background: #52e0f5;
-			}
-			.difficulty .label {
-				font: 400 11px "IBM Plex Mono", monospace;
-				color: #768190;
-				margin-left: 8px;
-				letter-spacing: 0.1em;
 			}
 			.title-heading {
 				margin: 0;
@@ -753,10 +730,7 @@ const ogDescription = `${meta.field.major} / 難易度${difficultyNum || "—"} 
 				<div>
 					<div class="id-line">
 						<span class="problem-id" data-pagefind-meta={`id:${meta.id}`}>{meta.id}</span>
-						<span class="difficulty" data-pagefind-meta={`difficulty:${meta.difficulty}`}>
-							{difficultyDots.map((on) => <span class={`dot${on ? " on" : ""}`} />)}
-							<span class="label">難易度 {difficultyNum || "—"} / 5</span>
-						</span>
+						<DifficultyBadge difficulty={meta.difficulty} pagefindMeta linkToLegend />
 					</div>
 					<h1 class="title-heading" data-pagefind-meta="title">{displayTitle}</h1>
 				</div>

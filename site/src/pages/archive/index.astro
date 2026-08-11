@@ -21,6 +21,7 @@ import { formatMathTitle } from "../../lib/title";
 import SearchModal from "../../components/SearchModal.astro";
 import BottomTabNav from "../../components/BottomTabNav.astro";
 import SiteHead from "../../components/SiteHead.astro";
+import DifficultyBadge from "../../components/DifficultyBadge.astro";
 
 const stats = computeSiteStats();
 
@@ -35,11 +36,6 @@ const problems = [...listPublishedProblems()].sort((a, b) => {
 	}
 	return a.id < b.id ? 1 : -1;
 });
-
-function difficultyDots(difficulty: string): boolean[] {
-	const n = Math.max(0, Math.min(5, parseInt(difficulty, 10) || 0));
-	return Array.from({ length: 5 }, (_, i) => i < n);
-}
 
 function formatDate(d: string): string {
 	return d ? d.replaceAll("-", ".") : "日付未設定";
@@ -199,6 +195,13 @@ for (const p of problems) {
 				color: #dfe6ee;
 				font-weight: 500;
 			}
+			.hero-stats .difficulty-legend-link {
+				color: #768190;
+				text-decoration: none;
+			}
+			.hero-stats .difficulty-legend-link:hover {
+				color: #52e0f5;
+			}
 
 			/* 年・月区切りの時系列リスト */
 			.archive-list {
@@ -268,20 +271,6 @@ for (const p of problems) {
 				padding: 4px 10px;
 				white-space: nowrap;
 				flex-shrink: 0;
-			}
-			.problem-row .dots {
-				display: flex;
-				gap: 3px;
-				flex-shrink: 0;
-			}
-			.problem-row .dots span {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-				background: #2a3340;
-			}
-			.problem-row .dots span.on {
-				background: #52e0f5;
 			}
 			.problem-row .date {
 				font: 400 11px "IBM Plex Mono", monospace;
@@ -374,6 +363,7 @@ for (const p of problems) {
 				</div>
 				<div class="hero-stats">
 					<span>PROBLEMS <strong>{String(stats.problemCount).padStart(4, "0")}</strong></span>
+					<a href="/about/#difficulty" class="difficulty-legend-link">難易度基準 →</a>
 				</div>
 			</section>
 
@@ -402,11 +392,7 @@ for (const p of problems) {
 										<span class="pill">
 											{p.field.major} / {p.field.minor}
 										</span>
-										<span class="dots">
-											{difficultyDots(p.difficulty).map((on) => (
-												<span class:list={[{ on }]} />
-											))}
-										</span>
+										<DifficultyBadge difficulty={p.difficulty} compact />
 										<span class="date">{formatDate(p.created)}</span>
 									</a>
 								))}
