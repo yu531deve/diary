@@ -36,12 +36,17 @@ export interface Props {
 	 * ページでは "article" を渡す。既定は "website"（索引・トップ等）。
 	 * （#122） */
 	ogType?: "website" | "article";
+	/** og:image の絶対パス（例: `/problems/0001/og.png`）。省略時は
+	 * og:image を出力しない（#123。問題・解答ページのみ渡す想定で、
+	 * 画像を持たないページに汎用画像を仮で出すことはしない。SiteHead の
+	 * 元コメント参照）。Astro.site を基準に絶対 URL へ変換する。 */
+	ogImage?: string;
 }
 
 const DEFAULT_FONTS =
 	"https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap";
 
-const { title, description, noindex = false, fonts = DEFAULT_FONTS, ogType = "website" } = Astro.props;
+const { title, description, noindex = false, fonts = DEFAULT_FONTS, ogType = "website", ogImage } = Astro.props;
 
 if (!Astro.site) {
 	throw new Error(
@@ -62,6 +67,9 @@ const ogTitle = title;
 // og:description は description を流用する。description が無いページ
 // （og:description 用に新設する動機が無いページ）では出力しない。
 const ogDescription = description;
+// #123: og:image も canonical/og:url と同じ組み立て（Astro.site 基準の
+// 絶対 URL）にする。SNS のクローラは相対 URL を解釈できない実装がある。
+const ogImageURL = ogImage ? new URL(ogImage, Astro.site).href : null;
 ---
 
 <meta charset="utf-8" />
@@ -74,17 +82,22 @@ const ogDescription = description;
 <link rel="canonical" href={canonicalURL} />
 <link rel="stylesheet" href={fonts} />
 
-<!-- OGP / Twitter Card（#122）。og:image は #123（OG 画像生成）待ちのため
-     ここでは出力しない。プレースホルダ画像を仮で指すと、ロゴだけの
-     汎用画像がすべての問題ページで同じカードに出る状態になり、後で
-     #123 が入るまで「画像入りだが無意味な OGP」を晒し続けることになる。
-     og:image 抜きでも Slack/X 等は他のメタタグからテキストカードを
-     表示できるため、実害は小さいと判断した。 -->
+<!-- OGP / Twitter Card（#122）。og:image は問題ごとに生成した画像
+     （#123。/problems/{id}/og.png、site/src/pages/problems/[id]/og.png.ts）
+     を渡すページでのみ出力する。渡されないページ（索引・トップ等）では
+     従来どおり出力しない（ロゴだけの汎用画像を仮で指すと、後から見て
+     「なぜここだけ無意味な画像か」が分かりにくくなるため。元コメント参照）。
+     twitter:card は画像の有無で summary / summary_large_image を切り替える
+     （画像なしで summary_large_image を指定すると空白の大枠が出るクライアントがある）。 -->
 <meta property="og:site_name" content="Diary" />
 <meta property="og:type" content={ogType} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={ogTitle} />
 {ogDescription && <meta property="og:description" content={ogDescription} />}
-<meta name="twitter:card" content="summary" />
+{ogImageURL && <meta property="og:image" content={ogImageURL} />}
+{ogImageURL && <meta property="og:image:width" content="1200" />}
+{ogImageURL && <meta property="og:image:height" content="630" />}
+<meta name="twitter:card" content={ogImageURL ? "summary_large_image" : "summary"} />
 <meta name="twitter:title" content={ogTitle} />
 {ogDescription && <meta name="twitter:description" content={ogDescription} />}
+{ogImageURL && <meta name="twitter:image" content={ogImageURL} />}

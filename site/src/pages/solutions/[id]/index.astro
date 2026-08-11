@@ -148,6 +148,7 @@ const formatDate = (d: string) => (d ? d.replaceAll("-", ".") : "—");
 			title={`解答 | ${meta.id} ${displayTitle} | Diary`}
 			description={ogDescription}
 			ogType="article"
+			ogImage={`/problems/${meta.id}/og.png`}
 		/>
 		<style>
 			:root {
