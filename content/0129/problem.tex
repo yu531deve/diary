@@ -1,0 +1,33 @@
+\diarytitle{0129}{指数分布における最尤推定量の一致性・不偏性と漸近正規性}
+
+母数 $\lambda > 0$ をもつ指数分布（確率密度関数 $f(x; \lambda) = \lambda e^{-\lambda x}\ (x > 0)$）に
+従う母集団から得られた独立同一分布の標本を $X_1, X_2, \dots, X_n$ とし、標本平均を
+$\overline{X} = \dfrac{1}{n}\displaystyle\sum_{i=1}^{n} X_i$ とする。以下の問に答えよ。
+
+\begin{enumerate}
+\item 尤度関数 $L(\lambda) = \displaystyle\prod_{i=1}^{n} f(X_i; \lambda)$ の対数を微分することにより、
+$\lambda$ の最尤推定量 $\hat{\lambda}$ が
+\[
+\hat{\lambda} = \frac{1}{\overline{X}}
+\]
+で与えられることを示せ。
+
+\item $\hat{\lambda}$ の一致性および有限標本での不偏性について、以下を示せ。
+\begin{enumerate}
+\item 大数の法則と連続写像定理を用いて、$\hat{\lambda}$ が $\lambda$ に確率収束すること（一致性）を示せ。
+\item 標本和 $S_n = \displaystyle\sum_{i=1}^{n} X_i$ が母数 $(n, \lambda)$ のガンマ分布に従うことを用いて、
+$n \ge 2$ のとき
+\[
+E[\hat{\lambda}] = \frac{n}{n-1}\lambda
+\]
+となることを示せ。この結果から、$\hat{\lambda}$ が（$n$ が有限である限り）不偏推定量ではないこと、
+および $\hat{\lambda}$ をもとに $\lambda$ の不偏推定量を 1 つ構成できることを述べよ。
+\end{enumerate}
+
+\item 中心極限定理とデルタ法を用いて、$\hat{\lambda}$ の漸近分布が
+\[
+\sqrt{n}\,(\hat{\lambda} - \lambda) \xrightarrow{d} N(0, \lambda^{2})
+\]
+となることを示せ。さらにこの結果を用いて、$\lambda$ に対する近似的な信頼係数 $95\%$ の
+信頼区間を、標準正規分布の上側 $2.5\%$ 点 $z_{0.025} = 1.96$ を用いて表せ。
+\end{enumerate}
