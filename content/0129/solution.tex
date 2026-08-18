@@ -1,0 +1,98 @@
+\subsection*{(1) 最尤推定量の導出}
+
+対数尤度関数は
+\[
+\ell(\lambda) = \log L(\lambda) = \sum_{i=1}^{n} \log f(X_i; \lambda)
+= \sum_{i=1}^{n} \left(\log \lambda - \lambda X_i\right)
+= n \log \lambda - \lambda \sum_{i=1}^{n} X_i .
+\]
+$\lambda$ について微分すると
+\[
+\frac{d\ell}{d\lambda} = \frac{n}{\lambda} - \sum_{i=1}^{n} X_i .
+\]
+これを $0$ とおくと $\dfrac{n}{\lambda} = \displaystyle\sum_{i=1}^{n} X_i$ より
+\[
+\hat{\lambda} = \frac{n}{\displaystyle\sum_{i=1}^{n} X_i} = \frac{1}{\overline{X}} .
+\]
+また $\dfrac{d^{2}\ell}{d\lambda^{2}} = -\dfrac{n}{\lambda^{2}} < 0$ であるから、この停留点は
+$\ell(\lambda)$ の（大域）最大点であり、$\hat{\lambda} = 1/\overline{X}$ は最尤推定量である。
+
+\subsection*{(2)(a) 一致性}
+
+$X_i$ は指数分布 $\mathrm{Exp}(\lambda)$ に従うので $E[X_i] = 1/\lambda$、$\operatorname{Var}(X_i) = 1/\lambda^{2}$
+であり、いずれも有限である。よって大数の法則（弱法則）より
+\[
+\overline{X} \xrightarrow{p} \frac{1}{\lambda} \qquad (n \to \infty).
+\]
+関数 $g(x) = 1/x$ は $x = 1/\lambda \ (\ne 0)$ で連続であるから、連続写像定理により
+\[
+\hat{\lambda} = g(\overline{X}) \xrightarrow{p} g\!\left(\frac{1}{\lambda}\right) = \lambda \qquad (n \to \infty)
+\]
+が成り立つ。すなわち $\hat{\lambda}$ は $\lambda$ の一致推定量である。
+
+\subsection*{(2)(b) 有限標本でのバイアス}
+
+指数分布 $\mathrm{Exp}(\lambda)$ に従う独立な確率変数 $X_1, \dots, X_n$ の和 $S_n = \sum_{i=1}^{n} X_i$ は、
+母数 $(n, \lambda)$ のガンマ分布 $\mathrm{Gamma}(n, \lambda)$ に従う。すなわち $S_n$ の確率密度関数は
+\[
+f_{S_n}(s) = \frac{\lambda^{n}}{(n-1)!}\, s^{n-1} e^{-\lambda s} \qquad (s > 0).
+\]
+$\hat{\lambda} = n/S_n$ であるから、$n \ge 2$ のとき
+\[
+E[\hat{\lambda}] = n\, E\!\left[\frac{1}{S_n}\right]
+= n \int_{0}^{\infty} \frac{1}{s} \cdot \frac{\lambda^{n}}{(n-1)!}\, s^{n-1} e^{-\lambda s} \, ds
+= \frac{n\lambda^{n}}{(n-1)!} \int_{0}^{\infty} s^{n-2} e^{-\lambda s} \, ds .
+\]
+ここで $\displaystyle\int_{0}^{\infty} s^{n-2} e^{-\lambda s}\, ds = \frac{(n-2)!}{\lambda^{n-1}}$
+（ガンマ関数 $\Gamma(n-1) = (n-2)!$ の定義積分、$n \ge 2$ で収束）であるから、
+\[
+E[\hat{\lambda}] = \frac{n\lambda^{n}}{(n-1)!} \cdot \frac{(n-2)!}{\lambda^{n-1}}
+= \frac{n\lambda}{n-1} .
+\]
+（$n = 1$ のときは $E[1/S_1] = E[1/X_1] = \int_0^\infty x^{-1}\lambda e^{-\lambda x}\,dx$ が発散し、
+$E[\hat{\lambda}]$ 自体が定義できない。）
+
+これより、任意の有限の $n \ge 2$ に対して
+\[
+E[\hat{\lambda}] - \lambda = \frac{\lambda}{n-1} > 0
+\]
+となり $\hat{\lambda}$ は $\lambda$ を正の方向にバイアスさせる（不偏推定量ではない）。ただし
+バイアス $\lambda/(n-1) \to 0\ (n \to \infty)$ であるから、(a) で示した一致性と矛盾しない
+（漸近的不偏性は成り立つ）。
+
+この結果から、
+\[
+\tilde{\lambda} = \frac{n-1}{n}\hat{\lambda} = \frac{n-1}{S_n}
+\]
+とおけば $E[\tilde{\lambda}] = \dfrac{n-1}{n} \cdot \dfrac{n\lambda}{n-1} = \lambda$ となり、$\tilde{\lambda}$ は
+$\lambda$ の不偏推定量である。
+
+\subsection*{(3) 漸近正規性とデルタ法}
+
+$\operatorname{Var}(X_i) = 1/\lambda^{2}$ は有限であるから、中心極限定理より
+\[
+\sqrt{n}\left(\overline{X} - \frac{1}{\lambda}\right) \xrightarrow{d} N\!\left(0, \frac{1}{\lambda^{2}}\right).
+\]
+$g(x) = 1/x$ は $x = 1/\lambda$ の近傍で微分可能であり、
+\[
+g'(x) = -\frac{1}{x^{2}}, \qquad g'\!\left(\frac{1}{\lambda}\right) = -\lambda^{2} \ne 0 .
+\]
+よってデルタ法より
+\[
+\sqrt{n}\left(g(\overline{X}) - g\!\left(\frac{1}{\lambda}\right)\right)
+= \sqrt{n}\,(\hat{\lambda} - \lambda)
+\xrightarrow{d} N\!\left(0,\ \left(g'\!\left(\frac{1}{\lambda}\right)\right)^{2} \cdot \frac{1}{\lambda^{2}}\right)
+= N\!\left(0,\ \lambda^{4} \cdot \frac{1}{\lambda^{2}}\right)
+= N(0, \lambda^{2}).
+\]
+
+漸近分散 $\lambda^{2}$ の $\lambda$ を、一致推定量である $\hat{\lambda}$ で置き換えても
+（スラツキーの定理により）同じ極限分布が得られるから、近似的に
+\[
+\hat{\lambda} \ \dot\sim\ N\!\left(\lambda,\ \frac{\hat{\lambda}^{2}}{n}\right)
+\]
+とみなせる。したがって、$\lambda$ に対する近似的な信頼係数 $95\%$ の信頼区間は
+\[
+\left[\ \hat{\lambda} - 1.96\, \frac{\hat{\lambda}}{\sqrt{n}},\quad \hat{\lambda} + 1.96\, \frac{\hat{\lambda}}{\sqrt{n}}\ \right]
+\]
+で与えられる。
